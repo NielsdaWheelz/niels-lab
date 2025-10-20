@@ -4,7 +4,7 @@ from sqlmodel import SQLModel, Field
 
 class PostBase(SQLModel):
   title: str
-  slug: str = Field(index=True)
+  slug: str = Field(index=True, unique=True)
   content: str
 
 class Post(PostBase, table=True):
