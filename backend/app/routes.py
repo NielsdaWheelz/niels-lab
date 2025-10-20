@@ -13,6 +13,16 @@ def list_posts(session: Session = Depends(get_session)):
   statement = select(Post).order_by(Post.created_at.desc())
   return session.exec(statement).all()
 
+@router.get("/posts/{slug}")
+def get_post(slug: str, session: Session = Depends(get_session)):
+  statement = select(Post).where(Post.slug == slug)
+
+  post = session.exec(statement).first()
+
+  if not post:
+    raise HTTPException(status_code=404, detail="Post not found")
+  
+  return post
 
 @router.post("/posts", status_code=201)
 def create_post(data: PostBase, session: Session = Depends(get_session)):
