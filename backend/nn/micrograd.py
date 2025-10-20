@@ -21,6 +21,12 @@ class Value:
     out = Value(self.data * other.data, (self, other), '*')
     return out
 
+  def tanh(self):
+    n = self.data
+    t = (math.exp(2 * n) - 1)/(math.exp(2 * n) + 1)
+    out = Value(t, (self, ), 'tanh')
+    return out
+
 a = Value(2.0, label = 'a')
 b = Value(-3.0, label = 'b')
 c = Value(10.0, label = 'c')
@@ -28,7 +34,7 @@ e = a * b; e.label = 'e'
 d = e + c; d.label = 'd'
 f = Value(-2.0, label = 'f')
 L = d * f; L.label = 'L'
-print(L)
+# print(L)
 
 # derivatives
 L.grad = 1.0
@@ -58,3 +64,28 @@ def lol():
   print((L2 - L1)/h)
 
 lol()
+
+# COMPLEX VERSION
+x1 = Value(2.0, label = 'x1')
+x2 = Value(0.0, label = 'x2')
+
+w1 = Value(-3.0, label = 'w1')
+w2 = Value(1.0, label = 'w2')
+
+b = Value(6.8813735870, label = 'b')
+
+x1w1 = x1 * w1; x1w1.label = 'x1*w1'
+x2w2 = x2 * w2; x2w2.label = 'x2*w2'
+
+x1w1x2w2 = x1w1 + x2w2; x1w1x2w2.label = 'x1*w1 + x2*w2'
+n = x1w1x2w2 + b; n.label = 'n'
+o = n.tanh(); o.label = 'o'
+
+x1.grad = w1.data * x1w1.grad # -1.5
+w1.grad = x1.data * x1w1.grad # 1
+x2.grad = w2.data * x2w2.grad # 0.5
+w2.grad = x2.data * x2w2.grad # 0
+x1w1x2w2.grad = 0.5
+b.grad = 0.5
+o.grad = 1.0
+n.grad = 0.5
