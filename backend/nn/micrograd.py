@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 class Value:
   def __init__(self, data, _children=(), _op='', label=''):
     self.data = data
+    self.grad = 0.0
     self._prev = set(_children)
     self._op = _op
     self.label = label
@@ -20,8 +21,40 @@ class Value:
     out = Value(self.data * other.data, (self, other), '*')
     return out
 
-a = Value(2.0, label='a')
-b = Value(-3.0, label='b')
+a = Value(2.0, label = 'a')
+b = Value(-3.0, label = 'b')
+c = Value(10.0, label = 'c')
+e = a * b; e.label = 'e'
+d = e + c; d.label = 'd'
+f = Value(-2.0, label = 'f')
+L = d * f; L.label = 'L'
+print(L)
 
-c = a + b
-print(c)
+# derivatives
+L.grad = 1.0
+f.grad = 4.0
+d.grad = -2.0
+
+def lol(): 
+  h = 0.0001
+
+  a = Value(2.0, label = 'a')
+  b = Value(-3.0, label = 'b')
+  c = Value(10.0, label = 'c')
+  e = a * b; e.label = 'e'
+  d = e + c; d.label = 'd'
+  f = Value(-2.0, label = 'f')
+  L = d * f; L.label = 'L'
+  L1 = L.data
+  
+  a = Value(2.0 + h, label = 'a')
+  b = Value(-3.0, label = 'b')
+  c = Value(10.0, label = 'c')
+  e = a * b; e.label = 'e'
+  d = e + c; d.label = 'd'
+  f = Value(-2.0, label = 'f')
+  L = d * f; L.label = 'L'
+  L2 = L.data
+  print((L2 - L1)/h)
+
+lol()
