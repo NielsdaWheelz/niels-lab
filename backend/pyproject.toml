@@ -12,6 +12,7 @@ dependencies = [
     "psycopg[binary]>=3.2.11",
     "pydantic-settings>=2.11.0",
     "python-dotenv>=1.1.1",
+    "rich>=14.2.0",
     "sqlmodel>=0.0.27",
     "torch>=2.9.0",
     "uvicorn[standard]>=0.38.0",
