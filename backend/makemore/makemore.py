@@ -1,5 +1,6 @@
 from rich import print
 import torch
+import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from pathlib import Path
 # open('names.txt') in backend/makemore/makemore.py:1 looks in whatever directory you launch the script from. 
@@ -30,13 +31,13 @@ for n in names:
 
 # print(int_to_string)
 
-plt.figure(figsize=(16,16))
-plt.imshow(N, cmap="Blues")
-for i in range(27):
-  for j in range(27):
-    char_string = int_to_string[i] + int_to_string[j]
-    plt.text(j, i, char_string, ha="center", va="bottom", color="gray")
-    plt.text(j, i, N[i,j].item(), ha="center", va="top", color="gray")
+# plt.figure(figsize=(16,16))
+# plt.imshow(N, cmap="Blues")
+# for i in range(27):
+#   for j in range(27):
+#     char_string = int_to_string[i] + int_to_string[j]
+#     plt.text(j, i, char_string, ha="center", va="bottom", color="gray")
+#     plt.text(j, i, N[i,j].item(), ha="center", va="top", color="gray")
 # plt.axis("off")
 # plt.show()
 
@@ -47,7 +48,7 @@ for i in range(27):
 p = N[0].float() # turn the row into a float tensor
 p = p / p.sum()
 
-
+# randomly initialize 27 neurons' weights. each neuron receives 27 inputs and produces 1 output
 g = torch.Generator().manual_seed(2147483647) # seed the generator so i match karpathy
 # p = torch.rand(3, generator=g) # generate 3 random numbers from the probability distribution
 # p = p / p.sum()
@@ -60,9 +61,9 @@ letter = int_to_string[multinomial.item()]
 # print(letter)
 
 # probabilities; basically our parameters
-P = N.float()
+P = (N+1).float()
 P /= P.sum(1, keepdim=True) # divide each row by the sum of the row to get a probability distribution
-print(P)
+# print(P)
 
 for i in range(10):
   out = []
@@ -90,6 +91,74 @@ for n in names[:3]:
     log_p = torch.log(p)
     log_likelihood += log_p
     n += 1
+avg_log_likelihood = -log_likelihood/n
     # print(char1, char2, p.item(), log_p.item())
-print(f'{-log_likelihood/n=}')
 # -log_likelihood/n is the average log probability of the characters in the name
+# print(f'{-log_likelihood/n=}')
+
+# NEURAL NETWORK
+# create training set of bigrams: (input{x}, output{y})
+xs, ys = [], []
+for n in names[:1]:
+  chars = ['.'] + list(n) + ['.']
+  # zip returns tuples
+  # but if one array is shorter, zip will stop at the end of the shorter array
+  for char1, char2 in zip(chars, chars[1:]):
+    integer_1 = string_to_int[char1]
+    integer_2 = string_to_int[char2]
+    xs.append(integer_1)
+    ys.append(integer_2)
+
+# now create tensors out of these lists
+xs = torch.tensor(xs)
+ys = torch.tensor(ys)
+
+# initialize weights
+# randomly initialize 27 neurons' weights. each neuron receives 27 inputs and produces 1 output
+g = torch.Generator().manual_seed(2147483647) # seed the generator so i match karpathy
+W = torch.randn((27, 27), generator=g)
+# each column in W is one neuron that votes for a particular next character
+
+# FORWARD PASS
+# one-hot encoding for alphabet (binary encoding)
+x_encoded = F.one_hot(xs, num_classes=27).float()
+
+# plt.figure(figsize=(16,16))
+# plt.imshow(x_encoded, cmap="Blues")
+# plt.show()
+
+# muiltiply weights by inputs to get predictions/outputs
+# matrix multiplication: (27, 27) @ (27, 27) = (27, 27); where '@' is matrix multiplication in pytorch
+logits = x_encoded @ W
+# Because x is one-hot, x @ W literally selects the row of W corresponding to the input letter
+
+# output is a tensor of shape (27, 27); the first dimension is the number of characters, the second dimension is the number of neurons
+# effectively this is the 27 activations for each neuron
+# (x_encoded @ W)[3, 13] = x_encoded[3] * W[:, 13] is the firing rate of the 13th neuron for the 3rd input
+
+# predict log-counts
+counts = logits.exp() # equivalent to the 'N' from before
+probabilities = counts / counts.sum(1, keepdims=True) # probabilities for each character, given the previous character
+# probability distribution for the next character
+# these last two lines are equivalent to the 'P' from before, AKA 'softmax'
+# Softmax: takes logits and converts them to probabilities; the probabilities are normalized to sum to 1
+
+# For every training example (every (prev → next) pair), we have a 27-length probability vector that says how likely each next character is according to our current weights
+
+# for each of our bigrams, we have a row of probabilities, normalized to sum to 1
+# print(p[0].sum(), p.shape)
+
+# nlls = torch.zeros(5)
+# for i in range(5):
+#   x = xs[i].item()
+#   y = ys[i].item()
+#   p = probabilities[x, y]
+#   logp = torch.log(p)
+#   nll = -logp
+#   nlls[i] = nll
+# print
+
+# done forward pass
+# now backward pass
+# calc loss: but not mse (because that's for regression), but negative log likelihood (because that's for classification)
+print(xs, ys)
