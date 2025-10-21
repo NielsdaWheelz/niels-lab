@@ -32,6 +32,7 @@ build/
 *.egg-info/
 .venv/
 backend/.venv/
+backend/local.db
 
 # Node / Next.js
 node_modules/
