@@ -40,4 +40,38 @@ for i in range(27):
 # plt.axis("off")
 # plt.show()
 
-print(N[0])
+# print(N[0])
+
+# probability of a given first character
+# turn the row into a probability distribution by dividing by the sum of the row
+p = N[0].float() # turn the row into a float tensor
+p = p / p.sum()
+
+
+g = torch.Generator().manual_seed(2147483647) # seed the generator so i match karpathy
+# p = torch.rand(3, generator=g) # generate 3 random numbers from the probability distribution
+# p = p / p.sum()
+
+# use the multinomial to draw samples from it
+multinomial = torch.multinomial(p, num_samples=1, replacement=True, generator=g)
+# letters = [int_to_string[i.item()] for i in multinomial]
+# print(''.join(letters))
+letter = int_to_string[multinomial.item()]
+# print(letter)
+
+P = N.float()
+P /= P.sum(1, keepdim=True) # divide each row by the sum of the row to get a probability distribution
+print(P)
+
+for i in range(10):
+  out = []
+  index = 0
+  while True:
+    p = P[index]
+    # p = N[index].float() # turn the row into a float tensor
+    # p = p / p.sum() # turn the row into a probability distribution
+    index = torch.multinomial(p, num_samples=1, replacement=True, generator=g).item() # draw a sample from the probability distribution
+    out.append(int_to_string[index])
+    if index == 0: # if the sample is 0, we have reached the end of the name
+      break
+  print(''.join(out))
