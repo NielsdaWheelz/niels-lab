@@ -14,7 +14,7 @@ integer_to_string = {integer:string for string, integer in string_to_integer.ite
 xs, ys = [], []
 for name in names:
   characters = ['.'] + list(name) + ['.']
-  for character_1, character_2 in zip(characters, characters[1]):
+  for character_1, character_2 in zip(characters, characters[1:]):
     index_1 = string_to_integer[character_1]
     index_2 = string_to_integer[character_2]
     xs.append(index_1)
@@ -30,9 +30,10 @@ for k in range(100):
   # forward pass
   x_encoded = F.one_hot(xs, num_classes = 27).float() # one-hot encode the inputs
   logits = x_encoded @ weights # predict log-counts
-  counts = logits.exp() # counts; equivalent to 'N'
-  probabilities = counts / counts.sum(1, keepdims = True) # probabilities for next character, given the previous character
-  loss = -probabilities[torch.arange(number_of_examples), ys].log().mean() + 0.01 * (weights**2).mean() # negative log likelihood loss
+  # counts = logits.exp() # counts; equivalent to 'N'
+  # probabilities = counts / counts.sum(1, keepdim = True) # probabilities for next character, given the previous character
+  probabilities = F.softmax(logits, dim=1) # probabilities for next character, given the previous character
+  loss = -probabilities[torch.arange(number_of_examples), ys].log().mean() + 0.0001 * (weights**2).mean() # negative log likelihood loss
   # L2 regularization: add a small penalty to the loss to prevent overfitting - tries to keep the weights small, closer to 0
   print(f"step {k}: loss {loss.item()}")
 
@@ -42,3 +43,21 @@ for k in range(100):
 
   # update the weights
   weights.data += -0.1 * weights.grad # gradient descent
+
+# sample from the model
+for i in range(10):
+  out = []
+  index = 0
+
+  while True:
+    x_encoded = F.one_hot(torch.tensor([index]), num_classes = 27).float()
+    logits = x_encoded @ weights
+    # counts = logits.exp()
+    # probabilities = counts / counts.sum(1, keepdim = True)
+    probabilities = F.softmax(logits, dim=1) 
+
+    index = torch.multinomial(probabilities, num_samples = 1, replacement = True, generator = generator).item()
+    out.append(integer_to_string[index])
+    if index == 0:
+      break
+  print(''.join(out))
