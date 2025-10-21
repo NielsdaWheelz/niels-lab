@@ -59,6 +59,7 @@ multinomial = torch.multinomial(p, num_samples=1, replacement=True, generator=g)
 letter = int_to_string[multinomial.item()]
 # print(letter)
 
+# probabilities; basically our parameters
 P = N.float()
 P /= P.sum(1, keepdim=True) # divide each row by the sum of the row to get a probability distribution
 print(P)
@@ -74,4 +75,21 @@ for i in range(10):
     out.append(int_to_string[index])
     if index == 0: # if the sample is 0, we have reached the end of the name
       break
-  print(''.join(out))
+  # print(''.join(out))
+
+for n in names[:3]:
+  chars = ['.'] + list(n) + ['.']
+  # zip returns tuples
+  # but if one array is shorter, zip will stop at the end of the shorter array
+  log_likelihood = 0.0
+  n = 0
+  for char1, char2 in zip(chars, chars[1:]):
+    integer_1 = string_to_int[char1]
+    integer_2 = string_to_int[char2]
+    p = P[integer_1, integer_2]
+    log_p = torch.log(p)
+    log_likelihood += log_p
+    n += 1
+    # print(char1, char2, p.item(), log_p.item())
+print(f'{-log_likelihood/n=}')
+# -log_likelihood/n is the average log probability of the characters in the name
