@@ -116,7 +116,7 @@ ys = torch.tensor(ys)
 # initialize weights
 # randomly initialize 27 neurons' weights. each neuron receives 27 inputs and produces 1 output
 g = torch.Generator().manual_seed(2147483647) # seed the generator so i match karpathy
-W = torch.randn((27, 27), generator=g)
+weights = torch.randn((27, 27), generator=g, requires_grad=True)
 # each column in W is one neuron that votes for a particular next character
 
 # FORWARD PASS
@@ -129,7 +129,7 @@ x_encoded = F.one_hot(xs, num_classes=27).float()
 
 # muiltiply weights by inputs to get predictions/outputs
 # matrix multiplication: (27, 27) @ (27, 27) = (27, 27); where '@' is matrix multiplication in pytorch
-logits = x_encoded @ W
+logits = x_encoded @ weights
 # Because x is one-hot, x @ W literally selects the row of W corresponding to the input letter
 
 # output is a tensor of shape (27, 27); the first dimension is the number of characters, the second dimension is the number of neurons
@@ -158,7 +158,18 @@ probabilities = counts / counts.sum(1, keepdims=True) # probabilities for each c
 #   nlls[i] = nll
 # print
 
-# done forward pass
-# now backward pass
 # calc loss: but not mse (because that's for regression), but negative log likelihood (because that's for classification)
-print(xs, ys)
+# probabilities[torch.arange(5), ys] is the probability of the correct next character for each of the 5 training examples
+# .log() is the log of the probability
+# .mean() is the mean of the log probabilities
+loss = -probabilities[torch.arange(5), ys].log().mean()
+# done forward pass
+
+# now backward pass
+# we want to get the gradient of the loss with respect to the weights
+# we use the chain rule to do this
+weights.grad = None # reset the gradients to 0
+loss.backward()
+print(weights.grad)
+# now we have the gradient of the loss with respect to the weights
+weights.data += -0.1 * weights.grad
