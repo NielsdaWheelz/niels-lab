@@ -1,44 +1,33 @@
 from logging.config import fileConfig
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
-from alembic import context
 from pathlib import Path
 import sys
+
+from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
 
-# add project root to sys.path so package imports resolve the same as the app
+from alembic import context
+
+# Ensure project root is importable so `app` modules resolve.
 ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from app.config import settings  # noqa: E402
-from app import models  # noqa: F401,E402 ensures tables register
-
+from app import models  # noqa: F401,E402 - import registers SQLModel tables
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
 # Interpret the config file for Python logging.
-# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
+# The metadata the autogeneration engine should examine.
 target_metadata = SQLModel.metadata
 
-# pull the DATABASE_URL from application settings so Alembic points at the same DB
+# Point Alembic at the same database URL as the application.
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
 
 
 def run_migrations_offline() -> None:
@@ -59,6 +48,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        compare_type=True,
+        compare_server_default=True,
     )
 
     with context.begin_transaction():
@@ -80,7 +71,10 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_type=True,
+            compare_server_default=True,
         )
 
         with context.begin_transaction():
