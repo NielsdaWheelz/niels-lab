@@ -55,6 +55,7 @@ n = MLP(3, [4, 4, 1])
 o = n(x)
 # print(o.data)
 
+# training data
 xs = [
   [2.0, 3.0, -1.0], # desired output: 1.0, according to the desired outputs list
   [3.0, -1.0, 0.5], # desired output: -1.0
@@ -62,20 +63,29 @@ xs = [
   [1.0, 1.0, -1.0], # desired output: 1.0
 ] # input data
 ys = [1.0, -1.0, -1.0, 1.0] # desired outputs
-ypred = [n(x) for x in xs] # predicted outputs
-# print(ypred)
 
-# loss function: MSE
-loss = sum(((yp - yt)**2 for yt, yp in zip(ys, ypred)), Value(0.0))
-print("first loss", loss)
+# let's do many steps at once
+for k in range(20):
+  # this is the forward pass
+  ypred = [n(x) for x in xs] # predicted outputs
+  # print(ypred)
+  # loss function: MSE
+  loss = sum(((yp - yt)**2 for yt, yp in zip(ys, ypred)), Value(0.0))
 
-loss.backward()
-# print(n.layers[0].neurons[0].w[0].grad)
+  # now backward pass
+  # first we have to reset the gradients
+  # because the gradients are accumulated (not just set), we need to reset them to 0 before each backward pass
+  for p in n.parameters():
+    p.grad = 0.0
+  loss.backward()
+  # print(n.layers[0].neurons[0].w[0].grad)
 
-for p in n.parameters():
-  # gradient is pointing downhill, so we need to move in the opposite direction to MINIMIZE the loss
-  p.data += -0.01 * p.grad
+  # now the update, the gradient descent
+  for p in n.parameters():
+    # gradient is pointing downhill, so we need to move in the opposite direction to MINIMIZE the loss
+    p.data += -0.05 * p.grad
+  print(f"step {k}: loss", loss)
 
-ypred = [n(x) for x in xs]
-loss = sum(((yp - yt)**2 for yt, yp in zip(ys, ypred)), Value(0.0))
-print("second loss", loss)
+# ypred = [n(x) for x in xs]
+# loss = sum(((yp - yt)**2 for yt, yp in zip(ys, ypred)), Value(0.0))
+# print("second loss", loss)
