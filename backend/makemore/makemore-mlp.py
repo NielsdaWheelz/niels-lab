@@ -40,8 +40,12 @@ for p in parameters:
   p.requires_grad = True
 
 for k in range(10):
+  # create mini-batches
+  index = torch.randint(0, X.shape[0], (32,)) # index is a tensor of shape (32,), where the first dimension is the number of examples, the second dimension is the index of the example
+  Xb = X[index] # Xb is a tensor of shape (32, 3), where the first dimension is the number of examples, the second dimension is the index of the example
+  Yb = Y[index] # Yb is a tensor of shape (32,), where the first dimension is the number of examples, the second dimension is the index of the example
   # forward pass
-  embeddings = C[X] # embeddings for the input context. X(X number of examples)x3(3 characters in context)x2(2 embedding dimensions)
+  embeddings = C[Xb] # embeddings for the input context. Xb(32, 3)x2(2 embedding dimensions)
   # .view(-1, 6) is to reshape the embeddings tensor to a 2D tensor, 
   # where the first dimension is inferred from the shape of the other dimensions (-1), 
   # 6 is the number of neurons in the first layer
@@ -52,7 +56,7 @@ for k in range(10):
   # probabilities = F.softmax(logits, dim=1)
   # probabilities is a tensor of shape (32, 27), where the first dimension is the number of examples, the second dimension is the number of characters
   # loss = -probabilities[torch.arange(32), Y].log().mean()
-  loss = F.cross_entropy(logits, Y) # another way to calculate the loss
+  loss = F.cross_entropy(logits, Yb) # another way to calculate the loss
 
   # reset the gradients to 0
   for p in parameters:
@@ -60,7 +64,7 @@ for k in range(10):
 
   # backward pass
   loss.backward()
-  
+
   # update the weights
   for p in parameters:
     p.data += -0.1 * p.grad
