@@ -53,10 +53,19 @@ for k in range(10000):
   Xb = X[index] # Xb is a tensor of shape (32, 3), where the first dimension is the number of examples, the second dimension is the index of the example
   Yb = Y[index] # Yb is a tensor of shape (32,), where the first dimension is the number of examples, the second dimension is the index of the example
   # forward pass
+  # C is an embedding matrix — a lookup table that turns character indices into small vectors of numbers.
+  # If you have 27 possible characters (., a–z), and each embedding is 2 numbers long, then C has shape (27, 2).
+  # So C[i] gives you a 2-number “meaningful representation” for character i.
+  # Xb is a matrix of shape (32, 3) — 32 rows (examples), 3 columns (previous characters).
+  # Now each of the 32 examples has 3 characters × 2 features each.
   embeddings = C[Xb] # embeddings for the input context. Xb(32, 3)x2(2 embedding dimensions)
-  # .view(-1, 6) is to reshape the embeddings tensor to a 2D tensor, 
-  # where the first dimension is inferred from the shape of the other dimensions (-1), 
-  # 6 is the number of neurons in the first layer
+
+  # Current shape of embeddings: (32, 3, 2). We're flattening the last two dimensions into one long vector per example.
+  # Each example has 3 characters × 2 numbers = 6 numbers total. Flattened shape: (32, 6)
+  # .view(-1, 6) reshapes the embeddings tensor to a 2D tensor, where the first dimension is inferred from the shape of the other dimensions (-1), and 6 is the number of neurons in the first layer
+  # W1 is a weight matrix of size (6, 100). Each of the 100 “neurons” in the hidden layer looks at all 6 inputs and forms a weighted sum.
+  # b1 is a bias vector of size (100,) — one bias per neuron.
+  # So before activation, each of the 32 examples becomes a 100-element vector of “neuron inputs”.
   hidden_layer_activations = torch.tanh(embeddings.view(-1, 6) @ W1 + b1)
   logits = hidden_layer_activations @ W2 + b2
   # counts = logits.exp()
