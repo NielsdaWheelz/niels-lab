@@ -3,6 +3,7 @@ import torch
 import torch.nn.functional as F
 from pathlib import Path
 import random
+import matplotlib.pyplot as plt
 
 names_path = Path(__file__).with_name("names.txt")
 names = names_path.read_text().splitlines()
@@ -37,9 +38,9 @@ Xdev, Ydev = build_dataset(names[n1:n2])
 Xte, Yte = build_dataset(names[n2:])
 
 C = torch.randn((27, 2), generator = generator)
-W1 = torch.randn((6, 100), generator = generator)
-b1 = torch.randn((100), generator = generator)
-W2 = torch.randn((100, 27), generator = generator)
+W1 = torch.randn((6, 300), generator = generator)
+b1 = torch.randn((300), generator = generator)
+W2 = torch.randn((300, 27), generator = generator)
 b2 = torch.randn(27, generator = generator)
 parameters = [C, W1, b1, W2, b2]
 
@@ -50,7 +51,13 @@ print(f"Number of parameters: {n_params}")
 for p in parameters:
   p.requires_grad = True
 
-for k in range(10000):
+learning_rate_exponent = torch.linspace(-3, 0, 1000) # 1000 steps, from 0.001 to 1
+learning_rates = 10**learning_rate_exponent
+learning_rates_used = [] # used learning rates
+losses = [] # losses for each step
+steps = [] # steps
+
+for k in range(50000):
   # construct a mini-batch
   index = torch.randint(0, Xtr.shape[0], (32,)) # (32,) a tensor of 32 random integers between 0 and the number of examples in the training set
 
@@ -68,10 +75,23 @@ for k in range(10000):
   loss.backward()
 
   # update the weights
-  learning_rate = 0.01
+  learning_rate = 0.1
   for p in parameters:
     p.data += -learning_rate * p.grad
+  
+  # learning_rates_used.append(learning_rate_exponent[k])
+  losses.append(loss.item())
+  steps.append(k)
 print("training loss", loss.item())
+
+# plt.plot(steps, losses)
+# plt.show()
+plt.figure(figsize=(8, 8))
+plt.scatter(C[:,0].data, C[:,1].data, s=200)
+for i in range(C.shape[0]):
+  plt.text(C[i,0].item(), C[i,1].item(), itos[i], ha="center", va="center", color="black")
+plt.grid('minor')
+plt.show()
 
 # dev set evaluation
 embeddings = C[Xdev] # (32, 3, 2)
