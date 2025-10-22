@@ -37,10 +37,10 @@ Xtr, Ytr = build_dataset(names[:n1])
 Xdev, Ydev = build_dataset(names[n1:n2])
 Xte, Yte = build_dataset(names[n2:])
 
-C = torch.randn((27, 2), generator = generator)
-W1 = torch.randn((6, 300), generator = generator)
-b1 = torch.randn((300), generator = generator)
-W2 = torch.randn((300, 27), generator = generator)
+C = torch.randn((27, 10), generator = generator)
+W1 = torch.randn((30, 200), generator = generator)
+b1 = torch.randn((200), generator = generator)
+W2 = torch.randn((200, 27), generator = generator)
 b2 = torch.randn(27, generator = generator)
 parameters = [C, W1, b1, W2, b2]
 
@@ -57,7 +57,7 @@ learning_rates_used = [] # used learning rates
 losses = [] # losses for each step
 steps = [] # steps
 
-for k in range(50000):
+for k in range(200000):
   # construct a mini-batch
   index = torch.randint(0, Xtr.shape[0], (32,)) # (32,) a tensor of 32 random integers between 0 and the number of examples in the training set
 
@@ -65,7 +65,7 @@ for k in range(50000):
   Xb = Xtr[index] # (32, 3) selects a tensor of 32 examples, each with a context of 3 characters
   Yb = Ytr[index] # (32,) selects a tensor of 32 labels, each corresponding to the correct next character
   embeddings = C[Xb] # (32, 3, 2) embeds the context of 3 characters into a 2-dimensional vector
-  hidden_layer_activations = torch.tanh(embeddings.view(-1, 6) @ W1 + b1) # (32, 100) applies the weights and biases to the embeddings to get the hidden layer activations
+  hidden_layer_activations = torch.tanh(embeddings.view(-1, 30) @ W1 + b1) # (32, 100) applies the weights and biases to the embeddings to get the hidden layer activations
   logits = hidden_layer_activations @ W2 + b2 # (32, 27)
   loss = F.cross_entropy(logits, Yb)
 
@@ -75,16 +75,16 @@ for k in range(50000):
   loss.backward()
 
   # update the weights
-  learning_rate = 0.1
+  learning_rate = 0.1 if k < 100000 else 0.01
   for p in parameters:
     p.data += -learning_rate * p.grad
   
   # learning_rates_used.append(learning_rate_exponent[k])
-  losses.append(loss.item())
+  losses.append(loss.log10().item())
   steps.append(k)
 print("training loss", loss.item())
 
-# plt.plot(steps, losses)
+plt.plot(steps, losses)
 # plt.show()
 plt.figure(figsize=(8, 8))
 plt.scatter(C[:,0].data, C[:,1].data, s=200)
@@ -95,14 +95,21 @@ plt.show()
 
 # dev set evaluation
 embeddings = C[Xdev] # (32, 3, 2)
-h = torch.tanh(embeddings.view(-1, 6) @ W1 + b1) # (32, 100)
+h = torch.tanh(embeddings.view(-1, 30) @ W1 + b1) # (32, 100)
 logits = h @ W2 + b2 # (32, 27)
 loss = F.cross_entropy(logits, Ydev) # (32,)
 print("dev set evaluation", loss.item())
 
 # test set evaluation
 embeddings = C[Xte] # (32, 3, 2)
-h = torch.tanh(embeddings.view(-1, 6) @ W1 + b1) # (32, 100)
+h = torch.tanh(embeddings.view(-1, 30) @ W1 + b1) # (32, 100)
 logits = h @ W2 + b2 # (32, 27)
 loss = F.cross_entropy(logits, Yte) # (32,)
 print("test set evaluation", loss.item())
+
+# KNOBS 
+# number of neurons in each hidden layer
+# dimensionality of the embeddings in the lookup table
+# number of characters in the context
+# optimization details: how many steps, learning rate, change in learning rate
+# batch size
