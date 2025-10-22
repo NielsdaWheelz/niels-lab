@@ -42,7 +42,7 @@ for k in range(100):
   loss.backward()
 
   # update the weights
-  weights.data += -0.1 * weights.grad # gradient descent
+  weights.data += -40 * weights.grad # gradient descent
 
 # sample from the model
 for i in range(10):
