@@ -44,8 +44,8 @@ n_hidden = 200 # the number of neurons in the hidden layer o fhte mlp
 C = torch.randn((n_characters, n_embeddings), generator = generator)
 W1 = torch.randn((n_embeddings * block_size, n_hidden), generator = generator)
 b1 = torch.randn((n_hidden), generator = generator)
-W2 = torch.randn((n_hidden, n_characters), generator = generator)
-b2 = torch.randn(n_characters, generator = generator)
+W2 = torch.randn((n_hidden, n_characters), generator = generator) * 0.01
+b2 = torch.randn(n_characters, generator = generator) * 0
 parameters = [C, W1, b1, W2, b2]
 for p in parameters:
   p.requires_grad = True
@@ -76,7 +76,7 @@ for i in range(max_steps):
   for p in parameters:
     p.data += -learning_rate * p.grad
   
-  if i % 1000 == 0:
+  if i % 10000 == 0:
     print(f'{i:7d}/{max_steps:7d} loss {loss.item():.4f}')
   losses.append(loss.log10().item())
 
@@ -110,17 +110,17 @@ split_loss('test')
 # sample
 g = torch.Generator().manual_seed(2147483647 + 10)
 
-for _ in range(20):
-  out = []
-  context = [0] * block_size
-  while True:
-    emb = C[torch.tensor([context])] # usually we're working with the size of the training set, but here we're working with a single example, so '1' is the batch size (1, block_size, embedding_dim)
-    h = torch.tanh(emb.view(1, -1) @ W1 + b1)
-    logits = h @ W2 + b2
-    probs = F.softmax(logits, dim=1)
-    i = torch.multinomial(probs, num_samples = 1, generator = g).item()
-    context = context[1:] + [i]
-    out.append(i)
-    if i == 0:
-      break
-  print(''.join(itos[i] for i in out))
+# for _ in range(20):
+#   out = []
+#   context = [0] * block_size
+#   while True:
+#     emb = C[torch.tensor([context])] # usually we're working with the size of the training set, but here we're working with a single example, so '1' is the batch size (1, block_size, embedding_dim)
+#     h = torch.tanh(emb.view(1, -1) @ W1 + b1)
+#     logits = h @ W2 + b2
+#     probs = F.softmax(logits, dim=1)
+#     i = torch.multinomial(probs, num_samples = 1, generator = g).item()
+#     context = context[1:] + [i]
+#     out.append(i)
+#     if i == 0:
+#       break
+#   print(''.join(itos[i] for i in out))
