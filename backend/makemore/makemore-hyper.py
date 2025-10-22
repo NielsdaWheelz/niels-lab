@@ -15,8 +15,9 @@ itos = {i:s for s,i in stoi.items()}
 
 generator = torch.Generator().manual_seed(2147483647)
 
+block_size = 3
+
 def build_dataset(names):
-  block_size = 3
   X, Y = [], []
   for name in names:
     context = [0] * block_size
@@ -84,14 +85,13 @@ for k in range(200000):
   steps.append(k)
 print("training loss", loss.item())
 
-plt.plot(steps, losses)
+# plt.plot(steps, losses)
+# plt.figure(figsize=(8, 8))
+# plt.scatter(C[:,0].data, C[:,1].data, s=200)
+# for i in range(C.shape[0]):
+#   plt.text(C[i,0].item(), C[i,1].item(), itos[i], ha="center", va="center", color="black")
+# plt.grid('minor')
 # plt.show()
-plt.figure(figsize=(8, 8))
-plt.scatter(C[:,0].data, C[:,1].data, s=200)
-for i in range(C.shape[0]):
-  plt.text(C[i,0].item(), C[i,1].item(), itos[i], ha="center", va="center", color="black")
-plt.grid('minor')
-plt.show()
 
 # dev set evaluation
 embeddings = C[Xdev] # (32, 3, 2)
@@ -113,3 +113,21 @@ print("test set evaluation", loss.item())
 # number of characters in the context
 # optimization details: how many steps, learning rate, change in learning rate
 # batch size
+
+# sample
+g = torch.Generator().manual_seed(2147483647 + 10)
+
+for _ in range(20):
+  out = []
+  context = [0] * block_size
+  while True:
+    emb = C[torch.tensor([context])] # usually we're working with the size of the training set, but here we're working with a single example, so '1' is the batch size (1, block_size, embedding_dim)
+    h = torch.tanh(emb.view(1, -1) @ W1 + b1)
+    logits = h @ W2 + b2
+    probs = F.softmax(logits, dim=1)
+    i = torch.multinomial(probs, num_samples = 1, generator = g).item()
+    context = context[1:] + [i]
+    out.append(i)
+    if i == 0:
+      break
+  print(''.join(itos[i] for i in out))
