@@ -15,7 +15,7 @@ generator = torch.Generator().manual_seed(2147483647)
 block_size = 3 # context length, number of characters to look at to predict the next character
 X, Y = [], [] # inputs and labels
 
-for name in names[:5]:
+for name in names:
   context = [0] * block_size # start with a context of all 0s
   for char in name + '.': # iterate over the characters in the name. padding with '.' to the end
     index = stoi[char] # get the index of the character
@@ -36,16 +36,32 @@ W2 = torch.randn((100, 27), generator = generator) # 100 is the number of neuron
 b2 = torch.randn(27, generator = generator) # bias for the second layer
 parameters = [C, W1, b1, W2, b2]
 
-embeddings = C[X] # embeddings for the input context. X(X number of examples)x3(3 characters in context)x2(2 embedding dimensions)
-# .view(-1, 6) is to reshape the embeddings tensor to a 2D tensor, 
-# where the first dimension is inferred from the shape of the other dimensions (-1), 
-# 6 is the number of neurons in the first layer
-hidden_layer_activations = torch.tanh(embeddings.view(-1, 6) @ W1 + b1)
-logits = hidden_layer_activations @ W2 + b2
-# counts = logits.exp()
-# probabilities = counts / counts.sum(1, keepdim = True)
-probabilities = F.softmax(logits, dim=1)
-# probabilities is a tensor of shape (32, 27), where the first dimension is the number of examples, the second dimension is the number of characters
-loss = -probabilities[torch.arange(32), Y].log().mean()
+for p in parameters:
+  p.requires_grad = True
 
-print(probabilities)
+for k in range(10):
+  # forward pass
+  embeddings = C[X] # embeddings for the input context. X(X number of examples)x3(3 characters in context)x2(2 embedding dimensions)
+  # .view(-1, 6) is to reshape the embeddings tensor to a 2D tensor, 
+  # where the first dimension is inferred from the shape of the other dimensions (-1), 
+  # 6 is the number of neurons in the first layer
+  hidden_layer_activations = torch.tanh(embeddings.view(-1, 6) @ W1 + b1)
+  logits = hidden_layer_activations @ W2 + b2
+  # counts = logits.exp()
+  # probabilities = counts / counts.sum(1, keepdim = True)
+  # probabilities = F.softmax(logits, dim=1)
+  # probabilities is a tensor of shape (32, 27), where the first dimension is the number of examples, the second dimension is the number of characters
+  # loss = -probabilities[torch.arange(32), Y].log().mean()
+  loss = F.cross_entropy(logits, Y) # another way to calculate the loss
+
+  # reset the gradients to 0
+  for p in parameters:
+    p.grad = None
+
+  # backward pass
+  loss.backward()
+  
+  # update the weights
+  for p in parameters:
+    p.data += -0.1 * p.grad
+  print(f"step {k}: loss {loss.item()}")
