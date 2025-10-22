@@ -2,6 +2,8 @@ from rich import print
 import torch
 import torch.nn.functional as F
 from pathlib import Path
+import matplotlib.pyplot as plt
+
 names_path = Path(__file__).with_name("names.txt")
 names = names_path.read_text().splitlines()
 
@@ -39,8 +41,14 @@ parameters = [C, W1, b1, W2, b2]
 for p in parameters:
   p.requires_grad = True
 
-for k in range(10):
+# learning_rate_exponent = torch.linspace(-3, 0, 1000) # 1000 steps, from 0.001 to 1
+# learning_rates = 10**learning_rate_exponent
+
+# learning_rates_used = []
+# losses = []
+for k in range(10000):
   # create mini-batches
+  # more less-accurate steps is more efficient than less and more accurate steps, because it's faster to compute the gradient and update the weights
   index = torch.randint(0, X.shape[0], (32,)) # index is a tensor of shape (32,), where the first dimension is the number of examples, the second dimension is the index of the example
   Xb = X[index] # Xb is a tensor of shape (32, 3), where the first dimension is the number of examples, the second dimension is the index of the example
   Yb = Y[index] # Yb is a tensor of shape (32,), where the first dimension is the number of examples, the second dimension is the index of the example
@@ -66,6 +74,16 @@ for k in range(10):
   loss.backward()
 
   # update the weights
+  # learning_rate = learning_rates[k]
+  learning_rate = 0.1
+  # decay this learning rate over time
+  # learning_rate = learning_rate / (1 + k / 1000)
   for p in parameters:
-    p.data += -0.1 * p.grad
-  print(f"step {k}: loss {loss.item()}")
+    p.data += -learning_rate * p.grad
+  # learning_rates_used.append(learning_rate_exponent[k])
+  # losses.append(loss.item())
+  # print(f"step {k}: loss {loss.item()}")
+print(loss.item())
+
+# plt.plot(learning_rates_used, losses)
+# plt.show()
