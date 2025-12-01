@@ -5,6 +5,10 @@ import Footer from '@/app/components/footer'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { baseUrl } from '@/app/sitemap'
+import { TerminalWrapper } from '@/app/components/Terminal/TerminalWrapper'
+import { getBlogPosts } from '@/app/blog/utils'
+import { getProjects } from '@/app/projects/utils'
+import { getBraindumps } from '@/app/braindumps/utils'
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -39,14 +43,22 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Build terminal data (server-side)
+  const terminalData = {
+    blogPosts: getBlogPosts(),
+    projects: getProjects(),
+    braindumps: getBraindumps(),
+  }
+
   return (
     <html lang="en">
       <body>
         <Navbar />
-        <main>
+        <main style={{ paddingBottom: '160px' }}>
           {children}
         </main>
         <Footer />
+        <TerminalWrapper data={terminalData} />
         <Analytics />
         <SpeedInsights />
       </body>

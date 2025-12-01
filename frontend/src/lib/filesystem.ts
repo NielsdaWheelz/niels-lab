@@ -26,11 +26,11 @@ export type FileSystem = {
 export function normalizePath(path: string, cwd: string = '/'): string {
   // handle relative paths
   const fullPath = path.startsWith('/') ? path : `${cwd}/${path}`
-  
+
   // split and filter empty segments
   const parts = fullPath.split('/').filter(Boolean)
   const resolved: string[] = []
-  
+
   for (const part of parts) {
     if (part === '.') continue
     if (part === '..') {
@@ -39,7 +39,7 @@ export function normalizePath(path: string, cwd: string = '/'): string {
       resolved.push(part)
     }
   }
-  
+
   return '/' + resolved.join('/')
 }
 
@@ -110,58 +110,58 @@ export function buildFileSystem(
   function findNode(path: string): FSNode | null {
     const normalized = normalizePath(path, '/')
     if (normalized === '/') return root
-    
+
     const parts = normalized.split('/').filter(Boolean)
     let current: FSNode = root
-    
+
     for (const part of parts) {
       if (current.type !== 'directory' || !current.children) return null
       const child = current.children.find(c => c.name === part)
       if (!child) return null
       current = child
     }
-    
+
     return current
   }
 
   return {
     root,
-    
+
     resolve(path: string, cwd: string): FSNode | null {
       const normalized = normalizePath(path, cwd)
       return findNode(normalized)
     },
-    
+
     list(path: string, cwd: string): FSNode[] | null {
       const node = this.resolve(path, cwd)
       if (!node || node.type !== 'directory') return null
       return node.children || []
     },
-    
+
     read(path: string, cwd: string): string | null {
       const node = this.resolve(path, cwd)
       if (!node || node.type !== 'file') return null
       return node.content || ''
     },
-    
+
     isDirectory(path: string, cwd: string): boolean {
       const node = this.resolve(path, cwd)
       return node?.type === 'directory'
     },
-    
+
     exists(path: string, cwd: string): boolean {
       return this.resolve(path, cwd) !== null
     },
-    
+
     completePath(partial: string, cwd: string): string[] {
       const normalized = normalizePath(partial, cwd)
       const parts = normalized.split('/')
       const lastPart = parts.pop() || ''
       const parentPath = parts.join('/') || '/'
-      
+
       const parent = findNode(parentPath)
       if (!parent || parent.type !== 'directory' || !parent.children) return []
-      
+
       return parent.children
         .filter(c => c.name.startsWith(lastPart))
         .map(c => c.name + (c.type === 'directory' ? '/' : ''))
