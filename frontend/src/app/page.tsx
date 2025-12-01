@@ -1,25 +1,17 @@
-import { api } from "@/lib/api"
-import type { Post } from "@/types/types"
+import { BlogPosts } from '@/app/components/posts'
 
-const HomePage = async () => {
-  const posts = await api<Post[]>("/api/posts");
-
+export default function Page() {
   return (
-    <main className="mx-auto max-w-2xl p-8 space-y-6">
-    <h1 className="text-3xl font-bold">Fractal Lab</h1>
-    <ul className="space-y-4">
-      {posts.map((p) => (
-        <li key={p.id} className="border p-4 rounded-lg">
-          <a
-            href={`/posts/${p.slug}`}
-            className="text-lg font-medium underline"
-          >
-            {p.title}
-          </a>
-        </li>
-      ))}
-    </ul>
-  </main>
+    <section>
+      <h1 className="mb-8 text-2xl font-semibold tracking-tighter">
+        Niels
+      </h1>
+      <p className="mb-4">
+        {`I'm just a guy. I like old-ass movies and older books. I play an unhealthy amount of soccer ever since my doctor forbade me from playing an unhealthy amount of hockey. I'm currently attending Fractal Bootcamp.`}
+      </p>
+      <div className="my-8">
+        <BlogPosts />
+      </div>
+    </section>
   )
 }
-export default HomePage
