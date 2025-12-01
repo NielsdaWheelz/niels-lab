@@ -18,6 +18,7 @@ html {
 body {
   min-height: 100vh;
   padding: 1.5rem;
+  padding-bottom: 70px; /* space for collapsed mobile terminal */
   max-width: 720px;
   margin: 0 auto;
 }
@@ -26,6 +27,7 @@ body {
 @media (min-width: 640px) {
   body {
     padding: 2rem;
+    padding-bottom: 160px; /* space for desktop terminal */
   }
 }
 
@@ -299,13 +301,3 @@ footer a:hover {
   animation-delay: 0.4s;
 }
 
-/* main content padding for terminal */
-main {
-  padding-bottom: 160px;
-}
-
-@media (max-width: 639px) {
-  main {
-    padding-bottom: 60px; /* smaller terminal on mobile */
-  }
-}
