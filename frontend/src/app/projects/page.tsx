@@ -1,16 +1,16 @@
 import { ProjectsList } from '@/app/components/projects'
+import { PageTitle } from '@/app/components/PageTitle'
 
 export const metadata = {
-  title: 'Projects',
-  description: 'Things I\'ve built.',
+  title: 'projects',
+  description: 'things i\'ve built',
 }
 
 export default function Page() {
   return (
     <section>
-      <h1 className="font-semibold text-2xl mb-8 tracking-tighter">Projects</h1>
+      <PageTitle>projects</PageTitle>
       <ProjectsList />
     </section>
   )
 }
-

@@ -5,7 +5,7 @@ export function BlogPosts() {
   const allBlogs = getBlogPosts()
 
   return (
-    <div>
+    <ul style={{ listStyle: 'none', padding: 0 }}>
       {allBlogs
         .sort((a, b) => {
           if (
@@ -15,23 +15,17 @@ export function BlogPosts() {
           }
           return 1
         })
+        .slice(0, 5) // only show recent 5
         .map((post) => (
-          <Link
-            key={post.slug}
-            className="flex flex-col space-y-1 mb-4"
-            href={`/blog/${post.slug}`}
-          >
-            <div className="w-full flex flex-col md:flex-row space-x-0 md:space-x-2">
-              <p className="text-neutral-600 dark:text-neutral-400 w-[100px] tabular-nums">
-                {formatDate(post.metadata.publishedAt, false)}
-              </p>
-              <p className="text-neutral-900 dark:text-neutral-100 tracking-tight">
-                {post.metadata.title}
-              </p>
-            </div>
-          </Link>
+          <li key={post.slug} style={{ marginBottom: '0.5rem' }}>
+            <Link href={`/blog/${post.slug}`}>
+              <span style={{ color: '#666', marginRight: '1rem', fontVariantNumeric: 'tabular-nums' }}>
+                {formatDate(post.metadata.publishedAt)}
+              </span>
+              {post.metadata.title}
+            </Link>
+          </li>
         ))}
-    </div>
+    </ul>
   )
 }
-

@@ -1,16 +1,16 @@
 import { BraindumpsList } from '@/app/components/braindumps'
+import { PageTitle } from '@/app/components/PageTitle'
 
 export const metadata = {
-  title: 'Braindumps',
-  description: 'Daily logs and unstructured thoughts.',
+  title: 'braindumps',
+  description: 'daily logs and unstructured thoughts',
 }
 
 export default function Page() {
   return (
     <section>
-      <h1 className="font-semibold text-2xl mb-8 tracking-tighter">Braindumps</h1>
+      <PageTitle>braindumps</PageTitle>
       <BraindumpsList />
     </section>
   )
 }
-

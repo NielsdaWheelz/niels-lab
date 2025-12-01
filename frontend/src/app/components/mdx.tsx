@@ -45,7 +45,7 @@ function CustomLink(props: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
 }
 
 function RoundedImage({ className, ...props }: React.ComponentProps<typeof Image>) {
-  return <Image className={`rounded-lg ${className ?? ''}`} {...props} />
+  return <Image className={className} {...props} />
 }
 
 function Code({ children, ...props }: { children: string }) {
@@ -70,19 +70,11 @@ function createHeading(level: number) {
     return React.createElement(
       `h${level}`,
       { id: slug },
-      [
-        React.createElement('a', {
-          href: `#${slug}`,
-          key: `link-${slug}`,
-          className: 'anchor',
-        }),
-      ],
       children
     )
   }
 
   Heading.displayName = `Heading${level}`
-
   return Heading
 }
 
@@ -107,4 +99,3 @@ export function CustomMDX(props: MDXRemoteProps) {
     />
   )
 }
-

@@ -1,150 +1,243 @@
-@import 'tailwindcss';
+/* brutalist portfolio - white on black, system fonts, raw */
 
-::selection {
-  background-color: #47a3f3;
-  color: #fefefe;
-}
-
-:root {
-  --sh-class: #2d5e9d;
-  --sh-identifier: #354150;
-  --sh-sign: #8996a3;
-  --sh-string: #007f7a;
-  --sh-keyword: #e02518;
-  --sh-comment: #a19595;
-  --sh-jsxliterals: #6266d1;
-  --sh-property: #e25a1c;
-  --sh-entity: #e25a1c;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --sh-class: #4c97f8;
-    --sh-identifier: white;
-    --sh-keyword: #f47067;
-    --sh-string: #0fa295;
-  }
-  html {
-    color-scheme: dark;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
-  min-width: 360px;
+  background: #000;
+  color: #e0e0e0;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
-.prose .anchor {
-  @apply absolute invisible no-underline;
-
-  margin-left: -1em;
-  padding-right: 0.5em;
-  width: 80%;
-  max-width: 700px;
-  cursor: pointer;
+body {
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
-.anchor:hover {
-  @apply visible;
+/* links - underlined, no color change */
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-.prose a {
-  @apply underline transition-all decoration-neutral-400 dark:decoration-neutral-600 underline-offset-2 decoration-[0.1em];
+a:hover {
+  color: #fff;
 }
 
-.prose .anchor:after {
-  @apply text-neutral-300 dark:text-neutral-700;
-  content: '#';
+/* headings - no special treatment, just bold */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  font-size: inherit;
+  margin: 1.5em 0 0.5em 0;
 }
 
-.prose *:hover > .anchor {
-  @apply visible;
+h1 {
+  font-size: 1.25rem;
 }
 
-.prose pre {
-  @apply bg-neutral-50 dark:bg-neutral-900 rounded-lg overflow-x-auto border border-neutral-200 dark:border-neutral-900 py-2 px-3 text-sm;
+h2 {
+  font-size: 1.1rem;
 }
 
-.prose code {
-  @apply px-1 py-0.5 rounded-lg;
+/* paragraphs */
+p {
+  margin: 1em 0;
 }
 
-.prose pre code {
-  @apply p-0;
-  border: initial;
-  line-height: 1.5;
+/* lists - minimal */
+ul, ol {
+  margin: 1em 0;
+  padding-left: 1.5em;
 }
 
-.prose code span {
-  @apply font-medium;
+li {
+  margin: 0.25em 0;
 }
 
-.prose img {
-  /* Don't apply styles to next/image */
-  @apply m-0;
-}
-
-.prose p {
-  @apply my-4 text-neutral-800 dark:text-neutral-200;
-}
-
-.prose h1 {
-  @apply text-4xl font-medium tracking-tight mt-6 mb-2;
-}
-
-.prose h2 {
-  @apply text-xl font-medium tracking-tight mt-6 mb-2;
-}
-
-.prose h3 {
-  @apply text-xl font-medium tracking-tight mt-6 mb-2;
-}
-
-.prose h4 {
-  @apply text-lg font-medium tracking-tight mt-6 mb-2;
-}
-
-.prose strong {
-  @apply font-medium;
-}
-
-.prose ul {
-  @apply list-disc pl-6;
-}
-
-.prose ol {
-  @apply list-decimal pl-6;
-}
-
-.prose > :first-child {
-  /* Override removing top margin, causing layout shift */
-  margin-top: 1.25em !important;
-  margin-bottom: 1.25em !important;
-}
-
-pre::-webkit-scrollbar {
-  display: none;
-}
-
+/* code blocks - slightly lighter bg with syntax highlighting */
 pre {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-/* Remove Safari input shadow on mobile */
-input[type='text'],
-input[type='email'] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
-
-table {
-  display: block;
-  max-width: fit-content;
+  background: #0a0a0a;
+  padding: 1rem;
   overflow-x: auto;
-  white-space: nowrap;
+  margin: 1em 0;
+  border: 1px solid #222;
 }
 
-.title {
-  text-wrap: balance;
+code {
+  font-family: inherit;
+  font-size: 0.9em;
+}
+
+/* inline code */
+p code, li code {
+  background: #1a1a1a;
+  padding: 0.1em 0.3em;
+}
+
+/* syntax highlighting - sugar-high colors */
+.sh__line {
+  display: block;
+}
+
+/* sugar-high token colors */
+code .sh__token--identifier { color: #e0e0e0; }
+code .sh__token--keyword { color: #f472b6; }
+code .sh__token--string { color: #a5f3fc; }
+code .sh__token--number { color: #fcd34d; }
+code .sh__token--comment { color: #6b7280; font-style: italic; }
+code .sh__token--punctuation { color: #9ca3af; }
+code .sh__token--operator { color: #f472b6; }
+code .sh__token--property { color: #93c5fd; }
+code .sh__token--function { color: #c4b5fd; }
+code .sh__token--class { color: #fcd34d; }
+code .sh__token--sign { color: #9ca3af; }
+code .sh__token--jsxliterals { color: #a5f3fc; }
+code .sh__token--entity { color: #f472b6; }
+
+/* fallback inline styles for sugar-high (it uses inline styles) */
+code span[style*="color"] {
+  /* let sugar-high colors through */
+}
+
+/* blockquotes */
+blockquote {
+  border-left: 2px solid #333;
+  padding-left: 1em;
+  margin: 1em 0;
+  color: #999;
+}
+
+/* tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+th, td {
+  border: 1px solid #333;
+  padding: 0.5em;
+  text-align: left;
+}
+
+th {
+  background: #111;
+}
+
+/* selection */
+::selection {
+  background: #444;
+  color: #fff;
+}
+
+/* horizontal rule */
+hr {
+  border: none;
+  border-top: 1px solid #333;
+  margin: 2em 0;
+}
+
+/* images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* strong/bold */
+strong, b {
+  color: #fff;
+}
+
+/* emphasis */
+em, i {
+  font-style: italic;
+}
+
+/* nav */
+nav {
+  margin-bottom: 3rem;
+}
+
+nav a {
+  margin-right: 1.5rem;
+  text-decoration: none;
+  color: #888;
+}
+
+nav a:hover {
+  color: #fff;
+}
+
+/* footer */
+footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid #222;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+footer a {
+  color: #888;
+}
+
+footer a:hover {
+  color: #fff;
+}
+
+/* prose styles for MDX content */
+.prose {
+  max-width: none;
+}
+
+.prose > *:first-child {
+  margin-top: 0;
+}
+
+/* text reveal animation */
+@keyframes cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.1em;
+  background: #e0e0e0;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  animation: cursor-blink 1s infinite;
+}
+
+.cursor--hidden {
+  opacity: 0;
+}
+
+/* loading dots */
+@keyframes loading-dot {
+  0%, 20% { opacity: 0.2; }
+  40% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+.loading-dot {
+  animation: loading-dot 1.4s infinite;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
 }
