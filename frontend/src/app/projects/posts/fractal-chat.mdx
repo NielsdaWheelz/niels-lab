@@ -1,0 +1,64 @@
+---
+title: 'Fractal Chat'
+publishedAt: '2025-10-05'
+summary: 'Real-time chat application with document processing and billing'
+repoUrl: 'https://github.com/NielsdaWheelz/fractal-chat'
+---
+
+A real-time chat application built during Fractal Bootcamp. Full-stack with document processing, Stripe billing integration, and server-side rendering.
+
+## features
+
+- Real-time messaging with WebSockets
+- Document/PDF processing and upload
+- Stripe subscription billing (Pro tier)
+- Server-side rendering with React Router
+- User authentication and profiles
+- Drizzle ORM for database
+
+## stack
+
+- React Router (SSR)
+- TypeScript
+- TailwindCSS
+- Drizzle ORM
+- Stripe API
+- Vite for bundling
+
+---
+
+## README
+
+```markdown
+# Fractal Chat
+
+Real-time chat with document processing and billing.
+
+## Getting Started
+
+npm install
+npm run dev
+
+→ http://localhost:5173
+
+## Stripe Configuration
+
+Required environment variables:
+- STRIPE_SECRET_KEY
+- STRIPE_PRICE_ID (recurring price for Pro subscription)
+- STRIPE_WEBHOOK_SECRET
+
+Configure webhook to POST to /api/stripe-webhook
+
+## Building for Production
+
+npm run build
+
+## Docker Deployment
+
+docker build -t fractal-chat .
+docker run -p 3000:3000 fractal-chat
+
+Deployable to: AWS ECS, Google Cloud Run, Azure Container Apps, 
+Fly.io, Railway, etc.
+```

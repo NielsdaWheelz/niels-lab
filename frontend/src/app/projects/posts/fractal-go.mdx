@@ -1,0 +1,59 @@
+---
+title: 'Fractal Go'
+publishedAt: '2025-09-27'
+summary: 'Real-time multiplayer Go board game'
+repoUrl: 'https://github.com/NielsdaWheelz/fractal-go'
+---
+
+My first real project at Fractal Bootcamp - a multiplayer Go board game with real-time sync.
+
+## what i built
+
+A full-stack Go game where two players can connect and play against each other with the board syncing in real-time via WebSockets.
+
+## the hard parts
+
+* **learning the rules** - I didn't know how to play Go when I started. The rules are deceptively simple but the implementation is not.
+* **capture logic** - detecting when stones are captured requires flood-fill algorithms to find connected groups and check for liberties.
+* **ko rule** - preventing infinite loops by disallowing moves that recreate the previous board state.
+* **territory scoring** - counting surrounded empty spaces at the end of the game.
+
+## what i learned
+
+The biggest lesson: don't try to hold the whole thing in your head. Break it down step by step. Figure out the next piece of data you need, get it, repeat.
+
+## stack
+
+- React + TypeScript + Vite
+- WebSockets for real-time multiplayer
+- Drizzle ORM
+- TailwindCSS
+
+---
+
+## README
+
+```markdown
+# Fractal Go
+
+Real-time multiplayer Go board game.
+
+## Getting Started
+
+npm install
+npm run dev
+
+→ http://localhost:5173
+
+## Features
+
+- Real-time multiplayer via WebSockets
+- Full Go rule implementation (captures, ko, scoring)
+- Responsive board
+
+## Stack
+
+- React + TypeScript + Vite
+- Drizzle ORM
+- WebSockets
+```

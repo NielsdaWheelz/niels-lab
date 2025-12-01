@@ -1,0 +1,104 @@
+---
+title: 'Factory Simulator'
+publishedAt: '2025-10-25'
+summary: 'Multi-agent LLM orchestration with deterministic factory scheduling simulation'
+repoUrl: 'https://github.com/NielsdaWheelz/factory-simulator'
+---
+
+Multi-agent LLM orchestration paired with deterministic factory scheduling simulation. Built for SupplyCo.
+
+## what it does
+
+**Input**: Free-form factory description + today's situation/priorities (text)
+
+**Output**: JSON response containing:
+- Parsed factory config (machines, jobs, routing)
+- 1–3 scenario variations (baseline, rush order, machine slowdown)
+- Performance metrics per scenario (makespan, lateness, bottlenecks, utilization)
+- Operational briefing (markdown summary with risks and recommendations)
+- Optional debug payload (10-stage pipeline execution trace)
+
+## use case
+
+Factory planners need to answer: "What will go wrong today? Which jobs are at risk? What can I do about it?" This system simulates alternative futures and explains risks in operational language, without manual what-if analysis.
+
+## architecture
+
+### two integrated pipelines
+
+**Onboarding Pipeline (O0–O4)**: Factory description → FactoryConfig
+- O0: Explicit ID extraction (regex)
+- O1: Coarse structure enumeration (LLM)
+- O2: Fine extraction - jobs → steps (LLM)
+- O3: Validate & normalize
+- O4: Coverage assessment
+
+**Decision Pipeline (D1–D5)**: Factory + situation → metrics + briefing
+- D1: Intent classification (LLM)
+- D2: Futures expansion (LLM)
+- D3: Simulation (deterministic EDD scheduler)
+- D4: Metrics computation
+- D5: Briefing generation (LLM)
+
+## core design principles
+
+1. **LLM at the edges, deterministic core** – Agents interpret input and generate output; simulation/metrics/scheduling are pure computation
+2. **Strict validation, no hallucination** – All LLM outputs validated against Pydantic schemas
+3. **100% coverage enforced** – Onboarding ensures all mentioned IDs appear in final factory; otherwise falls back to toy factory
+4. **Full reproducibility** – Same input → deterministic output, no randomness
+
+## stack
+
+- Python 3.10+, FastAPI, Pydantic
+- OpenAI API (JSON mode)
+- React 18+, TypeScript, Vite
+- ~9,000 LOC of tests across 24 test files
+
+---
+
+## README
+
+```markdown
+# Factory Day Simulator
+
+Multi-agent LLM orchestration paired with deterministic factory 
+scheduling simulation.
+
+## Quick Start
+
+# Python dependencies
+pip install -U openai pydantic pytest fastapi uvicorn
+
+# Frontend
+cd frontend && npm install
+
+# Environment
+export OPENAI_API_KEY="sk-..."
+
+## Running
+
+# API server
+uvicorn backend.server:app --reload
+# → http://localhost:8000
+
+# Frontend
+cd frontend && npm run dev
+# → http://localhost:5173
+
+# CLI
+python -m backend.main "we have a rush order for J2"
+
+## Testing
+
+python -m pytest -v
+
+## API
+
+POST /api/simulate
+{
+  "factory_description": "3 machines (M1, M2, M3), 3 jobs",
+  "situation_text": "rush order for J2 today"
+}
+
+Returns: factory, specs, metrics, briefing, meta, debug
+```

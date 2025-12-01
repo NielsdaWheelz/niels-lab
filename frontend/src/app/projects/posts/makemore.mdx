@@ -1,0 +1,82 @@
+---
+title: 'Makemore'
+publishedAt: '2025-11-18'
+summary: 'Character-level language models following Karpathy''s Zero to Hero'
+repoUrl: 'https://github.com/NielsdaWheelz/makemore'
+---
+
+Learning project following [Andrej Karpathy's Zero to Hero](https://www.youtube.com/watch?v=TCH_1BHY58I) series. Builds character-level language models that generate plausible names.
+
+## what it does
+
+Implements neural networks from scratch to predict the next character in a name. Starts simple (bigram) and progressively adds complexity (MLP, backprop, batch normalization). Trains on `names.txt` dataset.
+
+## variants (in order of complexity)
+
+1. **01-bigram.py** - bigram model with neural net formulation, manual gradient descent
+2. **02-bigram-clean.py** - cleaner bigram with one-hot encoding, 100 training steps
+3. **03-mlp.py** - multi-layer perceptron with embeddings, 10k steps
+4. **04-mlp-hyperparams.py** - MLP with train/dev/test splits, hyperparameter experiments, 200k steps
+5. **05-mlp-variant.py** - alternative MLP architecture (10-dim embeddings, 200-unit hidden layer)
+
+## key concepts
+
+* **embeddings** - turning discrete tokens into continuous vectors
+* **forward pass** - matrix multiplications, activations, loss calculation
+* **backprop** - chain rule, computing gradients for every parameter
+* **initialization** - kaiming init to prevent dead neurons
+* **batch normalization** - keeping activations well-behaved during training
+
+## stack
+
+- Python
+- PyTorch
+- matplotlib (plotting losses)
+- rich (pretty printing)
+
+---
+
+## README
+
+```markdown
+# makemore
+
+learning project following andrej karpathy's zero to hero series. 
+builds character-level language models that generate plausible names.
+
+## getting started
+
+# check python is installed
+python3 --version
+
+# install uv (fast package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# create and activate virtual environment
+uv venv
+source .venv/bin/activate
+
+# install dependencies
+uv pip install -r requirements.txt
+
+## running
+
+source .venv/bin/activate
+python makemore/01-bigram.py
+
+start with 01-bigram.py and work through in order. 
+the later files (04, 05) train for 200k steps and take a few minutes.
+
+## dependencies
+
+- torch - neural network framework
+- matplotlib - plotting losses
+- rich - pretty printing
+- names.txt - training data (included)
+
+## common gotchas
+
+- forgot to activate venv? you'll get "module not found" errors
+- .venv/ should be in .gitignore (don't commit it)
+- requirements.txt should be committed (do commit it)
+```

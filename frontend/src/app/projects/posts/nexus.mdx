@@ -1,0 +1,95 @@
+---
+title: 'Nexus'
+publishedAt: '2025-10-12'
+summary: 'Reading-first knowledge management with semantic search and LLM conversation'
+repoUrl: 'https://github.com/NielsdaWheelz/nexus'
+---
+
+Reading-first knowledge management system with semantic search, persistent anchoring, and LLM-augmented conversation. Built as the week 3 group project at Fractal with Nyan and Jahnik.
+
+## what we built
+
+A knowledge management platform where users can save, annotate, and search through their reading materials. The system uses semantic search to find related content and LLM integration for augmented conversation about your saved knowledge.
+
+## my contributions
+
+* **permissions system** - role-based access control. This broke my brain. The complexity and edge cases were brutal. Should have sought help sooner and broken it into smaller chunks.
+
+## the team
+
+* **Nyan** - his ability and drive are unreal
+* **Jahnik** - kept us focused, organized, and optimistic. Solved conflicts, helped everyone. None of it would have worked without him.
+
+## lessons learned
+
+* **typing matters** - when the codebase isn't just yours, clean typed code is essential
+* **don't be a cowboy** - making sweeping changes to shared code has costs
+* **ask for help sooner** - I spent too long stuck on permissions when I should have asked
+
+## stack
+
+- Python/FastAPI backend
+- React/TypeScript frontend
+- PostgreSQL + Redis
+- uv (Python), bun (JavaScript)
+- Docker Compose
+- GitHub Actions CI/CD
+
+---
+
+## README
+
+```markdown
+# Nexus
+
+Reading-first knowledge management system with semantic search, 
+persistent anchoring, and LLM-augmented conversation.
+
+## Quick Start
+
+### Prerequisites
+- uv (Python package manager)
+- bun (JavaScript runtime)
+- Docker & Docker Compose
+
+### One-Command Setup
+
+make infra-up    # Start PostgreSQL + Redis
+make backend     # Install + test backend
+make frontend    # Install + test frontend
+
+## Project Structure
+
+nexus/
+├── backend/          # Python/FastAPI
+│   ├── app/
+│   └── tests/
+├── frontend/         # React/TypeScript
+│   └── src/
+├── infra/
+│   └── docker-compose.yml
+└── .github/workflows/ci.yml
+
+## Development
+
+### Backend (from backend/)
+make install    # Install with uv
+make test       # Run pytest
+make lint       # ruff + black + mypy
+
+### Frontend (from frontend/)
+make install    # Install with bun
+make dev        # Start dev server
+make test       # Run vitest
+
+## CI/CD
+
+Runs on every push:
+- Backend: ruff, black, mypy, pytest
+- Frontend: eslint, prettier, vitest
+
+## Documentation
+
+- SPEC.md - System specification
+- PR_ROADMAP.md - Implementation roadmap
+```
