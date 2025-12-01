@@ -5,25 +5,36 @@ summary: 'Real-time chat application with document processing and billing'
 repoUrl: 'https://github.com/NielsdaWheelz/fractal-chat'
 ---
 
-A real-time chat application built during Fractal Bootcamp. Full-stack with document processing, Stripe billing integration, and server-side rendering.
+An AI-powered reader that bridges the gap between your PDFs, EPUBs, and your curiousity.
 
-## features
+### Smart Document Processing
+Upload a PDF or EPUB, and Fractal Chat automatically:
+- Extracts and chunks the text for optimal comprehension
+- Generates semantic embeddings for intelligent search
+- Preserves document metadata and structure
 
-- Real-time messaging with WebSockets
-- Document/PDF processing and upload
-- Stripe subscription billing (Pro tier)
-- Server-side rendering with React Router
-- User authentication and profiles
-- Drizzle ORM for database
+### AI Chat That Actually Gets It
+Ask questions about your documents, and get precise answers grounded in the actual content. No hallucinations, no generic responses—just intelligent retrieval backed by OpenAI's latest models.
 
-## stack
+### Collaboration Built In
+- **Annotations**: Highlight and comment on specific passages
+- **Groups**: Share documents with teams and manage permissions
+- **Privacy Controls**: Granular access management (Owner, Viewer roles)
 
-- React Router (SSR)
-- TypeScript
-- TailwindCSS
-- Drizzle ORM
-- Stripe API
-- Vite for bundling
+### Production-Ready Features
+We didn't skip the hard parts:
+- **Authentication**: Secure login via Google OAuth or email/password (powered by Better Auth)
+- **Billing**: Stripe integration with Free and Pro tiers
+- **Modern Stack**: React Router v7, Vite, Tailwind CSS, and PostgreSQL for performance and scalability
+
+## The Tech Behind It
+
+Fractal Chat is built on a carefully chosen stack:
+- **Frontend**: React Router v7 with a polished Tailwind UI
+- **AI/ML**: Vercel AI SDK + OpenAI for chat and embeddings
+- **Database**: PostgreSQL + Drizzle ORM for type-safe data access
+- **Storage**: Supabase for document storage
+- **Payments**: Stripe for subscription management
 
 ---
 
@@ -32,33 +43,138 @@ A real-time chat application built during Fractal Bootcamp. Full-stack with docu
 ```markdown
 # Fractal Chat
 
-Real-time chat with document processing and billing.
+**Fractal Chat** is an AI-powered reader application that enables users to interact with their documents (PDFs, EPUBs) using advanced RAG (Retrieval-Augmented Generation) techniques. It features a modern, responsive UI, secure authentication, group collaboration, and subscription billing.
+
+## Features
+
+- **🤖 AI Chat**: Intelligent chat interface powered by OpenAI and Vercel AI SDK.
+- **📚 Document Intelligence**:
+  - Support for PDF and EPUB formats.
+  - Automatic text extraction, chunking, and embedding generation.
+  - Semantic search to retrieve relevant context for answers.
+- **📝 Annotations & Collaboration**:
+  - Highlight and annotate documents.
+  - Share documents and collaborate in groups.
+  - Granular permission system (Owner, Viewer).
+- **🔐 Authentication**: Secure user authentication via Better Auth (Google OAuth, Email/Password).
+- **💳 Billing**: Integrated Stripe subscription management (Free vs Pro plans).
+- **👥 Groups**: Create groups to manage shared resources and team access.
+
+## Tech Stack
+
+- **Framework**: [React Router v7](https://reactrouter.com/) (formerly Remix)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Database**: [PostgreSQL](https://www.postgresql.org/)
+- **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
+- **AI/LLM**: [Vercel AI SDK](https://sdk.vercel.ai/), OpenAI
+- **Storage**: [Supabase Storage](https://supabase.com/storage)
+- **Auth**: [Better Auth](https://better-auth.com/)
+- **Payments**: [Stripe](https://stripe.com/)
+
+## Prerequisites
+
+- **Node.js**: v20+ recommended
+- **Bun**: (Optional) Used for faster package management and script execution.
+- **Docker**: (Optional) For running a local PostgreSQL instance.
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/fractal_chat"
+
+# Authentication (Better Auth)
+BETTER_AUTH_SECRET="your_generated_secret"
+BETTER_AUTH_URL="http://localhost:5173" # or your production URL
+
+# OAuth Providers
+GOOGLE_CLIENT_ID="your_google_client_id"
+GOOGLE_CLIENT_SECRET="your_google_client_secret"
+
+# AI
+OPENAI_API_KEY="sk-..."
+
+# Storage (Supabase)
+SUPABASE_URL="https://your-project.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="your_service_role_key"
+SUPABASE_BUCKET="documents" # Default bucket for document storage
+
+# Payments (Stripe)
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_PRICE_ID="price_..." # ID for the Pro subscription plan
+STRIPE_WEBHOOK_SECRET="whsec_..."
+```
 
 ## Getting Started
 
-npm install
-npm run dev
+1. **Clone the repository**
 
-→ http://localhost:5173
+   ```bash
+   git clone <repository-url>
+   cd fractal-chat
+   ```
 
-## Stripe Configuration
+2. **Install dependencies**
 
-Required environment variables:
-- STRIPE_SECRET_KEY
-- STRIPE_PRICE_ID (recurring price for Pro subscription)
-- STRIPE_WEBHOOK_SECRET
+   ```bash
+   npm install
+   # or
+   bun install
+   ```
 
-Configure webhook to POST to /api/stripe-webhook
+3. **Set up the database**
 
-## Building for Production
+   If you don't have a Postgres instance, you can use Docker:
 
-npm run build
+   ```bash
+   docker run --name fractal-db -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres
+   ```
 
-## Docker Deployment
+   Run migrations to push the schema to your database:
 
+   ```bash
+   npm run drizzle-kit push
+   # or
+   bun run drizzle-kit push
+   ```
+
+4. **Start the development server**
+
+   ```bash
+   npm run dev
+   # or
+   bun run dev
+   ```
+
+   The app will be available at `http://localhost:5173`.
+
+## Scripts
+
+- `dev`: Start the development server.
+- `build`: Build the application for production.
+- `start`: Start the production server.
+- `typecheck`: Run TypeScript type checking.
+- `vercel-build`: Custom build script for Vercel deployment.
+
+## Deployment
+
+The application is built with React Router v7 and can be deployed to any platform that supports Node.js or Docker.
+
+### Docker
+
+```bash
 docker build -t fractal-chat .
 docker run -p 3000:3000 fractal-chat
+```
 
-Deployable to: AWS ECS, Google Cloud Run, Azure Container Apps, 
-Fly.io, Railway, etc.
+### Vercel
+
+This project is configured for Vercel. Ensure you set the environment variables in your Vercel project settings.
+
+---
+
+Built with ❤️ using React Router.
 ```
