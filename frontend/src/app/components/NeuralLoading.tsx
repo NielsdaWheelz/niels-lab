@@ -10,9 +10,16 @@ interface NeuralLoadingProps {
 export function NeuralLoading({ text = 'loading', speed = 50 }: NeuralLoadingProps) {
   const [displayedText, setDisplayedText] = useState('')
   const [charIndex, setCharIndex] = useState(0)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    if (charIndex < text.length) {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+
+    if (charIndex < (text?.length ?? 0)) {
       const timeout = setTimeout(() => {
         setDisplayedText(prev => prev + text[charIndex])
         setCharIndex(prev => prev + 1)
@@ -28,7 +35,7 @@ export function NeuralLoading({ text = 'loading', speed = 50 }: NeuralLoadingPro
 
       return () => clearTimeout(resetTimeout)
     }
-  }, [charIndex, text, speed])
+  }, [charIndex, text, speed, mounted])
 
   return (
     <span style={{ color: '#666' }}>
