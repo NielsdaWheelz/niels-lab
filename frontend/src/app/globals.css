@@ -17,9 +17,16 @@ html {
 
 body {
   min-height: 100vh;
-  padding: 2rem;
+  padding: 1.5rem;
   max-width: 720px;
   margin: 0 auto;
+}
+
+/* responsive padding */
+@media (min-width: 640px) {
+  body {
+    padding: 2rem;
+  }
 }
 
 /* links - underlined, no color change */
@@ -41,11 +48,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
 }
 
 h2 {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+}
+
+@media (min-width: 640px) {
+  h1 {
+    font-size: 1.25rem;
+  }
+  h2 {
+    font-size: 1.1rem;
+  }
 }
 
 /* paragraphs */
@@ -66,10 +82,18 @@ li {
 /* code blocks - slightly lighter bg with syntax highlighting */
 pre {
   background: #0a0a0a;
-  padding: 1rem;
+  padding: 0.75rem;
   overflow-x: auto;
   margin: 1em 0;
   border: 1px solid #222;
+  font-size: 0.85em;
+}
+
+@media (min-width: 640px) {
+  pre {
+    padding: 1rem;
+    font-size: 0.9em;
+  }
 }
 
 code {
@@ -103,11 +127,6 @@ code .sh__token--sign { color: #9ca3af; }
 code .sh__token--jsxliterals { color: #a5f3fc; }
 code .sh__token--entity { color: #f472b6; }
 
-/* fallback inline styles for sugar-high (it uses inline styles) */
-code span[style*="color"] {
-  /* let sugar-high colors through */
-}
-
 /* blockquotes */
 blockquote {
   border-left: 2px solid #333;
@@ -121,12 +140,26 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin: 1em 0;
+  font-size: 0.9em;
+  display: block;
+  overflow-x: auto;
 }
 
 th, td {
   border: 1px solid #333;
-  padding: 0.5em;
+  padding: 0.4em 0.6em;
   text-align: left;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  table {
+    display: table;
+  }
+  th, td {
+    padding: 0.5em;
+    white-space: normal;
+  }
 }
 
 th {
@@ -164,11 +197,20 @@ em, i {
 
 /* nav */
 nav {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+@media (min-width: 640px) {
+  nav {
+    margin-bottom: 3rem;
+    gap: 0 1.5rem;
+  }
 }
 
 nav a {
-  margin-right: 1.5rem;
   text-decoration: none;
   color: #888;
 }
@@ -179,11 +221,19 @@ nav a:hover {
 
 /* footer */
 footer {
-  margin-top: 4rem;
-  padding-top: 2rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
   border-top: 1px solid #222;
   color: #666;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    font-size: 0.9rem;
+  }
 }
 
 footer a {
@@ -211,12 +261,19 @@ footer a:hover {
 
 .cursor {
   display: inline-block;
-  width: 0.6em;
-  height: 1.1em;
+  width: 0.5em;
+  height: 1em;
   background: #e0e0e0;
   margin-left: 1px;
   vertical-align: text-bottom;
   animation: cursor-blink 1s infinite;
+}
+
+@media (min-width: 640px) {
+  .cursor {
+    width: 0.6em;
+    height: 1.1em;
+  }
 }
 
 .cursor--hidden {
@@ -240,4 +297,15 @@ footer a:hover {
 
 .loading-dot:nth-child(3) {
   animation-delay: 0.4s;
+}
+
+/* main content padding for terminal */
+main {
+  padding-bottom: 160px;
+}
+
+@media (max-width: 639px) {
+  main {
+    padding-bottom: 60px; /* smaller terminal on mobile */
+  }
 }

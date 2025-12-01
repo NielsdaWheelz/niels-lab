@@ -16,13 +16,20 @@ export function ProjectsList() {
           return 1
         })
         .map((project) => (
-          <li key={project.slug} style={{ marginBottom: '0.5rem' }}>
-            <Link href={`/projects/${project.slug}`}>
-              {project.metadata.title}
+          <li key={project.slug} style={{ marginBottom: '0.75rem' }}>
+            <Link 
+              href={`/projects/${project.slug}`}
+              style={{
+                display: 'block',
+              }}
+            >
+              <span>{project.metadata.title}</span>
+              {project.metadata.summary && (
+                <span style={{ color: '#666', display: 'block', fontSize: '0.9em', marginTop: '0.1rem' }}>
+                  {project.metadata.summary}
+                </span>
+              )}
             </Link>
-            {project.metadata.summary && (
-              <span style={{ color: '#666' }}> — {project.metadata.summary}</span>
-            )}
           </li>
         ))}
     </ul>

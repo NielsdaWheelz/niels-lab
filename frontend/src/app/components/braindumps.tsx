@@ -16,12 +16,26 @@ export function BraindumpsList() {
           return 1
         })
         .map((dump) => (
-          <li key={dump.slug} style={{ marginBottom: '0.5rem' }}>
-            <Link href={`/braindumps/${dump.slug}`}>
-              <span style={{ color: '#666', marginRight: '1rem', fontVariantNumeric: 'tabular-nums' }}>
+          <li key={dump.slug} style={{ marginBottom: '0.75rem' }}>
+            <Link 
+              href={`/braindumps/${dump.slug}`}
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                gap: '0.25rem 1rem',
+                alignItems: 'baseline',
+              }}
+            >
+              <span style={{ 
+                color: '#666', 
+                fontVariantNumeric: 'tabular-nums',
+                fontSize: '0.9em',
+                whiteSpace: 'nowrap',
+              }}>
                 {formatDate(dump.metadata.publishedAt)}
               </span>
-              {dump.metadata.title}
+              <span>{dump.metadata.title}</span>
             </Link>
           </li>
         ))}
