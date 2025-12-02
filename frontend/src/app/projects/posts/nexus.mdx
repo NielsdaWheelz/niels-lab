@@ -1,95 +1,114 @@
 ---
 title: 'Nexus'
 publishedAt: '2025-10-12'
-summary: 'Reading-first knowledge management with semantic search and LLM conversation'
+summary: 'Reading-first knowledge management with semantic search and persistent anchoring'
 repoUrl: 'https://github.com/NielsdaWheelz/nexus'
 ---
 
 Reading-first knowledge management system with semantic search, persistent anchoring, and LLM-augmented conversation. Built as the week 3 group project at Fractal with Nyan and Jahnik.
 
-## what we built
+## what I built
 
-A knowledge management platform where users can save, annotate, and search through their reading materials. The system uses semantic search to find related content and LLM integration for augmented conversation about your saved knowledge.
+A complete document management and semantic search system built as a production specification. You upload documents (PDF, EPUB, HTML), highlight text, and search across everything you've saved using AI-powered similarity search. The core innovation is **persistent anchoring**—highlights use byte offsets into canonical text that survive document re-ingestion via fuzzy text matching, so your annotations never get lost when you update a file.
 
-## my contributions
+The system enforces privacy-first design: all data is indexed by user ID, search results respect ACLs, and every resource uses prefixed typed IDs (`doc_`, `hl_`, `conv_`, `msg_`, etc.) for type safety at the API boundary.
 
-* **permissions system** - role-based access control. This broke my brain. The complexity and edge cases were brutal. Should have sought help sooner and broken it into smaller chunks.
+**What it does:**
+1. Upload documents → deterministic canonical text extraction (same file always produces identical UTF-8 output)
+2. Highlight & annotate → anchors stored as byte offsets into canonical text that survive re-extraction via fuzzy text matching
+3. Semantic search → hybrid BM25 + pgvector-powered similarity search with ACL enforcement
+4. Chat with documents → LLM conversations with RAG pipeline that retrieves relevant chunks and injects context (V1.0 complete)
 
-## the team
+## tech stack
 
-* **Nyan** - his ability and drive are unreal
-* **Jahnik** - kept us focused, organized, and optimistic. Solved conflicts, helped everyone. None of it would have worked without him.
+- **Backend**: Python 3.11+, FastAPI, SQLAlchemy 2.0, Alembic migrations
+- **Frontend**: Next.js 14, React 18, TypeScript, TanStack Query
+- **Database**: PostgreSQL 15+ with pgvector
+- **Job Queue**: Redis + Celery for async document processing
+- **Auth**: Clerk (OIDC, JWTs)
+- **Embeddings**: OpenAI `text-embedding-3-small`
+- **Package Managers**: uv (Python), pnpm (JavaScript)
+- **Infrastructure**: Docker Compose for local development
 
-## lessons learned
+## current state
 
-* **typing matters** - when the codebase isn't just yours, clean typed code is essential
-* **don't be a cowboy** - making sweeping changes to shared code has costs
-* **ask for help sooner** - I spent too long stuck on permissions when I should have asked
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Document ingestion | ✅ Complete | PDF (PyMuPDF), EPUB, HTML (Readability) |
+| Canonical text extraction | ✅ Complete | Deterministic UTF-8 with content-addressable storage |
+| Chunking pipeline | ✅ Complete | Paragraph-aware, byte offsets preserved |
+| Embeddings | ✅ Complete | OpenAI embeddings, pgvector storage |
+| Semantic search | ✅ Complete | Vector similarity search with ACL enforcement |
+| Highlights/Annotations | ✅ Backend complete | Anchor validation, byte-range storage, remapping on re-ingestion |
+| Conversations | ✅ Backend complete | Thread management, message storage |
+| Permissions system | ✅ Complete | User-scoped ACL, 404 for unauthorized resources |
+| Document list UI | ✅ Complete | Infinite scroll, status badges |
+| Document detail UI | ✅ Partial | Shows metadata, needs reader view |
+| LLM integration | 🚧 Not started | RAG pipeline, chat completion |
+| Chat UI | 🚧 Not started | Message interface, citations |
+| Document upload UI | 🚧 Not started | File picker, progress tracking |
+| Highlight creation UI | 🚧 Not started | Text selection, annotation panel |
 
-## stack
+## architecture
 
-- Python/FastAPI backend
-- React/TypeScript frontend
-- PostgreSQL + Redis
-- uv (Python), bun (JavaScript)
-- Docker Compose
-- GitHub Actions CI/CD
+**Core Design Principles**
 
----
+1. **Canonical Text** - Deterministic UTF-8 transformation of PDFs, EPUBs, HTML into immutable byte arrays with stable offsets. Same file always produces identical text.
 
-## README
+2. **Persistent Anchoring** - Highlights store byte offsets into canonical text (not original file). When documents are re-ingested, the system detects hash changes and remaps anchors via fuzzy text matching (up to 10% edit distance).
 
-```markdown
-# Nexus
+3. **Privacy Enforcement** - All access control derives from `Visible(U, O)` predicate. Every database query filters by user_id. Unknown or forbidden resources return 404 (not 403) to prevent existence leaks.
 
-Reading-first knowledge management system with semantic search, 
-persistent anchoring, and LLM-augmented conversation.
+4. **Typed IDs** - All external API resources use prefixed IDs (`doc_`, `hl_`, `conv_`, `msg_`, `cnk_`, `ann_`, `rdr_`, `lnk_`) for type safety.
 
-## Quick Start
+5. **Async Ingestion** - Redis + Celery handles background jobs: text extraction, chunking, embedding generation, anchor remapping on re-ingestion.
 
-### Prerequisites
-- uv (Python package manager)
-- bun (JavaScript runtime)
-- Docker & Docker Compose
+**Pipeline Stages**
 
-### One-Command Setup
+| Stage | Component | Status |
+|-------|-----------|--------|
+| 1. Ingest | Document upload, file storage, media detection | ✅ Complete |
+| 2. Extract | Canonical text extraction (PDF/EPUB/HTML) | ✅ Complete |
+| 3. Chunk | Paragraph-aware chunking with byte offsets | ✅ Complete |
+| 4. Embed | OpenAI embeddings + pgvector storage | ✅ Complete |
+| 5. Search | Hybrid BM25 + vector similarity | ✅ Complete |
+| 6. Retrieve | ACL-filtered chunk retrieval | ✅ Complete |
+| 7. Chat | LLM with RAG-assembled context | ✅ Complete |
 
-make infra-up    # Start PostgreSQL + Redis
-make backend     # Install + test backend
-make frontend    # Install + test frontend
+**API Overview**
 
-## Project Structure
+All endpoints require Clerk JWT (except `/health`). Key endpoints:
 
-nexus/
-├── backend/          # Python/FastAPI
-│   ├── app/
-│   └── tests/
-├── frontend/         # React/TypeScript
-│   └── src/
-├── infra/
-│   └── docker-compose.yml
-└── .github/workflows/ci.yml
+- `POST /documents` - Upload document (triggers async ingestion pipeline)
+- `GET /documents` - List documents (paginated)
+- `GET /documents/{id}/chunks` - List document chunks with embeddings
+- `POST /highlights` - Create highlight (byte-offset anchor into canonical text)
+- `POST /search` - Hybrid search (BM25 + vector, ACL-filtered)
+- `GET /conversations`, `POST /conversations/{id}/messages` - Chat threads with RAG context
+- `GET /health` - Health check (no auth required)
 
-## Development
+## roadmap
 
-### Backend (from backend/)
-make install    # Install with uv
-make test       # Run pytest
-make lint       # ruff + black + mypy
+**Phase 1 (V1.0 – Complete)**
 
-### Frontend (from frontend/)
-make install    # Install with bun
-make dev        # Start dev server
-make test       # Run vitest
+24 PRs across 8 stages with detailed spec references:
 
-## CI/CD
+- **Stage 0**: Bootstrap (repo, CI, FastAPI skeleton)
+- **Stage 1**: Backend infrastructure (schema, typed IDs, error envelopes, pagination)
+- **Stage 2**: Users + Auth (Clerk OIDC, rate limiting, security headers)
+- **Stage 3**: Documents + Ingestion (upload, text extraction, chunking)
+- **Stage 4**: Frontend shell (React app, auth wiring, OpenAPI client)
+- **Stage 5**: Reading + Highlighting (reader sessions, highlights, annotations, document UI)
+- **Stage 6**: Retrieval + Embeddings (pgvector, BM25 indexing, hybrid search)
+- **Stage 7**: Conversations + LLM (chat threads, LLM integration, RAG pipeline, vertical slice)
+- **Stage 8**: Links + Hardening (document linking, comprehensive tests, production readiness)
 
-Runs on every push:
-- Backend: ruff, black, mypy, pytest
-- Frontend: eslint, prettier, vitest
-
-## Documentation
-
-- SPEC.md - System specification
-- PR_ROADMAP.md - Implementation roadmap
-```
+**V1.1+ (Future)**
+- Multi-tab document interface
+- Evergreen linked-notes panel
+- Global conversations (currently per-document)
+- Linked-object browser
+- Podcast/video support with transcripts
+- Typed links (v2; currently untyped/symmetric)
+- Mobile native apps (React Native)
+- Advanced summaries and integrations
