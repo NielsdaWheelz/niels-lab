@@ -9,6 +9,7 @@ import { TerminalWrapper } from '@/app/components/Terminal/TerminalWrapper'
 import { getBlogPosts } from '@/app/blog/utils'
 import { getProjects } from '@/app/projects/utils'
 import { getBraindumps } from '@/app/braindumps/utils'
+import { getCVContent } from '@/app/cv/utils'
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -44,10 +45,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   // Build terminal data (server-side)
+  const cvContent = getCVContent()
   const terminalData = {
     blogPosts: getBlogPosts(),
     projects: getProjects(),
     braindumps: getBraindumps(),
+    cv: cvContent,
   }
 
   return (

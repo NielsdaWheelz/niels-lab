@@ -47,7 +47,8 @@ export function normalizePath(path: string, cwd: string = '/'): string {
 export function buildFileSystem(
   blogPosts: Array<{ slug: string; metadata: Record<string, string>; content: string }>,
   projects: Array<{ slug: string; metadata: Record<string, string>; content: string }>,
-  braindumps: Array<{ slug: string; metadata: Record<string, string>; content: string }>
+  braindumps: Array<{ slug: string; metadata: Record<string, string>; content: string }>,
+  cv: { slug?: string; metadata: Record<string, string>; content: string }
 ): FileSystem {
   const root: FSNode = {
     type: 'directory',
@@ -103,6 +104,13 @@ export function buildFileSystem(
           content: dump.content,
           metadata: dump.metadata,
         })),
+      },
+      {
+        type: 'file',
+        name: 'cv',
+        path: '/cv',
+        content: cv.content,
+        metadata: cv.metadata,
       },
     ],
   }

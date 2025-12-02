@@ -8,6 +8,7 @@ export type ContentData = {
   blogPosts: Array<{ slug: string; metadata: Record<string, string>; content: string }>
   projects: Array<{ slug: string; metadata: Record<string, string>; content: string }>
   braindumps: Array<{ slug: string; metadata: Record<string, string>; content: string }>
+  cv: { slug?: string; metadata: Record<string, string>; content: string }
 }
 
 interface TerminalWrapperProps {
@@ -15,8 +16,8 @@ interface TerminalWrapperProps {
 }
 
 export function TerminalWrapper({ data }: TerminalWrapperProps) {
-  const filesystem = useMemo(() => 
-    buildFileSystem(data.blogPosts, data.projects, data.braindumps),
+  const filesystem = useMemo(() =>
+    buildFileSystem(data.blogPosts, data.projects, data.braindumps, data.cv),
     [data]
   )
 

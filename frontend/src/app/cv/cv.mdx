@@ -1,0 +1,78 @@
+---
+title: 'CV'
+publishedAt: '2025-12-01'
+summary: 'Professional experience and background'
+---
+
+## EXPERIENCE
+
+### Intern – SupplyCo
+October – November 2025
+
+* Refactored production Dagster pipelines from ad-hoc Supabase/SQL scripts into a clean SQLModel-based architecture—typed DAOs for all I/O, pure transformation layers, and an orchestrator—eliminating pandas, reducing regressions, and making the workflow deterministic and testable
+* Rebuilt the database layer by replacing manual Supabase schema management with a full Alembic/SQLAlchemy migration system—baseline revisions, whitelists, schema diff tooling, and autogenerate gating—giving the team reproducible, version-controlled schema changes for the first time
+* Replaced brittle mock-based tests with an ephemeral Postgres test harness (Alembic-stamped), adding granular tests for migration filters and schema scope—ending silent ORM/DB drift and giving the pipeline real integration coverage
+
+### Product Manager – Mind Brain Behaviour Hive
+December 2018 – June 2020
+
+* Translated cognitive-neuroscience research into shipped software products—defining specifications, shaping experiments, and working with engineers to deliver browser, mobile, AR, and VR applications.
+
+### R&D Consultant – Mind Brain Behaviour Hive
+October 2015 – March 2016, July 2018 – December 2018
+
+* Developed detection algorithms across multiple signal channels (physiology, text/speech, facial/gestural cues), transforming raw behavioral data into feature sets, metrics, and visualizations used to model emotional and cognitive states.
+* Prototyped applied systems including a VR stress-regulation game and a Bluetooth breathing/HR monitor integrated into research workflows.
+
+### Research Assistant – University of Toronto: Rotman School of Management
+July 2015 – March 2016
+
+* Designed and ran behavioural experiments on multi-alternative choice (attraction, compromise, dominance effects), analyzing how contextual options shape decision formation.
+* Developed a habituation experiment in collaboration with Dr. Colin Camerer, focusing on how repeated exposure alters valuation and choice behaviour.
+
+## PROJECTS
+
+### Factory Simulator
+November 2025
+
+* Built a multi-agent LLM system wrapped around a fully deterministic factory-scheduling simulator—LLM agents handle interpretation/reporting, while the core EDD scheduler and metrics engine remain pure, auditable computation.
+* Designed a 10-stage orchestration pipeline with strict validation (Pydantic schemas, ID-coverage guarantees, no-hallucination rules) and safe fallbacks, exposing full pipeline traces via a debug API and React UI.
+* Developed comprehensive tests covering determinism, purity, contract enforcement, agent behavior (LLM-mocked), and end-to-end pipeline invariants.
+
+### Nexus
+November 2025
+
+* Designed and implemented a reading-first knowledge management system: ingesting PDFs/EPUBs/HTML into deterministic canonical text, chunking, and embedding content into Postgres/pgvector for semantic search.
+* Built a persistent anchoring model where highlights and annotations are stored as byte-offset ranges into canonical text, then remapped on re-ingestion, so annotations survive document updates without breaking.
+* Architected the service as a modern web stack (FastAPI + SQLAlchemy/Alembic, Redis/Celery workers, Next.js frontend with generated TypeScript API client), with per-user ACL enforced on all search and document access.
+* Implemented LLM-augmented conversations (thread and message models) as the foundation for a RAG-style "chat with your documents and authors" feature.
+
+## EDUCATION
+
+### Fractal Tech – Software Engineering Fellowship – Full-time, six-day weeks
+October 2025 – present
+
+### McGill University – BSc. Molecular Biology
+2010 – 2014
+
+### LSAT – 176 (99.7th percentile)
+October 2015
+
+### MCAT – 36 (97.5th percentile)
+August 2013
+
+## SKILLS
+
+**Languages:** Python, TypeScript, SQL
+
+**Backend:** FastAPI, SQLAlchemy/SQLModel, PostgreSQL, Alembic, Redis/Celery
+
+**AI/ML:** OpenAI API (function/JSON mode), embeddings (pgvector), LLM orchestration
+
+**Frontend:** React/Next.js
+
+**Tools:** Docker, Git, pytest
+
+---
+
+*Gap due to major concussion in March 2016. Continued in an advisory role during the interim*

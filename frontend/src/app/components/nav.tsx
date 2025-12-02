@@ -5,6 +5,7 @@ const navItems = {
   '/blog': 'blog',
   '/projects': 'projects',
   '/braindumps': 'braindumps',
+  '/cv': 'cv',
 }
 
 export function Navbar() {

@@ -255,6 +255,46 @@ footer a:hover {
   margin-top: 0;
 }
 
+/* CV-specific styling */
+.prose h2 {
+  margin-top: 2em;
+  margin-bottom: 1em;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5em;
+}
+
+.prose h2:first-of-type {
+  margin-top: 0;
+}
+
+.prose h3 {
+  margin-top: 1.2em;
+  margin-bottom: 0.25em;
+  color: #fff;
+  font-weight: 700;
+}
+
+.prose h3 + p {
+  margin-top: 0.25em;
+  margin-bottom: 0.75em;
+  color: #999;
+  font-size: 0.95em;
+}
+
+.prose ul, .prose ol {
+  margin: 0.75em 0 1em 0;
+  padding-left: 1.5em;
+}
+
+.prose li {
+  margin: 0.35em 0;
+  line-height: 1.5;
+}
+
+.prose p {
+  margin: 0.75em 0;
+}
+
 /* text reveal animation */
 @keyframes cursor-blink {
   0%, 50% { opacity: 1; }
