@@ -29,7 +29,7 @@ export function BlogPosts() {
               }}
             >
               <span style={{ 
-                color: '#666', 
+                color: 'var(--color-text-muted)', 
                 fontVariantNumeric: 'tabular-nums',
                 fontSize: '0.9em',
                 whiteSpace: 'nowrap',

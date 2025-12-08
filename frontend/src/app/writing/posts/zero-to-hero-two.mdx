@@ -1,0 +1,67 @@
+---
+title: 'Zero to Hero - Two'
+publishedAt: '2025-11-18'
+summary: ''
+---
+
+recap:
+- each note gets turned into coordinates (a little embedding vector)
+- everyone in the room mixes those numbers in their own weird way
+- they pass their result to a final guesser
+- we see how wrong the guess was
+- everyone adjusts themselves a tiny bit
+
+but if we don't invite the right initial people into the room, they'll be completely useless.
+
+1. bad initialization
+
+if we don't manage who we're inviting into the room, we get tone-deaf people, literally deaf people, bats, ants...
+
+each guesser does: `mix = (the sound) * (the listener's random strengths) + (their bias)`. if their random strengths are too large or small, the "mix" number they compute is huge or tiny. then tanh tries to squash it:
+
+squish = tanh(mix)
+tanh(very large) = 1
+tanh(very negative) = -1
+
+and every guesser outputs -1 or 1, which tells you fuck-all. worse still, these guessers are too fucked to even learn, so they stay that way. they're literally called 'dead neurons'.
+
+2. how big should the starting weights be? ('kaiming init')
+
+we want `variance_out ≈ variance_in` so the signal stays alive. for a guesser with N inputs, the general rule is 
+
+`weight scale ≈ 1 / sqrt(N)`
+
+the more inputs a neuron has, the smaller its weights need to be. more inputs? shrink their weights so they don't collectively blow up.
+
+3. batch normalization
+
+even if you initialize perfectly, signals can still drift because the weights change every step - some people in the room might start producing giant numbers again or shrink to tiny ones.
+
+enter `batchnorm`:
+- takes a mini-batch of examples
+- computes their mean and standard deviation
+- centers and scales the activations: `z_norm = (z - mean) / std`
+
+this way the room's activations are always nicely distributed between 0 and 1.
+
+to allow the weights to actually learn and change, the model is scaled and shifted every pass:
+
+y = gamma * z_norm + beta
+
+these gamma (scale) and beta (shift) are learned, changed, just like the weights
+
+4. jitter
+
+batchnorm uses the current batch to compute its mean/std, but every batch is slightly different. so even if weights don't change much, it wobbles:
+
+batch 1 mean = 0.12
+batch 2 mean = 0.05
+batch 3 mean = -0.03
+...
+
+that wiggle in the mean/std creates wiggle in the activations -> wiggle in the logits -> wiggle in the loss.
+
+big models + big batches drown it out, but in small models it is very visible.
+
+bad initialization makes neurons saturate, kaiming fixes the scale, batchnorm keeps activations well-behaved during training, and gamma/beta ensure the network still has full expressive power.
+

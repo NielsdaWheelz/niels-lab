@@ -7,7 +7,6 @@ interface Point {
   x: number
   y: number
   age: number
-  connections: number[]
 }
 
 interface Branch {
@@ -17,28 +16,29 @@ interface Branch {
 }
 
 const COLORS = ['#E07A5F', '#81B29A', '#F2CC8F', '#3D3D3D']
-const FADE_START = 2000
-const FADE_DURATION = 3000
-const CONNECTION_DISTANCE = 120
-const BRANCH_CHANCE = 0.02
+const FADE_START = 3000
+const FADE_DURATION = 4000
 const POINT_INTERVAL = 8
+const BRANCH_CHANCE = 0.02
 
 export function SketchCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const branchesRef = useRef<Branch[]>([])
   const animationFrameRef = useRef<number>()
+  const demoRunRef = useRef(false)
   const lastPointRef = useRef<{ x: number; y: number } | null>(null)
   const isDrawingRef = useRef(false)
   const currentBranchRef = useRef<Branch | null>(null)
   const pointCountRef = useRef(0)
-  const hasInteractedRef = useRef(false)
-  const [showHint, setShowHint] = useState(true)
+  
+  const [drawMode, setDrawMode] = useState(false)
+  const [showHint, setShowHint] = useState(false)
 
   const getRandomColor = () => COLORS[Math.floor(Math.random() * COLORS.length)]
 
   const startNewBranch = useCallback((x: number, y: number, color?: string) => {
     const branch: Branch = {
-      points: [{ x, y, age: Date.now(), connections: [] }],
+      points: [{ x, y, age: Date.now() }],
       color: color || getRandomColor(),
       createdAt: Date.now(),
     }
@@ -49,62 +49,68 @@ export function SketchCanvas() {
   // Auto-draw demo on page load
   const runDemo = useCallback(() => {
     const canvas = canvasRef.current
-    if (!canvas || hasInteractedRef.current) return
+    if (!canvas || demoRunRef.current) return
+    demoRunRef.current = true
 
     const centerX = canvas.width * 0.5
-    const centerY = canvas.height * 0.35
+    const centerY = canvas.height * 0.3
 
-    const branch = startNewBranch(centerX - 150, centerY)
+    const branch = startNewBranch(centerX - 180, centerY)
     
     // Create a flowing path
     const points: { x: number; y: number }[] = []
-    let x = centerX - 150
+    let x = centerX - 180
     let y = centerY
     
-    for (let i = 0; i < 40; i++) {
-      x += 8 + Math.random() * 4
-      y += Math.sin(i * 0.3) * 8 + (Math.random() - 0.5) * 6
+    for (let i = 0; i < 50; i++) {
+      x += 7 + Math.random() * 3
+      y += Math.sin(i * 0.25) * 6 + (Math.random() - 0.5) * 4
       points.push({ x, y })
     }
 
     // Animate drawing the points
     let pointIndex = 0
     const drawNextPoint = () => {
-      if (pointIndex >= points.length || hasInteractedRef.current) return
+      if (pointIndex >= points.length) return
       
       const p = points[pointIndex]
       branch.points.push({
         x: p.x,
         y: p.y,
         age: Date.now(),
-        connections: [],
       })
 
-      // Spawn a branch occasionally
-      if (pointIndex === 15 || pointIndex === 28) {
-        const angle = (pointIndex === 15 ? -1 : 1) * (Math.PI / 4 + Math.random() * 0.3)
+      // Spawn branches at specific points
+      if (pointIndex === 12 || pointIndex === 25 || pointIndex === 38) {
+        const direction = pointIndex === 25 ? 1 : -1
+        const angle = direction * (Math.PI / 4 + Math.random() * 0.2)
         const newBranch = startNewBranch(p.x, p.y, branch.color)
         
         let bx = p.x
         let by = p.y
-        for (let j = 0; j < 8; j++) {
-          bx += Math.cos(angle) * (10 + Math.random() * 5)
-          by += Math.sin(angle) * (10 + Math.random() * 5)
+        const branchLength = 6 + Math.floor(Math.random() * 4)
+        for (let j = 0; j < branchLength; j++) {
+          bx += Math.cos(angle) * (8 + Math.random() * 4)
+          by += Math.sin(angle) * (8 + Math.random() * 4)
           newBranch.points.push({
             x: bx,
             y: by,
-            age: Date.now() + j * 30,
-            connections: [],
+            age: Date.now() + j * 40,
           })
         }
       }
 
       pointIndex++
-      setTimeout(drawNextPoint, 25)
+      if (pointIndex < points.length) {
+        setTimeout(drawNextPoint, 30)
+      } else {
+        // Demo finished, show hint after a short delay
+        setTimeout(() => setShowHint(true), 1500)
+      }
     }
 
     // Start demo after a short delay
-    setTimeout(drawNextPoint, 800)
+    setTimeout(drawNextPoint, 600)
   }, [startNewBranch])
 
   const draw = useCallback(() => {
@@ -121,10 +127,9 @@ export function SketchCanvas() {
 
     // Filter out old branches and draw remaining
     branchesRef.current = branchesRef.current.filter(branch => {
-      const branchAge = now - branch.createdAt
       const lastPointAge = branch.points.length > 0 
         ? now - branch.points[branch.points.length - 1].age 
-        : branchAge
+        : now - branch.createdAt
 
       // Remove if fully faded
       if (lastPointAge > FADE_START + FADE_DURATION) return false
@@ -136,7 +141,7 @@ export function SketchCanvas() {
       }
 
       ctx.save()
-      ctx.globalAlpha = opacity * 0.6
+      ctx.globalAlpha = opacity * 0.5
 
       // Draw the path
       if (branch.points.length > 1) {
@@ -153,10 +158,10 @@ export function SketchCanvas() {
         }
       }
 
-      // Draw subtle nodes at branch points
+      // Draw subtle node at the end
       if (branch.points.length > 0) {
         const lastPoint = branch.points[branch.points.length - 1]
-        ctx.globalAlpha = opacity * 0.3
+        ctx.globalAlpha = opacity * 0.25
         rc.circle(lastPoint.x, lastPoint.y, 4, {
           stroke: branch.color,
           strokeWidth: 1,
@@ -171,9 +176,6 @@ export function SketchCanvas() {
     })
 
     // Draw connections between nearby points from different branches
-    ctx.save()
-    ctx.globalAlpha = 0.15
-    
     const allPoints: { point: Point; branch: Branch }[] = []
     branchesRef.current.forEach(branch => {
       branch.points.forEach(point => {
@@ -181,6 +183,7 @@ export function SketchCanvas() {
       })
     })
 
+    ctx.save()
     for (let i = 0; i < allPoints.length; i++) {
       for (let j = i + 1; j < allPoints.length; j++) {
         const { point: p1, branch: b1 } = allPoints[i]
@@ -190,9 +193,11 @@ export function SketchCanvas() {
         if (b1 === b2) continue
         
         const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y)
+        const CONNECTION_DISTANCE = 120
+        
         if (dist < CONNECTION_DISTANCE && dist > 20) {
-          const connectionOpacity = 1 - (dist / CONNECTION_DISTANCE)
-          ctx.globalAlpha = connectionOpacity * 0.1
+          const connectionOpacity = (1 - dist / CONNECTION_DISTANCE) * 0.15
+          ctx.globalAlpha = connectionOpacity
           
           rc.line(p1.x, p1.y, p2.x, p2.y, {
             stroke: '#3D3D3D',
@@ -203,23 +208,20 @@ export function SketchCanvas() {
         }
       }
     }
-    
     ctx.restore()
 
     animationFrameRef.current = requestAnimationFrame(draw)
   }, [])
 
   const handlePointerDown = useCallback((e: PointerEvent) => {
-    if (!hasInteractedRef.current) {
-      hasInteractedRef.current = true
-      setShowHint(false)
-    }
+    if (!drawMode) return
     
+    setShowHint(false)
     isDrawingRef.current = true
     lastPointRef.current = { x: e.clientX, y: e.clientY }
     currentBranchRef.current = startNewBranch(e.clientX, e.clientY)
     pointCountRef.current = 0
-  }, [startNewBranch])
+  }, [drawMode, startNewBranch])
 
   const handlePointerMove = useCallback((e: PointerEvent) => {
     if (!isDrawingRef.current || !lastPointRef.current || !currentBranchRef.current) return
@@ -229,12 +231,10 @@ export function SketchCanvas() {
     const distance = Math.hypot(dx, dy)
 
     if (distance > POINT_INTERVAL) {
-      // Add point to current branch
       currentBranchRef.current.points.push({
         x: e.clientX,
         y: e.clientY,
         age: Date.now(),
-        connections: [],
       })
 
       pointCountRef.current++
@@ -251,7 +251,6 @@ export function SketchCanvas() {
           x: branchX,
           y: branchY,
           age: Date.now(),
-          connections: [],
         })
       }
 
@@ -265,6 +264,30 @@ export function SketchCanvas() {
     currentBranchRef.current = null
     pointCountRef.current = 0
   }, [])
+
+  // Handle Shift key for draw mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Shift' && !e.repeat) {
+        setDrawMode(true)
+      }
+    }
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Shift') {
+        setDrawMode(false)
+        handlePointerUp()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [handlePointerUp])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -297,19 +320,21 @@ export function SketchCanvas() {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
+      // Reset for React strict mode re-mount
+      demoRunRef.current = false
+      branchesRef.current = []
     }
-  }, [draw, handlePointerDown, handlePointerMove, handlePointerUp, runDemo])
+  }, [draw, runDemo, handlePointerDown, handlePointerMove, handlePointerUp])
 
   return (
     <>
       <canvas
         ref={canvasRef}
-        className="sketch-canvas interactive"
-        style={{ cursor: 'crosshair' }}
+        className={`sketch-canvas ${drawMode ? 'draw-mode' : ''}`}
       />
       {showHint && (
         <div className="sketch-hint">
-          <span>drag to trace</span>
+          <kbd>⇧ shift</kbd> + drag to trace
         </div>
       )}
     </>
