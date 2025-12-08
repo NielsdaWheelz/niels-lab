@@ -640,3 +640,100 @@ body.draw-mode-active footer {
     transform: scale(1);
   }
 }
+
+/* ============================================
+   SKETCH DIVIDER - hand-drawn section breaks
+   ============================================ */
+.sketch-divider {
+  width: 100%;
+  max-width: 320px;
+  height: 30px;
+  margin: 2rem 0;
+  opacity: 0.7;
+}
+
+.sketch-divider svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sketch-divider-path {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  transition: stroke-dashoffset 1.2s ease-out;
+}
+
+.sketch-divider-path.animate {
+  stroke-dashoffset: 0;
+}
+
+.sketch-dot {
+  opacity: 0;
+  transform-origin: center;
+  animation: sketch-dot-pop 0.4s ease-out forwards;
+}
+
+@keyframes sketch-dot-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  60% {
+    opacity: 0.8;
+    transform: scale(1.3);
+  }
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   DRAW HEADING - headings with animated underline
+   ============================================ */
+.draw-heading {
+  position: relative;
+  display: inline-block;
+}
+
+.draw-heading-text {
+  position: relative;
+  z-index: 1;
+}
+
+.draw-heading-underline {
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  overflow: visible;
+}
+
+.draw-underline-path {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  transition: stroke-dashoffset 0.6s ease-out;
+}
+
+.draw-heading-underline.animate .draw-underline-path {
+  stroke-dashoffset: 0;
+}
+
+.draw-underline-dot {
+  transition: opacity 0.3s ease-out 0.5s;
+}
+
+.draw-heading-underline.animate .draw-underline-dot {
+  opacity: 0.7;
+}
+
+/* Slight hover effect on headings */
+.draw-heading:hover .draw-underline-path {
+  stroke-width: 2;
+}
+
+.draw-heading:hover .draw-underline-dot {
+  opacity: 1;
+  transform: scale(1.2);
+}
