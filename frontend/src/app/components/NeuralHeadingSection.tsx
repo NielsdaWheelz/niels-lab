@@ -40,7 +40,7 @@ export function NeuralHeadingSection({
   }, [])
 
   return (
-    <div ref={headingRef} className={`neural-heading-wrapper ${className}`}>
+    <div ref={headingRef} className={`neural-heading-section ${className}`}>
       {children}
       <NeuralPathway 
         containerRef={headingRef} 

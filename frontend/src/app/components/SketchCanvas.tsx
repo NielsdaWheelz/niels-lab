@@ -32,7 +32,7 @@ export function SketchCanvas() {
   const pointCountRef = useRef(0)
   
   const [drawMode, setDrawMode] = useState(false)
-  const [showHint, setShowHint] = useState(true)
+  const [showHint, setShowHint] = useState(false)
 
   const getRandomColor = () => COLORS[Math.floor(Math.random() * COLORS.length)]
 
@@ -46,70 +46,170 @@ export function SketchCanvas() {
     return branch
   }, [])
 
-  // Auto-draw demo on page load - draws on the right side
+  // Auto-draw demo on page load - draws complex neural network on the right side
   const runDemo = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas || demoRunRef.current) return
     demoRunRef.current = true
 
-    // Start from the right side of the screen
-    const startX = canvas.width * 0.7
-    const startY = canvas.height * 0.15
+    // Multiple starting points for a more complex pattern
+    const startX = canvas.width * 0.72
+    const startY = canvas.height * 0.12
+    const mainBranches: Array<{ branch: Branch; points: Array<{ x: number; y: number }> }> = []
 
-    const branch = startNewBranch(startX, startY)
-    
-    // Create a flowing path that goes down and slightly left
-    const points: { x: number; y: number }[] = []
+    // Create main curved trunk with organic flow
+    const mainTrunkPoints: { x: number; y: number }[] = []
     let x = startX
     let y = startY
+    const curveAmount = 0.4
     
-    for (let i = 0; i < 40; i++) {
-      x += Math.sin(i * 0.2) * 8 + (Math.random() - 0.6) * 3
-      y += 6 + Math.random() * 3
-      points.push({ x, y })
+    for (let i = 0; i < 60; i++) {
+      const progress = i / 60
+      const wave = Math.sin(progress * Math.PI * 2.5) * 12
+      const curve = Math.sin(progress * Math.PI) * 25
+      x += wave * curveAmount + (Math.random() - 0.5) * 2
+      y += 5 + curve * 0.3 + Math.sin(progress * Math.PI * 3) * 4
+      mainTrunkPoints.push({ x, y })
+    }
+    
+    const mainBranch = startNewBranch(startX, startY)
+    mainBranches.push({ branch: mainBranch, points: mainTrunkPoints })
+
+    // Create secondary main branch that intersects
+    const secondaryStartX = startX - 35
+    const secondaryStartY = startY + 40
+    const secondaryPoints: { x: number; y: number }[] = []
+    let sx = secondaryStartX
+    let sy = secondaryStartY
+    
+    for (let i = 0; i < 50; i++) {
+      const progress = i / 50
+      const spiral = Math.sin(progress * Math.PI * 4) * 15
+      sx += spiral + (Math.random() - 0.5) * 3
+      sy += 6 + Math.cos(progress * Math.PI * 2) * 8
+      secondaryPoints.push({ x: sx, y: sy })
+    }
+    
+    const secondaryBranch = startNewBranch(secondaryStartX, secondaryStartY)
+    mainBranches.push({ branch: secondaryBranch, points: secondaryPoints })
+
+    // Create tertiary branch from different angle
+    const tertiaryStartX = startX + 20
+    const tertiaryStartY = startY + 25
+    const tertiaryPoints: { x: number; y: number }[] = []
+    let tx = tertiaryStartX
+    let ty = tertiaryStartY
+    
+    for (let i = 0; i < 45; i++) {
+      const progress = i / 45
+      const wave = Math.cos(progress * Math.PI * 3.5) * 18
+      tx += wave * 0.5 + (Math.random() - 0.5) * 2.5
+      ty += 7 + Math.sin(progress * Math.PI * 2.5) * 6
+      tertiaryPoints.push({ x: tx, y: ty })
+    }
+    
+    const tertiaryBranch = startNewBranch(tertiaryStartX, tertiaryStartY)
+    mainBranches.push({ branch: tertiaryBranch, points: tertiaryPoints })
+
+    // Function to create branching sub-patterns
+    const createSubBranch = (
+      fromX: number, 
+      fromY: number, 
+      angle: number, 
+      length: number, 
+      color: string,
+      depth: number = 0
+    ) => {
+      if (depth > 2) return // Limit recursion depth
+      
+      const subBranch = startNewBranch(fromX, fromY)
+      const subPoints: { x: number; y: number }[] = []
+      
+      for (let i = 0; i < length; i++) {
+        const progress = i / length
+        const curve = Math.sin(progress * Math.PI) * 8
+        fromX += Math.cos(angle) * (6 + Math.random() * 3) + curve * Math.cos(angle + Math.PI / 2)
+        fromY += Math.sin(angle) * (6 + Math.random() * 3) + curve * Math.sin(angle + Math.PI / 2)
+        subPoints.push({ x: fromX, y: fromY })
+        
+        // Occasionally branch again
+        if (depth < 2 && Math.random() < 0.15 && i > 3) {
+          const branchAngle = angle + (Math.random() - 0.5) * Math.PI * 0.8
+          createSubBranch(fromX, fromY, branchAngle, 4 + Math.floor(Math.random() * 5), color, depth + 1)
+        }
+      }
+      
+      return { branch: subBranch, points: subPoints }
     }
 
-    // Animate drawing the points
+    // Add branches along main trunks
+    mainTrunkPoints.forEach((p, i) => {
+      if (i % 12 === 5 && i > 10 && i < mainTrunkPoints.length - 10) {
+        const angle = Math.atan2(
+          mainTrunkPoints[Math.min(i + 3, mainTrunkPoints.length - 1)].y - p.y,
+          mainTrunkPoints[Math.min(i + 3, mainTrunkPoints.length - 1)].x - p.x
+        )
+        const branchAngle1 = angle + (Math.PI / 3 + Math.random() * 0.4)
+        const branchAngle2 = angle - (Math.PI / 3 + Math.random() * 0.4)
+        
+        createSubBranch(p.x, p.y, branchAngle1, 6 + Math.floor(Math.random() * 6), mainBranch.color, 0)
+        if (Math.random() > 0.5) {
+          createSubBranch(p.x, p.y, branchAngle2, 5 + Math.floor(Math.random() * 5), mainBranch.color, 0)
+        }
+      }
+    })
+
+    // Add branches to secondary trunk
+    secondaryPoints.forEach((p, i) => {
+      if (i % 10 === 4 && i > 8 && i < secondaryPoints.length - 8) {
+        const angle = Math.atan2(
+          secondaryPoints[Math.min(i + 2, secondaryPoints.length - 1)].y - p.y,
+          secondaryPoints[Math.min(i + 2, secondaryPoints.length - 1)].x - p.x
+        )
+        const branchAngle = angle + (Math.random() - 0.5) * Math.PI * 0.9
+        createSubBranch(p.x, p.y, branchAngle, 4 + Math.floor(Math.random() * 5), secondaryBranch.color, 0)
+      }
+    })
+
+    // Animate drawing all branches
+    let branchIndex = 0
     let pointIndex = 0
-    const drawNextPoint = () => {
-      if (pointIndex >= points.length) return
+    const delay = 28
+
+    const drawNext = () => {
+      if (branchIndex >= mainBranches.length) {
+        // Demo finished, show hint after a short delay
+        setTimeout(() => setShowHint(true), 1200)
+        return
+      }
+
+      const currentBranch = mainBranches[branchIndex]
       
-      const p = points[pointIndex]
-      branch.points.push({
+      if (pointIndex >= currentBranch.points.length) {
+        branchIndex++
+        pointIndex = 0
+        if (branchIndex < mainBranches.length) {
+          setTimeout(drawNext, delay * 2)
+        } else {
+          setTimeout(() => setShowHint(true), 1200)
+        }
+        return
+      }
+
+      const p = currentBranch.points[pointIndex]
+      currentBranch.branch.points.push({
         x: p.x,
         y: p.y,
         age: Date.now(),
       })
 
-      // Spawn branches at specific points - going outward
-      if (pointIndex === 10 || pointIndex === 22 || pointIndex === 32) {
-        const direction = pointIndex === 22 ? -1 : 1
-        const angle = direction * (Math.PI / 3 + Math.random() * 0.3)
-        const newBranch = startNewBranch(p.x, p.y, branch.color)
-        
-        let bx = p.x
-        let by = p.y
-        const branchLength = 5 + Math.floor(Math.random() * 4)
-        for (let j = 0; j < branchLength; j++) {
-          bx += Math.cos(angle) * (7 + Math.random() * 4)
-          by += Math.sin(angle) * (5 + Math.random() * 3)
-          newBranch.points.push({
-            x: bx,
-            y: by,
-            age: Date.now() + j * 40,
-          })
-        }
-      }
-
       pointIndex++
-      if (pointIndex < points.length) {
-        setTimeout(drawNextPoint, 35)
-      }
+      setTimeout(drawNext, delay)
     }
 
     // Start demo after a short delay
-    setTimeout(drawNextPoint, 600)
-  }, [startNewBranch])
+    setTimeout(drawNext, 600)
+  }, [startNewBranch, setShowHint])
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current

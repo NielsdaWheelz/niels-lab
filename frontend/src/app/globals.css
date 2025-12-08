@@ -274,23 +274,25 @@ nav a:hover {
   z-index: 1;
 }
 
-/* neural heading wrapper - for h2 with pathway */
-.neural-heading-wrapper {
+/* neural heading section - for h2 sections with pathway */
+.neural-heading-section {
   position: relative;
-  display: inline-block;
-  padding: 0.5rem 0;
-  margin: 0;
+  margin-bottom: 0;
 }
 
-.neural-heading-wrapper h2 {
+.neural-heading-section h2 {
   position: relative;
   z-index: 2;
   cursor: default;
-  margin: 0;
 }
 
-.neural-heading-wrapper h2:hover {
+.neural-heading-section h2:hover {
   z-index: 3;
+}
+
+.neural-heading-section a {
+  position: relative;
+  z-index: 1;
 }
 
 /* footer */

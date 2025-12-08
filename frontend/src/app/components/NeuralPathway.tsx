@@ -81,83 +81,105 @@ export function NeuralPathway({
       const hasHovered = nodes.some(n => n.isHovered)
       const hoveredNode = nodes.find(n => n.isHovered)
 
-      // If only one node and it's hovered, create decorative connection points around it
+      // If only one node (heading) and it's hovered, create wavy web around it
       if (nodes.length === 1 && hasHovered && hoveredNode) {
         const centerX = hoveredNode.x
         const centerY = hoveredNode.y
+        const element = hoveredNode.element
+        const rect = element.getBoundingClientRect()
+        const containerRect = container.getBoundingClientRect()
         
-        // Create decorative nodes around the heading
-        const decorativeNodes: Array<{ x: number; y: number }> = []
-        const radius = 60
-        const numNodes = 8
+        // Get text bounds to create web around the actual text area
+        const textLeft = rect.left - containerRect.left
+        const textRight = rect.right - containerRect.left
+        const textTop = rect.top - containerRect.top
+        const textBottom = rect.bottom - containerRect.top
+        const textWidth = textRight - textLeft
+        const textHeight = textBottom - textTop
         
-        for (let i = 0; i < numNodes; i++) {
-          const angle = (Math.PI * 2 * i) / numNodes + Math.random() * 0.3
-          const offset = radius + (Math.random() - 0.5) * 20
-          decorativeNodes.push({
-            x: centerX + Math.cos(angle) * offset,
-            y: centerY + Math.sin(angle) * offset,
+        // Create organic connection points around the text
+        const connectionPoints: Array<{ x: number; y: number }> = []
+        const numPoints = 15
+        
+        // Points around the text perimeter and slightly beyond
+        const padding = 30
+        
+        for (let i = 0; i < numPoints; i++) {
+          const progress = i / numPoints
+          let x, y
+          
+          if (progress < 0.25) {
+            // Top edge
+            const t = progress * 4
+            x = textLeft + textWidth * t - padding + (Math.random() - 0.5) * 20
+            y = textTop - padding + (Math.random() - 0.5) * 15
+          } else if (progress < 0.5) {
+            // Right edge
+            const t = (progress - 0.25) * 4
+            x = textRight + padding + (Math.random() - 0.5) * 15
+            y = textTop + textHeight * t + (Math.random() - 0.5) * 20
+          } else if (progress < 0.75) {
+            // Bottom edge
+            const t = (progress - 0.5) * 4
+            x = textRight - textWidth * t + padding + (Math.random() - 0.5) * 20
+            y = textBottom + padding + (Math.random() - 0.5) * 15
+          } else {
+            // Left edge
+            const t = (progress - 0.75) * 4
+            x = textLeft - padding + (Math.random() - 0.5) * 15
+            y = textBottom - textHeight * t + (Math.random() - 0.5) * 20
+          }
+          
+          connectionPoints.push({ x, y })
+        }
+        
+        // Add some interior points for denser web
+        for (let i = 0; i < 8; i++) {
+          connectionPoints.push({
+            x: textLeft + Math.random() * textWidth,
+            y: textTop + Math.random() * textHeight,
           })
         }
         
         ctx.save()
         
-        // Draw connections from center to decorative nodes
-        decorativeNodes.forEach((decoNode) => {
-          const dist = Math.hypot(decoNode.x - centerX, decoNode.y - centerY)
-          const connectionOpacity = (1 - dist / 100) * 0.3
-          ctx.globalAlpha = connectionOpacity
-          
-          rc.line(centerX, centerY, decoNode.x, decoNode.y, {
-            stroke: 'var(--color-text)',
-            strokeWidth: 0.6,
-            roughness: 1.8,
-            bowing: 1.2,
-          })
-        })
-        
-        // Draw connections between decorative nodes
-        for (let i = 0; i < decorativeNodes.length; i++) {
-          for (let j = i + 1; j < decorativeNodes.length; j++) {
-            const n1 = decorativeNodes[i]
-            const n2 = decorativeNodes[j]
-            const dist = Math.hypot(n2.x - n1.x, n2.y - n1.y)
+        // Draw wavy web of connections
+        for (let i = 0; i < connectionPoints.length; i++) {
+          for (let j = i + 1; j < connectionPoints.length; j++) {
+            const p1 = connectionPoints[i]
+            const p2 = connectionPoints[j]
+            const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y)
             
-            if (dist < 80) {
-              const connectionOpacity = (1 - dist / 80) * 0.15
+            // Connect points that are reasonably close (web-like pattern)
+            if (dist > 20 && dist < 120) {
+              const connectionOpacity = (1 - dist / 120) * 0.25
               ctx.globalAlpha = connectionOpacity
               
-              rc.line(n1.x, n1.y, n2.x, n2.y, {
+              // Wavy, organic lines with higher roughness for hand-drawn feel
+              rc.line(p1.x, p1.y, p2.x, p2.y, {
                 stroke: 'var(--color-text)',
-                strokeWidth: 0.4,
-                roughness: 2,
-                bowing: 1.5,
+                strokeWidth: 0.5,
+                roughness: 2.5,
+                bowing: 1.8,
               })
             }
           }
+          
+          // Connect points to center (text) for more web-like effect
+          const p = connectionPoints[i]
+          const distToCenter = Math.hypot(p.x - centerX, p.y - centerY)
+          if (distToCenter > 30 && distToCenter < 100) {
+            const connectionOpacity = (1 - distToCenter / 100) * 0.2
+            ctx.globalAlpha = connectionOpacity
+            
+            rc.line(p.x, p.y, centerX, centerY, {
+              stroke: 'var(--color-text)',
+              strokeWidth: 0.5,
+              roughness: 2.2,
+              bowing: 1.5,
+            })
+          }
         }
-        
-        // Draw decorative node circles
-        decorativeNodes.forEach((decoNode) => {
-          ctx.globalAlpha = 0.1
-          rc.circle(decoNode.x, decoNode.y, 3, {
-            stroke: 'var(--color-text)',
-            strokeWidth: 0.5,
-            roughness: 1,
-            fill: 'var(--color-text)',
-            fillStyle: 'solid',
-          })
-        })
-        
-        // Draw central node (heading)
-        ctx.globalAlpha = 0.2
-        rc.circle(centerX, centerY, 5, {
-          stroke: 'var(--color-text)',
-          strokeWidth: 1,
-          roughness: 1,
-          fill: 'var(--color-text)',
-          fillStyle: 'solid',
-        })
         
         ctx.restore()
         animationFrameRef.current = requestAnimationFrame(draw)
