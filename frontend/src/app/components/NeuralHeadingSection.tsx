@@ -44,7 +44,7 @@ export function NeuralHeadingSection({
       {children}
       <NeuralPathway 
         containerRef={headingRef} 
-        nodeSelectors={['h2']}
+        nodeSelectors={['h2', 'a']}
         hoveredElement={hoveredElement}
       />
     </div>
