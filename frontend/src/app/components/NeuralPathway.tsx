@@ -78,10 +78,96 @@ export function NeuralPathway({
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       const nodes = nodesRef.current
-      if (nodes.length < 2) return
-
       const hasHovered = nodes.some(n => n.isHovered)
       const hoveredNode = nodes.find(n => n.isHovered)
+
+      // If only one node and it's hovered, create decorative connection points around it
+      if (nodes.length === 1 && hasHovered && hoveredNode) {
+        const centerX = hoveredNode.x
+        const centerY = hoveredNode.y
+        
+        // Create decorative nodes around the heading
+        const decorativeNodes: Array<{ x: number; y: number }> = []
+        const radius = 60
+        const numNodes = 8
+        
+        for (let i = 0; i < numNodes; i++) {
+          const angle = (Math.PI * 2 * i) / numNodes + Math.random() * 0.3
+          const offset = radius + (Math.random() - 0.5) * 20
+          decorativeNodes.push({
+            x: centerX + Math.cos(angle) * offset,
+            y: centerY + Math.sin(angle) * offset,
+          })
+        }
+        
+        ctx.save()
+        
+        // Draw connections from center to decorative nodes
+        decorativeNodes.forEach((decoNode) => {
+          const dist = Math.hypot(decoNode.x - centerX, decoNode.y - centerY)
+          const connectionOpacity = (1 - dist / 100) * 0.3
+          ctx.globalAlpha = connectionOpacity
+          
+          rc.line(centerX, centerY, decoNode.x, decoNode.y, {
+            stroke: 'var(--color-text)',
+            strokeWidth: 0.6,
+            roughness: 1.8,
+            bowing: 1.2,
+          })
+        })
+        
+        // Draw connections between decorative nodes
+        for (let i = 0; i < decorativeNodes.length; i++) {
+          for (let j = i + 1; j < decorativeNodes.length; j++) {
+            const n1 = decorativeNodes[i]
+            const n2 = decorativeNodes[j]
+            const dist = Math.hypot(n2.x - n1.x, n2.y - n1.y)
+            
+            if (dist < 80) {
+              const connectionOpacity = (1 - dist / 80) * 0.15
+              ctx.globalAlpha = connectionOpacity
+              
+              rc.line(n1.x, n1.y, n2.x, n2.y, {
+                stroke: 'var(--color-text)',
+                strokeWidth: 0.4,
+                roughness: 2,
+                bowing: 1.5,
+              })
+            }
+          }
+        }
+        
+        // Draw decorative node circles
+        decorativeNodes.forEach((decoNode) => {
+          ctx.globalAlpha = 0.1
+          rc.circle(decoNode.x, decoNode.y, 3, {
+            stroke: 'var(--color-text)',
+            strokeWidth: 0.5,
+            roughness: 1,
+            fill: 'var(--color-text)',
+            fillStyle: 'solid',
+          })
+        })
+        
+        // Draw central node (heading)
+        ctx.globalAlpha = 0.2
+        rc.circle(centerX, centerY, 5, {
+          stroke: 'var(--color-text)',
+          strokeWidth: 1,
+          roughness: 1,
+          fill: 'var(--color-text)',
+          fillStyle: 'solid',
+        })
+        
+        ctx.restore()
+        animationFrameRef.current = requestAnimationFrame(draw)
+        return
+      }
+
+      if (nodes.length < 2) {
+        animationFrameRef.current = requestAnimationFrame(draw)
+        return
+      }
 
       // Draw connections between nearby nodes
       ctx.save()

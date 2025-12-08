@@ -49,7 +49,7 @@ export function Hero() {
           {mounted && (
             <TextReveal 
               text={greeting} 
-              speed={40} 
+              speed={25} 
               showCursor={true}
               onComplete={handleGreetingComplete}
             />
@@ -61,14 +61,19 @@ export function Hero() {
             <p>
               <TextReveal 
                 text={bio1} 
-                speed={12} 
+                speed={25} 
+                showCursor={true}
                 onComplete={handleBio1Complete}
               />
             </p>
           )}
           {phase >= 2 && (
             <p className="hero-interests">
-              <TextReveal text={bio2} speed={12} />
+              <TextReveal 
+                text={bio2} 
+                speed={25} 
+                showCursor={true}
+              />
             </p>
           )}
         </div>

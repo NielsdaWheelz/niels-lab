@@ -32,7 +32,7 @@ export function SketchCanvas() {
   const pointCountRef = useRef(0)
   
   const [drawMode, setDrawMode] = useState(false)
-  const [showHint, setShowHint] = useState(false)
+  const [showHint, setShowHint] = useState(true)
 
   const getRandomColor = () => COLORS[Math.floor(Math.random() * COLORS.length)]
 
@@ -104,9 +104,6 @@ export function SketchCanvas() {
       pointIndex++
       if (pointIndex < points.length) {
         setTimeout(drawNextPoint, 35)
-      } else {
-        // Demo finished, show hint after a short delay
-        setTimeout(() => setShowHint(true), 1500)
       }
     }
 
@@ -290,6 +287,18 @@ export function SketchCanvas() {
     }
   }, [handlePointerUp])
 
+  // Add class to body when in draw mode to allow drawing through content
+  useEffect(() => {
+    if (drawMode) {
+      document.body.classList.add('draw-mode-active')
+    } else {
+      document.body.classList.remove('draw-mode-active')
+    }
+    return () => {
+      document.body.classList.remove('draw-mode-active')
+    }
+  }, [drawMode])
+
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -335,7 +344,7 @@ export function SketchCanvas() {
       />
       {showHint && (
         <div className="sketch-hint">
-          <kbd>⇧ shift</kbd> + drag to trace
+          <kbd>⇧ shift</kbd> + <span>drag to draw</span>
         </div>
       )}
     </>

@@ -6,12 +6,7 @@ import Footer from '@/app/components/footer'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { baseUrl } from '@/app/sitemap'
-import { TerminalWrapper } from '@/app/components/Terminal/TerminalWrapper'
 import { SketchCanvas } from '@/app/components/SketchCanvas'
-import { getBlogPosts } from '@/app/blog/utils'
-import { getProjects } from '@/app/projects/utils'
-import { getBraindumps } from '@/app/braindumps/utils'
-import { getCVContent } from '@/app/cv/utils'
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -51,15 +46,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Build terminal data (server-side)
-  const cvContent = getCVContent()
-  const terminalData = {
-    blogPosts: getBlogPosts(),
-    projects: getProjects(),
-    braindumps: getBraindumps(),
-    cv: cvContent,
-  }
-
   return (
     <html lang="en" className={jetbrainsMono.variable}>
       <body>
@@ -69,7 +55,6 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
-        <TerminalWrapper data={terminalData} />
         <Analytics />
         <SpeedInsights />
       </body>
