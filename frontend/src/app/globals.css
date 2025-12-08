@@ -24,6 +24,8 @@ html {
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  /* simple dot cursor */
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Ccircle cx='4' cy='4' r='3' fill='%231A7080'/%3E%3C/svg%3E") 4 4, auto;
 }
 
 body {
@@ -52,6 +54,8 @@ a {
   text-decoration: underline;
   text-underline-offset: 2px;
   transition: color 0.2s ease;
+  /* simple dot cursor for links - green accent */
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Ccircle cx='4' cy='4' r='3' fill='%2380D8A0'/%3E%3C/svg%3E") 4 4, pointer;
 }
 
 a:hover {
