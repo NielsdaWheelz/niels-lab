@@ -888,3 +888,16 @@ body.draw-mode-active footer {
 .project-link:hover {
   color: var(--color-terracotta);
 }
+
+/* View all links */
+.view-all-link {
+  color: var(--color-terracotta);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease;
+  font-weight: 500;
+}
+
+.view-all-link:hover {
+  color: var(--color-sage);
+}
