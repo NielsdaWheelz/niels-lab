@@ -1,4 +1,15 @@
-/* brutalist portfolio - white on black, system fonts, raw */
+/* warm, light-hearted portfolio with hand-drawn feel */
+
+:root {
+  --color-bg: #FDF6E3;
+  --color-bg-alt: #FAF3E0;
+  --color-text: #3D3D3D;
+  --color-text-muted: #6B6B6B;
+  --color-terracotta: #E07A5F;
+  --color-sage: #81B29A;
+  --color-gold: #F2CC8F;
+  --color-border: #E5DDD0;
+}
 
 * {
   box-sizing: border-box;
@@ -7,9 +18,9 @@
 }
 
 html {
-  background: #000;
-  color: #e0e0e0;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-mono), monospace;
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -18,35 +29,41 @@ html {
 body {
   min-height: 100vh;
   padding: 1.5rem;
+  padding-top: 3rem;
   padding-bottom: 70px; /* space for collapsed mobile terminal */
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 /* responsive padding */
 @media (min-width: 640px) {
   body {
     padding: 2rem;
+    padding-top: 4rem;
     padding-bottom: 160px; /* space for desktop terminal */
   }
 }
 
-/* links - underlined, no color change */
+/* links - underlined with accent color */
 a {
-  color: inherit;
+  color: var(--color-terracotta);
   text-decoration: underline;
   text-underline-offset: 2px;
+  transition: color 0.2s ease;
 }
 
 a:hover {
-  color: #fff;
+  color: var(--color-sage);
 }
 
-/* headings - no special treatment, just bold */
+/* headings */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   font-size: inherit;
   margin: 1.5em 0 0.5em 0;
+  color: var(--color-text);
 }
 
 h1 {
@@ -82,13 +99,14 @@ li {
   margin: 0.25em 0;
 }
 
-/* code blocks - slightly lighter bg with syntax highlighting */
+/* code blocks */
 pre {
-  background: #0a0a0a;
+  background: var(--color-bg-alt);
   padding: 0.75rem;
   overflow-x: auto;
   margin: 1em 0;
-  border: 1px solid #222;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
   font-size: 0.85em;
 }
 
@@ -106,36 +124,36 @@ code {
 
 /* inline code */
 p code, li code {
-  background: #1a1a1a;
+  background: var(--color-bg-alt);
   padding: 0.1em 0.3em;
+  border-radius: 3px;
 }
 
-/* syntax highlighting - sugar-high colors */
+/* syntax highlighting - warm palette */
 .sh__line {
   display: block;
 }
 
-/* sugar-high token colors */
-code .sh__token--identifier { color: #e0e0e0; }
-code .sh__token--keyword { color: #f472b6; }
-code .sh__token--string { color: #a5f3fc; }
-code .sh__token--number { color: #fcd34d; }
-code .sh__token--comment { color: #6b7280; font-style: italic; }
-code .sh__token--punctuation { color: #9ca3af; }
-code .sh__token--operator { color: #f472b6; }
-code .sh__token--property { color: #93c5fd; }
-code .sh__token--function { color: #c4b5fd; }
-code .sh__token--class { color: #fcd34d; }
-code .sh__token--sign { color: #9ca3af; }
-code .sh__token--jsxliterals { color: #a5f3fc; }
-code .sh__token--entity { color: #f472b6; }
+code .sh__token--identifier { color: var(--color-text); }
+code .sh__token--keyword { color: var(--color-terracotta); }
+code .sh__token--string { color: var(--color-sage); }
+code .sh__token--number { color: var(--color-gold); }
+code .sh__token--comment { color: var(--color-text-muted); font-style: italic; }
+code .sh__token--punctuation { color: #8B8B8B; }
+code .sh__token--operator { color: var(--color-terracotta); }
+code .sh__token--property { color: #5A8F7B; }
+code .sh__token--function { color: #C4956A; }
+code .sh__token--class { color: var(--color-gold); }
+code .sh__token--sign { color: #8B8B8B; }
+code .sh__token--jsxliterals { color: var(--color-sage); }
+code .sh__token--entity { color: var(--color-terracotta); }
 
 /* blockquotes */
 blockquote {
-  border-left: 2px solid #333;
+  border-left: 3px solid var(--color-sage);
   padding-left: 1em;
   margin: 1em 0;
-  color: #999;
+  color: var(--color-text-muted);
 }
 
 /* tables */
@@ -149,7 +167,7 @@ table {
 }
 
 th, td {
-  border: 1px solid #333;
+  border: 1px solid var(--color-border);
   padding: 0.4em 0.6em;
   text-align: left;
   white-space: nowrap;
@@ -166,19 +184,19 @@ th, td {
 }
 
 th {
-  background: #111;
+  background: var(--color-bg-alt);
 }
 
 /* selection */
 ::selection {
-  background: #444;
-  color: #fff;
+  background: var(--color-gold);
+  color: var(--color-text);
 }
 
 /* horizontal rule */
 hr {
   border: none;
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--color-border);
   margin: 2em 0;
 }
 
@@ -190,7 +208,8 @@ img {
 
 /* strong/bold */
 strong, b {
-  color: #fff;
+  color: var(--color-text);
+  font-weight: 700;
 }
 
 /* emphasis */
@@ -215,19 +234,20 @@ nav {
 
 nav a {
   text-decoration: none;
-  color: #888;
+  color: var(--color-text-muted);
+  transition: color 0.2s ease;
 }
 
 nav a:hover {
-  color: #fff;
+  color: var(--color-terracotta);
 }
 
 /* footer */
 footer {
   margin-top: 3rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #222;
-  color: #666;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
   font-size: 0.85rem;
 }
 
@@ -240,11 +260,11 @@ footer {
 }
 
 footer a {
-  color: #888;
+  color: var(--color-text-muted);
 }
 
 footer a:hover {
-  color: #fff;
+  color: var(--color-terracotta);
 }
 
 /* prose styles for MDX content */
@@ -260,7 +280,7 @@ footer a:hover {
 .prose h2 {
   margin-top: 2em;
   margin-bottom: 1em;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 0.5em;
 }
 
@@ -271,14 +291,14 @@ footer a:hover {
 .prose h3 {
   margin-top: 1.2em;
   margin-bottom: 0.25em;
-  color: #fff;
+  color: var(--color-text);
   font-weight: 700;
 }
 
 .prose h3 + p {
   margin-top: 0.25em;
   margin-bottom: 0.75em;
-  color: #999;
+  color: var(--color-text-muted);
   font-size: 0.95em;
 }
 
@@ -306,7 +326,7 @@ footer a:hover {
   display: inline-block;
   width: 0.5em;
   height: 1em;
-  background: #e0e0e0;
+  background: var(--color-terracotta);
   margin-left: 1px;
   vertical-align: text-bottom;
   animation: cursor-blink 1s infinite;
@@ -342,3 +362,42 @@ footer a:hover {
   animation-delay: 0.4s;
 }
 
+/* sketch canvas */
+.sketch-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sketch-canvas.interactive {
+  pointer-events: auto;
+}
+
+/* sketch hint */
+.sketch-hint {
+  position: fixed;
+  bottom: 180px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+  z-index: 2;
+  pointer-events: none;
+  animation: hint-pulse 2s ease-in-out infinite;
+}
+
+@media (max-width: 640px) {
+  .sketch-hint {
+    bottom: 100px;
+  }
+}
+
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
