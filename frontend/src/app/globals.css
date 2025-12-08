@@ -5,9 +5,9 @@
   --color-bg-alt: #FAF3E0;
   --color-text: #3D3D3D;
   --color-text-muted: #6B6B6B;
-  --color-terracotta: #E07A5F;
-  --color-sage: #81B29A;
-  --color-gold: #F2CC8F;
+  --color-terracotta: #1A7080;  /* deep teal - primary accent */
+  --color-sage: #7A8B5C;        /* olive green */
+  --color-gold: #D4A84A;        /* ochre/mustard */
   --color-border: #E5DDD0;
 }
 
@@ -64,6 +64,19 @@ h1, h2, h3, h4, h5, h6 {
   font-size: inherit;
   margin: 1.5em 0 0.5em 0;
   color: var(--color-text);
+}
+
+/* section headings on homepage need more space */
+.draw-heading {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .draw-heading {
+    margin-top: 3.5rem;
+    margin-bottom: 1.25rem;
+  }
 }
 
 h1 {

@@ -1,7 +1,6 @@
 import { BlogPosts } from '@/app/components/posts'
 import { ProjectsList } from '@/app/components/projects'
 import { Hero } from '@/app/components/Hero'
-import { SketchDivider } from '@/app/components/SketchDivider'
 import { DrawHeading } from '@/app/components/DrawHeading'
 
 export default function Page() {
@@ -9,14 +8,10 @@ export default function Page() {
     <section>
       <Hero />
       
-      <SketchDivider variant="minimal" delay={2000} />
-      
       <DrawHeading as="h2" underlineColor="sage" delay={2200}>
         projects
       </DrawHeading>
       <ProjectsList limit={3} />
-      
-      <SketchDivider variant="neural" delay={300} />
       
       <DrawHeading as="h2" underlineColor="terracotta" delay={500}>
         recent writing
