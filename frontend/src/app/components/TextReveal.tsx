@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface TextRevealProps {
   text: string
@@ -22,6 +22,7 @@ export function TextReveal({
   const [displayedText, setDisplayedText] = useState('')
   const [isComplete, setIsComplete] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
+  const hasCalledComplete = useRef(false)
 
   useEffect(() => {
     const startTimeout = setTimeout(() => {
@@ -40,7 +41,8 @@ export function TextReveal({
       }, speed)
 
       return () => clearTimeout(timeout)
-    } else {
+    } else if (!hasCalledComplete.current) {
+      hasCalledComplete.current = true
       setIsComplete(true)
       onComplete?.()
     }

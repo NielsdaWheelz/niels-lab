@@ -46,25 +46,26 @@ export function SketchCanvas() {
     return branch
   }, [])
 
-  // Auto-draw demo on page load
+  // Auto-draw demo on page load - draws on the right side
   const runDemo = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas || demoRunRef.current) return
     demoRunRef.current = true
 
-    const centerX = canvas.width * 0.5
-    const centerY = canvas.height * 0.3
+    // Start from the right side of the screen
+    const startX = canvas.width * 0.7
+    const startY = canvas.height * 0.15
 
-    const branch = startNewBranch(centerX - 180, centerY)
+    const branch = startNewBranch(startX, startY)
     
-    // Create a flowing path
+    // Create a flowing path that goes down and slightly left
     const points: { x: number; y: number }[] = []
-    let x = centerX - 180
-    let y = centerY
+    let x = startX
+    let y = startY
     
-    for (let i = 0; i < 50; i++) {
-      x += 7 + Math.random() * 3
-      y += Math.sin(i * 0.25) * 6 + (Math.random() - 0.5) * 4
+    for (let i = 0; i < 40; i++) {
+      x += Math.sin(i * 0.2) * 8 + (Math.random() - 0.6) * 3
+      y += 6 + Math.random() * 3
       points.push({ x, y })
     }
 
@@ -80,18 +81,18 @@ export function SketchCanvas() {
         age: Date.now(),
       })
 
-      // Spawn branches at specific points
-      if (pointIndex === 12 || pointIndex === 25 || pointIndex === 38) {
-        const direction = pointIndex === 25 ? 1 : -1
-        const angle = direction * (Math.PI / 4 + Math.random() * 0.2)
+      // Spawn branches at specific points - going outward
+      if (pointIndex === 10 || pointIndex === 22 || pointIndex === 32) {
+        const direction = pointIndex === 22 ? -1 : 1
+        const angle = direction * (Math.PI / 3 + Math.random() * 0.3)
         const newBranch = startNewBranch(p.x, p.y, branch.color)
         
         let bx = p.x
         let by = p.y
-        const branchLength = 6 + Math.floor(Math.random() * 4)
+        const branchLength = 5 + Math.floor(Math.random() * 4)
         for (let j = 0; j < branchLength; j++) {
-          bx += Math.cos(angle) * (8 + Math.random() * 4)
-          by += Math.sin(angle) * (8 + Math.random() * 4)
+          bx += Math.cos(angle) * (7 + Math.random() * 4)
+          by += Math.sin(angle) * (5 + Math.random() * 3)
           newBranch.points.push({
             x: bx,
             y: by,
@@ -102,7 +103,7 @@ export function SketchCanvas() {
 
       pointIndex++
       if (pointIndex < points.length) {
-        setTimeout(drawNextPoint, 30)
+        setTimeout(drawNextPoint, 35)
       } else {
         // Demo finished, show hint after a short delay
         setTimeout(() => setShowHint(true), 1500)
