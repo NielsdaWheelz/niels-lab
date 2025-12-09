@@ -16,6 +16,7 @@
     "next-mdx-remote": "^5.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "roughjs": "^4.6.6",
     "sugar-high": "^0.7.0"
   },
   "devDependencies": {

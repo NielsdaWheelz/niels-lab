@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface TextRevealProps {
   text: string
@@ -19,32 +19,55 @@ export function TextReveal({
   showCursor = true,
   onComplete,
 }: TextRevealProps) {
-  const [displayedText, setDisplayedText] = useState('')
+  const [currentIndex, setCurrentIndex] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
-  const [hasStarted, setHasStarted] = useState(false)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const onCompleteRef = useRef(onComplete)
+  const hasCalledComplete = useRef(false)
 
+  // Keep onComplete ref up to date
   useEffect(() => {
-    const startTimeout = setTimeout(() => {
-      setHasStarted(true)
-    }, delay)
+    onCompleteRef.current = onComplete
+  }, [onComplete])
 
-    return () => clearTimeout(startTimeout)
-  }, [delay])
-
+  // Reset when text changes
   useEffect(() => {
-    if (!hasStarted) return
-
-    if (displayedText.length < text.length) {
-      const timeout = setTimeout(() => {
-        setDisplayedText(text.slice(0, displayedText.length + 1))
-      }, speed)
-
-      return () => clearTimeout(timeout)
-    } else {
-      setIsComplete(true)
-      onComplete?.()
+    setCurrentIndex(0)
+    setIsComplete(false)
+    hasCalledComplete.current = false
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
     }
-  }, [displayedText, text, speed, hasStarted, onComplete])
+  }, [text])
+
+  // Typing effect
+  useEffect(() => {
+    if (currentIndex >= text.length) {
+      if (!hasCalledComplete.current) {
+        hasCalledComplete.current = true
+        setIsComplete(true)
+        onCompleteRef.current?.()
+      }
+      return
+    }
+
+    // Calculate when to start (accounting for delay on first character)
+    const startTime = currentIndex === 0 ? delay : 0
+
+    timeoutRef.current = setTimeout(() => {
+      setCurrentIndex(prev => prev + 1)
+    }, startTime + speed)
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+    }
+  }, [currentIndex, text.length, speed, delay])
+
+  const displayedText = text.slice(0, currentIndex)
 
   return (
     <span className={className}>

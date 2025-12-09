@@ -1,37 +1,69 @@
 import Link from 'next/link'
-import { getProjects } from '@/app/projects/utils'
+import { getProjects, formatDate } from '@/app/projects/utils'
 
-export function ProjectsList() {
+interface ProjectsListProps {
+  limit?: number
+}
+
+export function ProjectsList({ limit }: ProjectsListProps) {
   const allProjects = getProjects()
+    .sort((a, b) => {
+      if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
+        return -1
+      }
+      return 1
+    })
+
+  const projects = limit ? allProjects.slice(0, limit) : allProjects
 
   return (
-    <ul style={{ listStyle: 'none', padding: 0 }}>
-      {allProjects
-        .sort((a, b) => {
-          if (
-            new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)
-          ) {
-            return -1
-          }
-          return 1
-        })
-        .map((project) => (
-          <li key={project.slug} style={{ marginBottom: '0.75rem' }}>
-            <Link 
-              href={`/projects/${project.slug}`}
-              style={{
-                display: 'block',
-              }}
-            >
-              <span>{project.metadata.title}</span>
+    <ul className="projects-list">
+      {projects.map((project) => (
+        <li key={project.slug} className="project-item">
+          <div className="project-content">
+            <div className="project-image-card" />
+            <div className="project-text">
+              <Link href={`/projects/${project.slug}`} className="project-title">
+                {project.metadata.title}
+              </Link>
               {project.metadata.summary && (
-                <span style={{ color: '#666', display: 'block', fontSize: '0.9em', marginTop: '0.1rem' }}>
-                  {project.metadata.summary}
-                </span>
+                <p className="project-summary">{project.metadata.summary}</p>
               )}
-            </Link>
-          </li>
-        ))}
+              <div className="project-meta">
+                <time dateTime={project.metadata.publishedAt} className="project-date">
+                  {formatDate(project.metadata.publishedAt)}
+                </time>
+                {project.metadata.repoUrl && (
+                  <span className="project-link-sep"> • </span>
+                )}
+                {project.metadata.repoUrl && (
+                  <a 
+                    href={project.metadata.repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="project-link"
+                  >
+                    GitHub
+                  </a>
+                )}
+                {project.metadata.liveUrl && (
+                  <span className="project-link-sep"> • </span>
+                )}
+                {project.metadata.liveUrl && (
+                  <a 
+                    href={project.metadata.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="project-link"
+                  >
+                    Live
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </li>
+      ))}
     </ul>
   )
 }
