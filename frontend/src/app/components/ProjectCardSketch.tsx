@@ -19,8 +19,6 @@ interface ProjectCardSketchProps {
   className?: string
 }
 
-// Colors matching the site's palette
-const COLORS = ['var(--color-terracotta)', 'var(--color-sage)', 'var(--color-gold)', 'var(--color-text)']
 const FADE_START = 4000
 const FADE_DURATION = 3000
 const DRAW_DELAY = 25

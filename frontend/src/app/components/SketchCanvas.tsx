@@ -207,7 +207,7 @@ export function SketchCanvas() {
 
     // Start demo after a short delay
     setTimeout(drawNext, 600)
-  }, [startNewBranch, setShowHint])
+  }, [startNewBranch])
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current

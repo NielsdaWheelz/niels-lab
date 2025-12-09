@@ -44,7 +44,7 @@ export default function Page() {
       </DrawHeading>
       <div style={{ marginBottom: '2rem' }}>
         <p style={{ marginBottom: '0.75rem', fontSize: '0.95em' }}>
-          Looking to hire? I'm currently available for full-time opportunities.
+          Looking to hire? I am currently available for full-time opportunities.
         </p>
         <p style={{ fontSize: '0.95em' }}>
           <Link href="/cv">view my CV</Link>
