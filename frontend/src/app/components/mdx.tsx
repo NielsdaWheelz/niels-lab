@@ -44,8 +44,8 @@ function CustomLink(props: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   return <a target="_blank" rel="noopener noreferrer" {...props} />
 }
 
-function RoundedImage({ className, ...props }: React.ComponentProps<typeof Image>) {
-  return <Image className={className} {...props} />
+function RoundedImage({ className, alt = '', ...props }: React.ComponentProps<typeof Image>) {
+  return <Image className={className} alt={alt} {...props} />
 }
 
 function Code({ children, ...props }: { children: string }) {
