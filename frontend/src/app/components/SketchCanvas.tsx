@@ -24,7 +24,7 @@ const BRANCH_CHANCE = 0.02
 export function SketchCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const branchesRef = useRef<Branch[]>([])
-  const animationFrameRef = useRef<number>()
+  const animationFrameRef = useRef<number | undefined>(undefined)
   const demoRunRef = useRef(false)
   const lastPointRef = useRef<{ x: number; y: number } | null>(null)
   const isDrawingRef = useRef(false)
@@ -33,6 +33,7 @@ export function SketchCanvas() {
   
   const [drawMode, setDrawMode] = useState(false)
   const [showHint, setShowHint] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
 
   const getRandomColor = () => COLORS[Math.floor(Math.random() * COLORS.length)]
 
@@ -309,6 +310,10 @@ export function SketchCanvas() {
   }, [])
 
   const handlePointerDown = useCallback((e: PointerEvent) => {
+    // On mobile, enable draw mode on touch
+    if (isMobile && !drawMode) {
+      setDrawMode(true)
+    }
     if (!drawMode) return
     
     setShowHint(false)
@@ -316,7 +321,7 @@ export function SketchCanvas() {
     lastPointRef.current = { x: e.clientX, y: e.clientY }
     currentBranchRef.current = startNewBranch(e.clientX, e.clientY)
     pointCountRef.current = 0
-  }, [drawMode, startNewBranch])
+  }, [drawMode, startNewBranch, isMobile])
 
   const handlePointerMove = useCallback((e: PointerEvent) => {
     if (!isDrawingRef.current || !lastPointRef.current || !currentBranchRef.current) return
@@ -358,10 +363,26 @@ export function SketchCanvas() {
     lastPointRef.current = null
     currentBranchRef.current = null
     pointCountRef.current = 0
+    // On mobile, disable draw mode after touch ends
+    if (isMobile) {
+      setDrawMode(false)
+    }
+  }, [isMobile])
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640 || 'ontouchstart' in window)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Handle Shift key for draw mode
+  // Handle Shift key for draw mode (desktop only)
   useEffect(() => {
+    if (isMobile) return
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Shift' && !e.repeat) {
         setDrawMode(true)
@@ -382,7 +403,7 @@ export function SketchCanvas() {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [handlePointerUp])
+  }, [handlePointerUp, isMobile])
 
   // Add class to body when in draw mode to allow drawing through content
   useEffect(() => {
@@ -414,6 +435,7 @@ export function SketchCanvas() {
     canvas.addEventListener('pointermove', handlePointerMove)
     canvas.addEventListener('pointerup', handlePointerUp)
     canvas.addEventListener('pointerleave', handlePointerUp)
+    canvas.addEventListener('pointercancel', handlePointerUp)
 
     // Run demo on load
     runDemo()
@@ -424,6 +446,7 @@ export function SketchCanvas() {
       canvas.removeEventListener('pointermove', handlePointerMove)
       canvas.removeEventListener('pointerup', handlePointerUp)
       canvas.removeEventListener('pointerleave', handlePointerUp)
+      canvas.removeEventListener('pointercancel', handlePointerUp)
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
@@ -431,7 +454,7 @@ export function SketchCanvas() {
       demoRunRef.current = false
       branchesRef.current = []
     }
-  }, [draw, runDemo, handlePointerDown, handlePointerMove, handlePointerUp])
+    }, [draw, runDemo, handlePointerDown, handlePointerMove, handlePointerUp, isMobile])
 
   return (
     <>
@@ -441,7 +464,13 @@ export function SketchCanvas() {
       />
       {showHint && (
         <div className="sketch-hint">
-          <kbd>⇧ shift</kbd> + <span>drag to draw</span>
+          {isMobile ? (
+            <span>tap and drag to draw</span>
+          ) : (
+            <>
+              <kbd>⇧ shift</kbd> + <span>drag to draw</span>
+            </>
+          )}
         </div>
       )}
     </>
