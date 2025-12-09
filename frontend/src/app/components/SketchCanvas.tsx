@@ -32,7 +32,7 @@ export function SketchCanvas() {
   const pointCountRef = useRef(0)
   
   const [drawMode, setDrawMode] = useState(false)
-  const [showHint, setShowHint] = useState(false)
+  const [showHint, setShowHint] = useState(true)
 
   const getRandomColor = () => COLORS[Math.floor(Math.random() * COLORS.length)]
 
@@ -178,8 +178,7 @@ export function SketchCanvas() {
 
     const drawNext = () => {
       if (branchIndex >= mainBranches.length) {
-        // Demo finished, show hint after a short delay
-        setTimeout(() => setShowHint(true), 1200)
+        // Demo finished
         return
       }
 
@@ -190,8 +189,6 @@ export function SketchCanvas() {
         pointIndex = 0
         if (branchIndex < mainBranches.length) {
           setTimeout(drawNext, delay * 2)
-        } else {
-          setTimeout(() => setShowHint(true), 1200)
         }
         return
       }

@@ -1,4 +1,3 @@
-import { BlogPosts } from '@/app/components/posts'
 import { ProjectsList } from '@/app/components/projects'
 import { Hero } from '@/app/components/Hero'
 import { DrawHeading } from '@/app/components/DrawHeading'
@@ -38,16 +37,6 @@ export default function Page() {
         <p style={{ fontSize: '0.95em' }}>
           <strong>Tools:</strong> Docker, Git, pytest
         </p>
-      </div>
-      
-      <DrawHeading as="h2" underlineColor="gold" delay={500}>
-        recent writing
-      </DrawHeading>
-      <BlogPosts />
-      <div style={{ marginTop: '1rem', marginBottom: '2rem' }}>
-        <Link href="/blog" className="view-all-link" style={{ fontSize: '0.95em' }}>
-          view all posts →
-        </Link>
       </div>
       
       <DrawHeading as="h2" underlineColor="sage" delay={500}>

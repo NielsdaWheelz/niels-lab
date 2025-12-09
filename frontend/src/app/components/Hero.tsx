@@ -79,17 +79,10 @@ export function Hero() {
         </div>
       </div>
 
-      {/* small decorative dots */}
-      <div className="hero-dots" aria-hidden="true">
-        <span className="dot dot-1" />
-        <span className="dot dot-2" />
-        <span className="dot dot-3" />
-      </div>
-
       {/* neural pathway connections */}
       <NeuralPathway 
         containerRef={heroRef} 
-        nodeSelectors={['h1', 'p', '.dot']}
+        nodeSelectors={['h1', 'p']}
       />
     </section>
   )

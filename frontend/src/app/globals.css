@@ -1,14 +1,14 @@
-/* warm, light-hearted portfolio with hand-drawn feel */
+/* warm, light-hearted portfolio with hand-drawn feel - retro-futuristic grid palette */
 
 :root {
-  --color-bg: #FDF6E3;
-  --color-bg-alt: #FAF3E0;
-  --color-text: #3D3D3D;
-  --color-text-muted: #6B6B6B;
-  --color-terracotta: #1A7080;  /* deep teal - primary accent */
-  --color-sage: #7A8B5C;        /* olive green */
-  --color-gold: #D4A84A;        /* ochre/mustard */
-  --color-border: #E5DDD0;
+  --color-bg: #FDF6E3;           /* warm cream background */
+  --color-bg-alt: #FAF3E0;       /* slightly warmer cream */
+  --color-text: #3D3D3D;         /* dark muted blue-grey */
+  --color-text-muted: #6B6B6B;   /* medium grey */
+  --color-terracotta: #E06B3C;   /* vibrant orange - primary accent (rocket, rose, floors) */
+  --color-sage: #1A7080;         /* deep teal-blue - secondary accent (snail shell, butterfly) */
+  --color-gold: #D4A84A;         /* ochre/mustard - tertiary accent (sun rays, stars) */
+  --color-border: #E5DDD0;       /* soft cream border */
 }
 
 * {
@@ -24,8 +24,8 @@ html {
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  /* simple dot cursor */
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Ccircle cx='4' cy='4' r='3' fill='%231A7080'/%3E%3C/svg%3E") 4 4, auto;
+  /* simple dot cursor - vibrant orange */
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Ccircle cx='4' cy='4' r='3' fill='%23E06B3C'/%3E%3C/svg%3E") 4 4, auto;
 }
 
 body {
@@ -54,8 +54,8 @@ a {
   text-decoration: underline;
   text-underline-offset: 2px;
   transition: color 0.2s ease;
-  /* simple dot cursor for links - green accent */
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Ccircle cx='4' cy='4' r='3' fill='%2380D8A0'/%3E%3C/svg%3E") 4 4, pointer;
+  /* simple dot cursor for links - deep teal-blue accent */
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Ccircle cx='4' cy='4' r='3' fill='%231A7080'/%3E%3C/svg%3E") 4 4, pointer;
 }
 
 a:hover {
