@@ -27,7 +27,7 @@ export function ProjectCardSketch({ className = '' }: ProjectCardSketchProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const branchesRef = useRef<Branch[]>([])
-  const animationFrameRef = useRef<number>()
+  const animationFrameRef = useRef<number | null>(null)
   const demoRunRef = useRef(false)
   const hasStartedRef = useRef(false)
 

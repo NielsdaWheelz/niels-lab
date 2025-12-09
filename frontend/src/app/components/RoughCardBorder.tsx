@@ -59,7 +59,6 @@ export function RoughCardBorder({ className = '' }: RoughCardBorderProps) {
         stroke: 'var(--color-border)',
         strokeWidth: 1,
         roughness: 1.5,
-        opacity: 0.6,
       })
 
       // Bottom edge variation
@@ -67,7 +66,6 @@ export function RoughCardBorder({ className = '' }: RoughCardBorderProps) {
         stroke: 'var(--color-border)',
         strokeWidth: 1,
         roughness: 1.5,
-        opacity: 0.6,
       })
 
       // Left edge variation
@@ -75,7 +73,6 @@ export function RoughCardBorder({ className = '' }: RoughCardBorderProps) {
         stroke: 'var(--color-border)',
         strokeWidth: 1,
         roughness: 1.5,
-        opacity: 0.6,
       })
 
       // Right edge variation
@@ -83,7 +80,6 @@ export function RoughCardBorder({ className = '' }: RoughCardBorderProps) {
         stroke: 'var(--color-border)',
         strokeWidth: 1,
         roughness: 1.5,
-        opacity: 0.6,
       })
     }
 

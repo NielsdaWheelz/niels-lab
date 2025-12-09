@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import rough from 'roughjs'
 
 interface NeuralPathwayProps {
-  containerRef: React.RefObject<HTMLElement>
+  containerRef: React.RefObject<HTMLElement | null>
   nodeSelectors?: string[]
   className?: string
   hoveredElement?: HTMLElement | null
@@ -25,7 +25,7 @@ export function NeuralPathway({
   hoveredElement = null
 }: NeuralPathwayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationFrameRef = useRef<number>()
+  const animationFrameRef = useRef<number | null>(null)
   const nodesRef = useRef<Node[]>([])
   const hoverStateRef = useRef<HTMLElement | null>(null)
 
