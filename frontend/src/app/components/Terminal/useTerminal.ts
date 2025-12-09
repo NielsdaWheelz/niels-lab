@@ -1,37 +1,17 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { FileSystem } from '@/lib/filesystem'
 import { executeCommand, completeInput, CommandResult } from './commands'
 
 export type OutputLine = {
-  type: 'prompt' | 'output' | 'error'
+  type: 'prompt' | 'output' | 'error' | 'thinking'
   content: string
 }
 
-const HISTORY_KEY = 'terminal-history'
-const MAX_HISTORY = 100
-const MAX_OUTPUT = 100
-
-function loadHistory(): string[] {
-  if (typeof window === 'undefined') return []
-  try {
-    const stored = localStorage.getItem(HISTORY_KEY)
-    return stored ? JSON.parse(stored) : []
-  } catch {
-    return []
-  }
-}
-
-function saveHistory(history: string[]) {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-MAX_HISTORY)))
-  } catch {
-    // ignore storage errors
-  }
-}
+const MAX_OUTPUT = 50
+const MAX_HISTORY = 50
 
 export function useTerminal(fs: FileSystem) {
   const pathname = usePathname()
@@ -46,11 +26,7 @@ export function useTerminal(fs: FileSystem) {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [tabCount, setTabCount] = useState(0)
   const [lastTabInput, setLastTabInput] = useState('')
-
-  // load history on mount
-  useEffect(() => {
-    setHistory(loadHistory())
-  }, [])
+  const [isThinking, setIsThinking] = useState(false)
 
   // format prompt
   const prompt = cwd === '/' ? '~ $ ' : `~${cwd} $ `
@@ -70,6 +46,8 @@ export function useTerminal(fs: FileSystem) {
       return
     }
 
+    // For future LLM integration: detect if this is a natural language query
+    // For now, treat everything as a command
     const result: CommandResult = executeCommand(trimmed, { fs, cwd })
 
     // handle clear command
@@ -78,9 +56,7 @@ export function useTerminal(fs: FileSystem) {
       setInput('')
       // add to history
       if (trimmed && (history.length === 0 || history[history.length - 1] !== trimmed)) {
-        const newHistory = [...history, trimmed]
-        setHistory(newHistory)
-        saveHistory(newHistory)
+        setHistory(prev => [...prev, trimmed].slice(-MAX_HISTORY))
       }
       setHistoryIndex(-1)
       return
@@ -101,9 +77,7 @@ export function useTerminal(fs: FileSystem) {
 
     // add to history (avoid consecutive duplicates)
     if (trimmed && (history.length === 0 || history[history.length - 1] !== trimmed)) {
-      const newHistory = [...history, trimmed]
-      setHistory(newHistory)
-      saveHistory(newHistory)
+      setHistory(prev => [...prev, trimmed].slice(-MAX_HISTORY))
     }
 
     setInput('')
@@ -159,6 +133,25 @@ export function useTerminal(fs: FileSystem) {
     }
   }, [input, lastTabInput, tabCount, fs, cwd, prompt, addOutput])
 
+  // For future LLM integration
+  const startThinking = useCallback(() => {
+    setIsThinking(true)
+    addOutput([{ type: 'thinking', content: '' }])
+  }, [addOutput])
+
+  const stopThinking = useCallback((response: string, isError = false) => {
+    setIsThinking(false)
+    // Remove the thinking line and add the response
+    setOutput(prev => {
+      const withoutThinking = prev.filter(line => line.type !== 'thinking')
+      const newLine: OutputLine = { 
+        type: isError ? 'error' : 'output', 
+        content: response 
+      }
+      return [...withoutThinking, newLine].slice(-MAX_OUTPUT)
+    })
+  }, [])
+
   return {
     cwd,
     prompt,
@@ -169,6 +162,8 @@ export function useTerminal(fs: FileSystem) {
     handleHistoryUp,
     handleHistoryDown,
     handleTab,
+    isThinking,
+    startThinking,
+    stopThinking,
   }
 }
-
