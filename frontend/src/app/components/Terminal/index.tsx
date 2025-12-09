@@ -145,7 +145,7 @@ export function Terminal({ filesystem }: TerminalProps) {
       {!expanded && (
         <div className="assistant-collapsed" onClick={handleToggle}>
           <span className="assistant-prompt-hint">~</span>
-          <span className="assistant-placeholder">ask me anything...</span>
+          <span className="assistant-placeholder">use help to get started</span>
           <kbd className="assistant-shortcut">⌘K</kbd>
         </div>
       )}
@@ -179,7 +179,7 @@ export function Terminal({ filesystem }: TerminalProps) {
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               className="assistant-input"
-              placeholder={hasOutput ? '' : 'type a command or ask a question...'}
+              placeholder={hasOutput ? '' : 'type a command or use help to get started...'}
               spellCheck={false}
               autoComplete="off"
               autoCorrect="off"
