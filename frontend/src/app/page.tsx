@@ -26,16 +26,16 @@ export default function Page() {
           <strong>Languages:</strong> Python, TypeScript, SQL
         </p>
         <p style={{ marginBottom: '0.75rem', fontSize: '0.95em' }}>
-          <strong>Backend:</strong> FastAPI, SQLAlchemy, PostgreSQL, Redis/Celery
+          <strong>Backend:</strong> FastAPI, Alembic, SQLAlchemy, SQLModel, PostgreSQL, Redis, Celery, Express
         </p>
         <p style={{ marginBottom: '0.75rem', fontSize: '0.95em' }}>
-          <strong>AI/ML:</strong> OpenAI API, embeddings (pgvector), LLM orchestration
+          <strong>AI/ML:</strong> Pytorch, Scikit-learn, Pandas, Numpy, RAG, LangGraph, Agent Orchestration
         </p>
         <p style={{ marginBottom: '0.75rem', fontSize: '0.95em' }}>
-          <strong>Frontend:</strong> React, Next.js, TypeScript
+          <strong>Frontend:</strong> React, Next.js, TanStack Query, Tailwind, Vite
         </p>
         <p style={{ fontSize: '0.95em' }}>
-          <strong>Tools:</strong> Docker, Git, pytest
+          <strong>Tools:</strong> Docker, Git, JSON, Linux, Bash, Make
         </p>
       </div>
       
