@@ -1,0 +1,167 @@
+---
+title: "Suno Session Lab: turning clip generation into a navigable space"
+publishedAt: '2025-12-11'
+summary: 'Turns music generation into a navigable space, layering LLM labeling over CLAP/embedding-driven clustering and centroid-guided regeneration'
+liveUrl: 'https://suno-demo.vercel.app/'
+repoUrl: 'https://github.com/NielsdaWheelz/suno-demo'
+---
+
+## why i built this
+
+Most “prompt → generate → repeat” music AI feels like a slot machine: you pull the lever, you get a handful of clips, and your only tool is your own short-term memory. You can't steer. You're guessing what the model can do, testing it, and keeping track of where you’ve already been.
+
+**Suno Session Lab** is my attempt to make that steering problem tangible. It’s a small end-to-end system that:
+
+- takes a short “song brief” plus a few continuous control knobs,
+- generates a batch of clips,
+- embeds and clusters them,
+- and then lets you branch from any result with **“more like this”** — while preserving lineage.
+
+This is deliberately a demo: no auth, no persistence, no streaming. But it’s not a toy in the “hand-wavy” sense. The code is structured the way I’d want it structured on day 1 of a real product: clear contracts, swappable providers, deterministic fakes for tests.
+
+## the product idea (in one paragraph)
+
+The UI treats generation as a **tree of decisions**. Generation 0 is your initial batch. Every time you click “more like this,” you spawn a new generation row connected to the node you clicked—so you can run parallel “what if?” branches. Under the hood, “more like this” is implemented as **centroid-guided sampling**: we generate candidate clips, embed them, then keep the ones most similar (cosine) to the parent cluster’s centroid.
+
+## what you can do in the demo
+
+1. **Describe** the vibe (free text).
+2. **Dial in controls**:
+   - energy (0–1)
+   - density (0–1)
+   - duration (1–60s)
+   - tempo (60–180 bpm)
+   - brightness (0–1)
+   - “instrumental only” toggle
+3. Click **Generate**.
+4. Click **Play** on any node to immediately audition it in the bottom player.
+5. Click **More like this** to spawn the next generation from that node.
+
+The bottom player includes a small audio-reactive visualizer — purely decorative.
+
+## system overview
+
+At a high level:
+
+- **Frontend**: React + TypeScript + Tailwind. Local state for session/nodes; react-query mutations for request lifecycles.
+- **Backend**: FastAPI service with a single orchestration surface (`SessionService`).
+- **Media**: Filesystem-backed WAVs served under `/media/*`.
+- **Providers**: Swappable implementations for generation, embeddings, and naming.
+
+A simple model:
+
+```text
+ControlPanel (brief + params)
+        |
+        v
+POST /sessions  ------------------------------->  SessionService
+  returns BatchOut                                |  calls MusicProvider (fake or ElevenLabs)
+        |                                         |  calls EmbeddingProvider (fake or CLAP)
+        v                                         |  clusters via KMeans
+Node mapping (track -> node)                      |  names clusters (fake or OpenAI)
+        |
+        v
+NodeGrid (generation rows + lineage lines)
+        |
+        +--> POST /sessions/{sid}/clusters/{cid}/more   ("more like this")
+
+BottomPlayer: single <audio> + WebAudio analyser + canvas visualizer
+```
+
+## backend:
+
+- **API layer**: translates HTTP into domain calls and returns thin response models.
+- **Service layer** (`SessionService`): the orchestrator.
+- **Core algorithms** (`core/clustering.py`, `core/similarity.py`): pure functions.
+- **State** (`SessionStore`): in-memory sessions + a centroid map keyed by `(session_id, cluster_id)`.
+
+### endpoints
+
+The minimal “product” endpoints are:
+
+- `POST /sessions` → create a new session + initial batch
+- `POST /sessions/{session_id}/clusters/{cluster_id}/more` → generate more near a cluster
+
+There are also two pragmatic demo endpoints:
+
+- `DELETE /media-cache` → wipes the media directory (useful during rapid iteration; not a multi-user-safe idea)
+- `POST /music/settings` → currently supports `{ "force_instrumental": boolean }` for providers that expose it
+
+One small thing I did for developer ergonomics: the backend clears the media directory on startup, and the frontend also calls `DELETE /media-cache` on mount. That’s intentionally “impure” (it’s global state!) but it prevents a class of confusing stale-audio bugs while iterating.
+
+### api example (create session)
+
+Here’s what the wire contract looks like in practice:
+
+```bash
+curl -s -X POST http://127.0.0.1:8000/sessions \
+  -H "content-type: application/json" \
+  -d '{
+    "brief": "warm pads, slow arps, late-night drive",
+    "num_clips": 3,
+    "params": {
+      "energy": 0.35,
+      "density": 0.45,
+      "duration_sec": 8,
+      "tempo_bpm": 110,
+      "brightness": 0.40
+    }
+  }'
+```
+
+And the response is intentionally thin: the backend returns **clusters** of **tracks**, and each track only carries `{id, audio_url, duration_sec}`. (The service stores centroids internally, and the API reads the WAV headers to compute `duration_sec` so the response reflects what’s actually on disk.)
+
+### embeddings + clustering
+
+- **Embeddings**:
+  - optional: `ClapEmbeddingProvider` using `laion/clap-htsat-unfused`
+    - practical detail: CLAP decoding is WAV-only via Python’s `wave` module (then resampled to 48k) to avoid the “which codec backend is installed today?” failure mode that bites a lot of demo environments
+- **Clustering**:
+  - vanilla KMeans with `k = min(max_k, n)` (default `max_k = 3`)
+  - plus a **singleton-merge rule**: if there’s at least one “real” cluster (size ≥ 2), singleton clusters get reassigned to their nearest large centroid
+  - cluster ordering: by size desc, then earliest member index
+
+Note: KMeans is Euclidean, while “more like this” uses cosine similarity. For this demo that’s fine—the goal is a visible feedback loop, not metric purity. But if you were chasing cluster stability you’d likely L2-normalize embeddings (or use spherical kmeans).
+
+### “more like this” is similarity-filtered generation
+
+The backend’s `more_like_cluster` does *not* query a vector index or retrieve existing tracks. Instead it:
+
+1. generates `num_clips` candidates,
+2. embeds them,
+3. scores cosine similarity to the parent cluster centroid,
+4. keeps the top items subject to a minimum similarity threshold,
+5. falls back to top-N if nothing clears the threshold.
+
+### naming clusters
+
+Cluster names are **LLM-generated** via an OpenAI chat completion with strict constraints (aiming for 2–3 words, ASCII, no punctuation) and aggressive cleanup.
+
+## frontend:
+
+The current UI is **node-first**:
+
+- each returned **track** becomes a `NodeView`
+- `generationIndex` groups nodes into rows
+- `parentNodeId` encodes lineage
+- `backendClusterId` is the anchor used for the backend “more like this” call
+
+### the NodeGrid
+
+`NodeGrid` groups nodes by `generationIndex`, renders “generation 0/1/2…” rows, and draws lineage lines by measuring card positions and overlaying an SVG.
+
+### BottomPlayer
+
+Any play action sets the global player state. The bottom bar:
+
+- resets the audio element
+- auto-plays the new source
+- drives a lightweight visualizer using `AudioContext + AnalyserNode + canvas`
+
+The visualizer is a 64-bin frequency snapshot rendered as vertical bars with an HSL hue shift (cyan → magenta as energy increases).
+
+## closing
+
+Generative models become dramatically more useful when you treat their output space as something you can **navigate**, not just sample.
+
+The seams are in the right places: providers are swappable, tests are deterministic, and the contracts are explicit. The interface is honest: it exposes the assumptions (embedding choice, clustering heuristic, similarity threshold) and makes it easy to change them.
