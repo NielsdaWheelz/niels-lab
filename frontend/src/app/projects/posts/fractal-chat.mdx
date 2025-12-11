@@ -1,177 +1,245 @@
 ---
 title: 'Fractal Chat'
 publishedAt: '2025-10-05'
-summary: 'Real-time chat application with document processing and billing'
+summary: 'Chat-first reader that ingests URLs/PDFs/EPUBs and stays grounded'
 liveUrl: 'https://fractal-chat.vercel.app/'
 repoUrl: 'https://github.com/NielsdaWheelz/fractal-chat'
 ---
 
-An AI-powered reader that bridges the gap between your PDFs, EPUBs, and your curiousity.
+# Fractal Chat: A Reading Companion for Infinite Text
 
-### Smart Document Processing
-Upload a PDF or EPUB, and Fractal Chat automatically:
-- Extracts and chunks the text for optimal comprehension
-- Generates semantic embeddings for intelligent search
-- Preserves document metadata and structure
-
-### AI Chat That Actually Gets It
-Ask questions about your documents, and get precise answers grounded in the actual content. No hallucinations, no generic responses—just intelligent retrieval backed by OpenAI's latest models.
-
-### Collaboration Built In
-- **Annotations**: Highlight and comment on specific passages
-- **Groups**: Share documents with teams and manage permissions
-- **Privacy Controls**: Granular access management (Owner, Viewer roles)
-
-### Production-Ready Features
-We didn't skip the hard parts:
-- **Authentication**: Secure login via Google OAuth or email/password (powered by Better Auth)
-- **Billing**: Stripe integration with Free and Pro tiers
-- **Modern Stack**: React Router v7, Vite, Tailwind CSS, and PostgreSQL for performance and scalability
-
-## The Tech Behind It
-
-Fractal Chat is built on a carefully chosen stack:
-- **Frontend**: React Router v7 with a polished Tailwind UI
-- **AI/ML**: Vercel AI SDK + OpenAI for chat and embeddings
-- **Database**: PostgreSQL + Drizzle ORM for type-safe data access
-- **Storage**: Supabase for document storage
-- **Payments**: Stripe for subscription management
+*A chat-first reader built to ingest messy documents.*
 
 ---
 
-## README
+## System Architecture
 
-```markdown
-# Fractal Chat
+### Document ingestion
 
-**Fractal Chat** is an AI-powered reader application that enables users to interact with their documents (PDFs, EPUBs) using advanced RAG (Retrieval-Augmented Generation) techniques. It features a modern, responsive UI, secure authentication, group collaboration, and subscription billing.
+Three inputs:
 
-## Features
+**1) URLs** - Mozilla [Readability](https://github.com/mozilla/readability) strips junk and keeps the article.
 
-- **🤖 AI Chat**: Intelligent chat interface powered by OpenAI and Vercel AI SDK.
-- **📚 Document Intelligence**:
-  - Support for PDF and EPUB formats.
-  - Automatic text extraction, chunking, and embedding generation.
-  - Semantic search to retrieve relevant context for answers.
-- **📝 Annotations & Collaboration**:
-  - Highlight and annotate documents.
-  - Share documents and collaborate in groups.
-  - Granular permission system (Owner, Viewer).
-- **🔐 Authentication**: Secure user authentication via Better Auth (Google OAuth, Email/Password).
-- **💳 Billing**: Integrated Stripe subscription management (Free vs Pro plans).
-- **👥 Groups**: Create groups to manage shared resources and team access.
-
-## Tech Stack
-
-- **Framework**: [React Router v7](https://reactrouter.com/) (formerly Remix)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Database**: [PostgreSQL](https://www.postgresql.org/)
-- **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
-- **AI/LLM**: [Vercel AI SDK](https://sdk.vercel.ai/), OpenAI
-- **Storage**: [Supabase Storage](https://supabase.com/storage)
-- **Auth**: [Better Auth](https://better-auth.com/)
-- **Payments**: [Stripe](https://stripe.com/)
-
-## Prerequisites
-
-- **Node.js**: v20+ recommended
-- **Bun**: (Optional) Used for faster package management and script execution.
-- **Docker**: (Optional) For running a local PostgreSQL instance.
-
-## Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/fractal_chat"
-
-# Authentication (Better Auth)
-BETTER_AUTH_SECRET="your_generated_secret"
-BETTER_AUTH_URL="http://localhost:5173" # or your production URL
-
-# OAuth Providers
-GOOGLE_CLIENT_ID="your_google_client_id"
-GOOGLE_CLIENT_SECRET="your_google_client_secret"
-
-# AI
-OPENAI_API_KEY="sk-..."
-
-# Storage (Supabase)
-SUPABASE_URL="https://your-project.supabase.co"
-SUPABASE_SERVICE_ROLE_KEY="your_service_role_key"
-SUPABASE_BUCKET="documents" # Default bucket for document storage
-
-# Payments (Stripe)
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_PRICE_ID="price_..." # ID for the Pro subscription plan
-STRIPE_WEBHOOK_SECRET="whsec_..."
+```typescript
+const article = await extractMainFromUrl(normalizedUrl)
+// { title, content, textContent, byline, publishedTime, meta }
 ```
 
-## Getting Started
+Single pages aren't enough, so there's a breadth-first crawler:
 
-1. **Clone the repository**
-
-   ```bash
-   git clone <repository-url>
-   cd fractal-chat
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   # or
-   bun install
-   ```
-
-3. **Set up the database**
-
-   If you don't have a Postgres instance, you can use Docker:
-
-   ```bash
-   docker run --name fractal-db -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres
-   ```
-
-   Run migrations to push the schema to your database:
-
-   ```bash
-   npm run drizzle-kit push
-   # or
-   bun run drizzle-kit push
-   ```
-
-4. **Start the development server**
-
-   ```bash
-   npm run dev
-   # or
-   bun run dev
-   ```
-
-   The app will be available at `http://localhost:5173`.
-
-## Scripts
-
-- `dev`: Start the development server.
-- `build`: Build the application for production.
-- `start`: Start the production server.
-- `typecheck`: Run TypeScript type checking.
-- `vercel-build`: Custom build script for Vercel deployment.
-
-## Deployment
-
-The application is built with React Router v7 and can be deployed to any platform that supports Node.js or Docker.
-
-### Docker
-
-```bash
-docker build -t fractal-chat .
-docker run -p 3000:3000 fractal-chat
+```typescript
+const pages = await crawlSite(normalizedUrl, {
+  maxPages: 50,
+  sameHostOnly: true,
+  delayMs: 500
+})
 ```
 
-### Vercel
+Aggregate pages or keep them separate; archives and docs need both.
 
-This project is configured for Vercel. Ensure you set the environment variables in your Vercel project settings.
+**2) PDFs** - Dual extractor because PDFs are hostile:
 
+```typescript
+const parsed = await extractPdfText(buffer);
+if (!textResult?.text?.trim()) {
+  return runFallbackExtraction(buffer, primaryError);
+}
+```
+
+**3) EPUBs** - EPUB is structured HTML. Pull chapters, glue them, keep metadata.
+
+```typescript
+const book = await EPub.createAsync(tmpPath);
+const htmlChapters = await Promise.all(
+  book.flow.map((ch) => book.getChapterRawAsync(ch.id))
+);
+```
+
+### Metadata resolution
+
+Site metadata is sloppy. The pipeline combines rules and LLM inference:
+
+```typescript
+const { object } = await generateObject({
+  model: openai("gpt-5-nano"),
+  schema: metadataSchema,
+  prompt: contextualPrompt,
+});
+```
+
+Schema-constrained output stops hallucinated fields.
+
+### Chunking and embeddings
+
+Text gets split with LangChain's recursive splitter to keep concepts intact:
+
+```typescript
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 500,
+  chunkOverlap: 50,
+});
+```
+
+Embeddings: OpenAI `text-embedding-3-small` at 512 dims to balance cost and recall.
+
+```typescript
+const { embeddings } = await embedMany({
+  model: openai.textEmbeddingModel('text-embedding-3-small'),
+  values: chunkTexts,
+  providerOptions: { openai: { dimensions: 512 } },
+});
+```
+
+Stored in Postgres with `pgvector` so cosine search runs in the database:
+
+```sql
+SELECT *, 1 - (embedding <=> $1::vector) as similarity
+FROM document_chunks
+ORDER BY similarity DESC
+LIMIT $2
+```
+
+No external vector DB; fewer moving parts.
+
+---
+
+## Annotation System
+
+### Character-offset anchoring
+
+Anchors stick to text, not the DOM:
+
+```typescript
+const annotation = {
+  start: 1420,
+  end: 1580,
+  quote: "...",
+  prefix: "...",
+  suffix: "...",
+};
+```
+
+If HTML shifts, offsets still line up unless the words change. Prefix/suffix support fuzzy re-anchoring after minor edits.
+
+### Permission inheritance
+
+Annotations inherit document visibility. Groups add another layer: share a doc with a group, everyone can read; public annotations from members are visible to the group; owner keeps admin rights.
+
+```typescript
+export async function computeAccessLevel(
+  userId: string,
+  resourceType: ResourceType,
+  resourceId: string
+): Promise<PermissionLevel> {
+  // direct permissions
+  // creator checks
+  // visibility flags
+  // parent traversal
+  // group memberships
+}
+```
+
+It's query-heavy, but correctness beats premature caching.
+
+---
+
+## AI Interface
+
+### Document-grounded chat
+
+Chats are bound to a document; the system prompt names it and its author and reminds the model it has a search tool. Less drift, better answers.
+
+```typescript
+systemPrompt += `\n\nContext: You are discussing the document "${document.title}"`;
+if (authorNames) systemPrompt += ` by ${authorNames}`;
+systemPrompt += `. You have access to a searchDocuments tool.`;
+```
+
+### Retrieval as a tool
+
+Semantic search is exposed to the model so it can pull evidence when needed:
+
+```typescript
+tools: {
+  searchDocuments: tool({
+    description: `Search documents for matching chunks of text.`,
+    inputSchema: z.object({
+      query: z.string(),
+      topK: z.number(),
+      searchScope: z.enum(['current', 'mentioned', 'all']),
+    }),
+    execute: async ({ query, topK, searchScope }) => {
+      return await embedAndSearch(userId, query, topK, docIds);
+    },
+  }),
+}
+```
+
+RAG as agentic tool use instead of a fixed pipeline.
+
+### Mentions for cross-document context
+
+Mention syntax pulls other docs or authors into scope:
+
+```
+What did @[Meditations](document:abc123) say?
+How does this compare to @[Marcus Aurelius](author:xyz789)?
+```
+
+Regex parse, expand search scope, synthesize across sources.
+
+---
+
+## UI/UX
+
+Cyberpunk skin with a job: signal hierarchy and interactivity.
+
+```css
+.cyber-border::before {
+  background: linear-gradient(45deg,
+    var(--color-cyber-cyan),
+    var(--color-cyber-pink),
+    var(--color-cyber-purple)
+  );
+}
+.scanlines::before {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+}
+```
+
+Annotation popovers get layered shadows to feel tactile:
+
+```typescript
+boxShadow: "0 0 30px rgba(0,0,0,0.4), \
+            0 0 60px rgba(0,0,0,0.2), \
+            inset 0 1px 0 rgba(255,255,255,0.1)"
+```
+
+Looks serve clarity, not vibes.
+
+---
+
+## Technical Choices
+
+- React Router 7: SSR with focused client islands; loader/action keeps data flow honest.
+- Drizzle ORM: Type-safe SQL without Prisma magic; vector queries stay visible.
+- Better-Auth: Auth as a library; no external service tax.
+- Vercel AI SDK: Streaming and tool calls solved; reinventing adds no value.
+- Stripe: Billing is solved; don't cosplay a payments company.
+- Supabase Storage: S3-compatible PDF storage; Postgres handles pgvector.
+
+---
+
+## Lessons
+
+1) Metadata beats content in difficulty. Sites are inconsistent; expect cleanup.  
+2) Permissions grow teeth fast. Hierarchies and overrides are inevitable.  
+3) PDFs fight back. Test against pathological files or users will do it for you.  
+4) LLMs work best as tools with constraints, not as oracles.  
+5) Visual coherence reduces cognitive load; good UI teaches itself.
