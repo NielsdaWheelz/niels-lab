@@ -16,7 +16,7 @@ export default function CVPage() {
     <section>
       <PageTitle>cv</PageTitle>
       <p style={{ marginTop: '0.5rem', marginBottom: '1.5rem', fontSize: '0.9em' }}>
-        <Link href="/cv.pdf" target="_blank" rel="noopener noreferrer">
+        <Link href="/niels-erik-nandal-cv.pdf" target="_blank" rel="noopener noreferrer">
           view/download pdf
         </Link>
       </p>
