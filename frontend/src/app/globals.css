@@ -1159,3 +1159,155 @@ body.draw-mode-active footer {
     display: none;
   }
 }
+
+/* ============================================
+   TERMINAL ENHANCED COMPONENTS
+   ============================================ */
+
+/* Status line */
+.assistant-status {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  padding: 0 1rem 0.5rem;
+  opacity: 0.7;
+}
+
+/* Terminal link styling */
+.terminal-link {
+  color: var(--color-sage);
+  text-decoration: none;
+}
+
+.terminal-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Terminal command highlight */
+.terminal-command {
+  color: var(--color-terracotta);
+}
+
+/* Terminal search highlight */
+.terminal-highlight {
+  background: rgba(224, 107, 60, 0.2);
+  color: var(--color-text);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* Search results */
+.terminal-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.terminal-result-card {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.terminal-result-title {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.terminal-result-path {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.terminal-result-snippet {
+  font-size: 0.85rem;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.terminal-line-num {
+  color: var(--color-text-muted);
+  margin-right: 0.25rem;
+}
+
+/* Whois card */
+.terminal-card {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.terminal-card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.terminal-card-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.terminal-card-role {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.terminal-card-bio {
+  font-size: 0.85rem;
+  color: var(--color-text);
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+}
+
+.terminal-card-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.terminal-card-fact {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.terminal-card-label {
+  color: var(--color-sage);
+  min-width: 80px;
+}
+
+.terminal-card-links {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.terminal-card-sep {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.terminal-card-stats {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.terminal-stat-bar {
+  color: var(--color-sage);
+}
+
+/* Visualize scribble */
+.terminal-scribble {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+}
