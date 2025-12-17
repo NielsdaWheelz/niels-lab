@@ -3,11 +3,12 @@
 import React, { useRef, useEffect, useState, KeyboardEvent, useMemo } from 'react'
 import Link from 'next/link'
 import { FileSystem } from '@/lib/filesystem'
-import { useTerminal, OutputLine } from './useTerminal'
+import { useTerminal, OutputLine, ChatHandler } from './useTerminal'
 import { TextReveal } from '../TextReveal'
 
 interface TerminalProps {
   filesystem: FileSystem
+  onChat?: ChatHandler
 }
 
 // Seeded PRNG for deterministic randomness (avoid hydration mismatch)
@@ -400,7 +401,7 @@ function OutputLineContent({
   return <>{content}</>
 }
 
-export function Terminal({ filesystem }: TerminalProps) {
+export function Terminal({ filesystem, onChat }: TerminalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const outputRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -420,7 +421,8 @@ export function Terminal({ filesystem }: TerminalProps) {
     isThinking,
     status,
     onTypewriterComplete,
-  } = useTerminal(filesystem)
+    cancelRequest,
+  } = useTerminal(filesystem, onChat)
 
   useEffect(() => {
     setMounted(true)
@@ -488,8 +490,13 @@ export function Terminal({ filesystem }: TerminalProps) {
         break
       case 'Escape':
         e.preventDefault()
-        inputRef.current?.blur()
-        setExpanded(false)
+        if (isThinking) {
+          // Cancel ongoing LLM request
+          cancelRequest()
+        } else {
+          inputRef.current?.blur()
+          setExpanded(false)
+        }
         break
     }
   }
@@ -519,7 +526,7 @@ export function Terminal({ filesystem }: TerminalProps) {
       {!expanded && (
         <div className="assistant-collapsed" onClick={handleToggle}>
           <span className="assistant-prompt-hint">~</span>
-          <span className="assistant-placeholder">use help to get started</span>
+          <span className="assistant-placeholder">chat or /help for commands</span>
           <kbd className="assistant-shortcut">^K</kbd>
         </div>
       )}
@@ -556,7 +563,7 @@ export function Terminal({ filesystem }: TerminalProps) {
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               className="assistant-input"
-              placeholder={hasOutput ? '' : 'type a command or use help to get started...'}
+              placeholder={hasOutput ? '' : 'chat or type /help for commands...'}
               spellCheck={false}
               autoComplete="off"
               autoCorrect="off"

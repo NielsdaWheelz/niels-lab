@@ -1043,6 +1043,21 @@ body.draw-mode-active footer {
   color: var(--color-terracotta);
 }
 
+.assistant-line--user {
+  color: var(--color-text);
+  padding-left: 0;
+}
+
+.assistant-line--user::before {
+  content: '> ';
+  color: var(--color-sage);
+}
+
+.assistant-line--assistant {
+  color: var(--color-text);
+  padding-left: 0;
+}
+
 .assistant-dir {
   color: var(--color-sage);
 }
