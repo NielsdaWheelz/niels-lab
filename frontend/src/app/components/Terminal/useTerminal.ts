@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { FileSystem } from '@/lib/filesystem'
-import { executeCommand, completeInput, CommandResult } from './commands'
+import { executeCommand, completeInput, CommandResult, isSlashCommand } from './commands'
 
 export type OutputLine = {
-  type: 'prompt' | 'output' | 'error' | 'thinking'
+  type: 'prompt' | 'output' | 'error' | 'thinking' | 'user' | 'assistant'
   content: string | React.ReactNode
   id: string // unique id for tracking typewriter state
   isTyping?: boolean // whether this line is currently typing
@@ -23,7 +23,12 @@ function generateLineId(): string {
   return `line-${++lineIdCounter}-${Date.now()}`
 }
 
-export function useTerminal(fs: FileSystem) {
+export type ChatHandler = (
+  message: string,
+  context: { cwd: string; fs: FileSystem }
+) => Promise<{ response: string | React.ReactNode; isError?: boolean }>
+
+export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -39,29 +44,39 @@ export function useTerminal(fs: FileSystem) {
   const [isThinking, setIsThinking] = useState(false)
   const [status, setStatus] = useState<TerminalStatus>('idle')
 
-  // format prompt
+  // Abort controller for cancelling LLM requests
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  // format prompt - different for commands vs chat
   const prompt = cwd === '/' ? '~ $ ' : `~${cwd} $ `
 
   const addOutput = useCallback((lines: OutputLine[]) => {
     setOutput(prev => [...prev, ...lines].slice(-MAX_OUTPUT))
   }, [])
 
-  const execute = useCallback(() => {
+  const execute = useCallback(async () => {
     const trimmed = input.trim()
-
-    // add prompt line to output
-    addOutput([{ type: 'prompt', content: prompt + trimmed, id: generateLineId() }])
 
     if (!trimmed) {
       setInput('')
       return
     }
 
-    // Set status to running
-    setStatus(`running ${trimmed.split(/\s+/)[0]}...`)
+    const isCommand = trimmed.startsWith('/')
 
-    // For future LLM integration: detect if this is a natural language query
-    // For now, treat everything as a command
+    // Add user message/prompt to output
+    addOutput([{
+      type: isCommand ? 'prompt' : 'user',
+      content: isCommand ? (prompt + trimmed) : trimmed,
+      id: generateLineId()
+    }])
+
+    // Set status to running
+    if (isCommand) {
+      setStatus(`running ${trimmed.split(/\s+/)[0]}...`)
+    }
+
+    // Execute as slash command
     const result: CommandResult = executeCommand(trimmed, { fs, cwd })
 
     // handle clear command
@@ -77,7 +92,75 @@ export function useTerminal(fs: FileSystem) {
       return
     }
 
-    // add output
+    // handle chat message (non-slash input)
+    if (result.output === '__CHAT__') {
+      // add to history
+      if (trimmed && (history.length === 0 || history[history.length - 1] !== trimmed)) {
+        setHistory(prev => [...prev, trimmed].slice(-MAX_HISTORY))
+      }
+      setHistoryIndex(-1)
+      setInput('')
+
+      if (onChat) {
+        // LLM handler provided - use it
+        setIsThinking(true)
+        setStatus('thinking...')
+        addOutput([{ type: 'thinking', content: '', id: generateLineId() }])
+
+        // Create abort controller for this request
+        abortControllerRef.current = new AbortController()
+
+        try {
+          const { response, isError } = await onChat(trimmed, { cwd, fs })
+
+          // Remove thinking line and add response
+          setOutput(prev => {
+            const withoutThinking = prev.filter(line => line.type !== 'thinking')
+            const newLine: OutputLine = {
+              type: isError ? 'error' : 'assistant',
+              content: response,
+              id: generateLineId(),
+              isTyping: typeof response === 'string' && !isError,
+            }
+            return [...withoutThinking, newLine].slice(-MAX_OUTPUT)
+          })
+
+          setStatus(isError ? 'error' : (typeof response === 'string' ? 'typing...' : 'idle'))
+        } catch (err) {
+          // Handle abort or error
+          setOutput(prev => {
+            const withoutThinking = prev.filter(line => line.type !== 'thinking')
+            if ((err as Error).name === 'AbortError') {
+              return withoutThinking // silently remove thinking on abort
+            }
+            const errorLine: OutputLine = {
+              type: 'error',
+              content: `error: ${(err as Error).message || 'something went wrong'}`,
+              id: generateLineId(),
+            }
+            return [...withoutThinking, errorLine].slice(-MAX_OUTPUT)
+          })
+          setStatus('error')
+        } finally {
+          setIsThinking(false)
+          abortControllerRef.current = null
+        }
+      } else {
+        // No LLM handler - show placeholder message
+        addOutput([{
+          type: 'assistant',
+          content: "i'm not connected to an AI yet. use /help to see available commands.",
+          id: generateLineId(),
+          isTyping: true,
+        }])
+        setStatus('typing...')
+      }
+
+      setTabCount(0)
+      return
+    }
+
+    // add command output
     if (result.output) {
       const lineId = generateLineId()
       const isStringOutput = typeof result.output === 'string'
@@ -121,7 +204,7 @@ export function useTerminal(fs: FileSystem) {
     setInput('')
     setHistoryIndex(-1)
     setTabCount(0)
-  }, [input, prompt, fs, cwd, history, router, addOutput])
+  }, [input, prompt, fs, cwd, history, router, addOutput, onChat])
 
   const handleHistoryUp = useCallback(() => {
     if (history.length === 0) return
@@ -149,6 +232,11 @@ export function useTerminal(fs: FileSystem) {
   }, [history, historyIndex])
 
   const handleTab = useCallback(() => {
+    // Only tab-complete for commands
+    if (!input.startsWith('/')) {
+      return
+    }
+
     // track consecutive tabs on same input
     const isConsecutiveTab = input === lastTabInput
     const newTabCount = isConsecutiveTab ? tabCount + 1 : 1
@@ -181,7 +269,17 @@ export function useTerminal(fs: FileSystem) {
     setStatus('idle')
   }, [])
 
-  // For future LLM integration
+  // Cancel ongoing LLM request
+  const cancelRequest = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+    }
+    setIsThinking(false)
+    setStatus('idle')
+  }, [])
+
+  // For manual LLM integration
   const startThinking = useCallback(() => {
     setIsThinking(true)
     setStatus('thinking...')
@@ -194,7 +292,7 @@ export function useTerminal(fs: FileSystem) {
     setOutput(prev => {
       const withoutThinking = prev.filter(line => line.type !== 'thinking')
       const newLine: OutputLine = {
-        type: isError ? 'error' : 'output',
+        type: isError ? 'error' : 'assistant',
         content: response,
         id: generateLineId(),
         isTyping: typeof response === 'string' && !isError,
@@ -220,5 +318,7 @@ export function useTerminal(fs: FileSystem) {
     status,
     setStatus,
     onTypewriterComplete,
+    cancelRequest,
+    isSlashCommand: (text: string) => isSlashCommand(text),
   }
 }

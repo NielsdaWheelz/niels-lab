@@ -12,24 +12,35 @@ export type CommandContext = {
   cwd: string
 }
 
-const HELP_TEXT = `commands:
-  pwd             print working directory
-  ls [path]       list directory contents
-  cd <path>       change directory (navigates page)
-  cat <file>      display file contents
-  search <query>  search content (alias: grep)
-  whois           display persona card
-  visualize       generate decorative scribble
-  clear           clear terminal output
-  help            show this message
+const HELP_TEXT = `slash commands (prefix with /):
+  /pwd             print working directory
+  /ls [path]       list directory contents
+  /cd <path>       change directory (navigates page)
+  /cat <file>      display file contents
+  /search <query>  search content (alias: /grep)
+  /whois           display persona card
+  /visualize       generate decorative scribble
+  /clear           clear terminal output
+  /help            show this message
 
 keyboard:
-  ctrl+k          focus terminal
-  tab             autocomplete
-  ↑/↓             command history
-  escape          blur terminal`
+  ctrl+k           focus terminal
+  tab              autocomplete
+  ↑/↓              command history
+  escape           blur terminal
 
-const COMMANDS = ['pwd', 'ls', 'cd', 'cat', 'clear', 'help', 'search', 'grep', 'whois', 'visualize', 'sudo']
+tip: type without / to chat with the assistant`
+
+// Commands that can be executed with / prefix
+const SLASH_COMMANDS = ['pwd', 'ls', 'cd', 'cat', 'clear', 'help', 'search', 'grep', 'whois', 'visualize', 'sudo']
+
+// Check if input is a slash command
+export function isSlashCommand(input: string): boolean {
+  const trimmed = input.trim()
+  if (!trimmed.startsWith('/')) return false
+  const cmd = trimmed.slice(1).split(/\s+/)[0]
+  return SLASH_COMMANDS.includes(cmd)
+}
 
 export function executeCommand(
   input: string,
@@ -40,12 +51,21 @@ export function executeCommand(
     return { output: '', isError: false }
   }
 
-  // handle sudo first
-  if (trimmed.startsWith('sudo ')) {
-    return cmdSudo(trimmed)
+  // Must start with /
+  if (!trimmed.startsWith('/')) {
+    // This is a chat message, not a command
+    return { output: '__CHAT__', isError: false }
   }
 
-  const parts = trimmed.split(/\s+/)
+  // Remove the leading /
+  const withoutSlash = trimmed.slice(1)
+
+  // handle sudo first (special case)
+  if (withoutSlash.startsWith('sudo')) {
+    return cmdSudo(withoutSlash)
+  }
+
+  const parts = withoutSlash.split(/\s+/)
   const cmd = parts[0]
   const args = parts.slice(1)
 
@@ -69,10 +89,8 @@ export function executeCommand(
       return cmdWhois()
     case 'visualize':
       return cmdVisualize()
-    case 'sudo':
-      return cmdSudo(trimmed)
     default:
-      return { output: `command not found: ${cmd}`, isError: true }
+      return { output: `unknown command: /${cmd}\ntype /help for available commands`, isError: true }
   }
 }
 
@@ -174,7 +192,7 @@ function cmdSearch(args: string[], ctx: CommandContext): CommandResult {
   const query = queryParts.join(' ').toLowerCase()
 
   if (!query) {
-    return { output: 'usage: search <query> [-n] [-l <limit>]', isError: true }
+    return { output: 'usage: /search <query> [-n] [-l <limit>]', isError: true }
   }
 
   // Search through filesystem content
@@ -263,7 +281,8 @@ function cmdVisualize(): CommandResult {
 
 // Sudo easter egg
 function cmdSudo(input: string): CommandResult {
-  const afterSudo = input.slice(5).trim()
+  // input is everything after the / but including 'sudo'
+  const afterSudo = input.slice(4).trim() // 'sudo'.length = 4
 
   if (afterSudo === 'make me a sandwich') {
     return {
@@ -283,17 +302,24 @@ export function completeInput(
   ctx: CommandContext
 ): { completed: string; options: string[] } {
   const trimmed = input.trimStart()
-  const parts = trimmed.split(/\s+/)
+
+  // Only complete if starts with /
+  if (!trimmed.startsWith('/')) {
+    return { completed: input, options: [] }
+  }
+
+  const withoutSlash = trimmed.slice(1)
+  const parts = withoutSlash.split(/\s+/)
 
   // completing command name
   if (parts.length === 1 && !input.endsWith(' ')) {
     const partial = parts[0]
-    const matches = COMMANDS.filter(c => c.startsWith(partial))
+    const matches = SLASH_COMMANDS.filter(c => c.startsWith(partial))
 
     if (matches.length === 1) {
-      return { completed: matches[0] + ' ', options: [] }
+      return { completed: '/' + matches[0] + ' ', options: [] }
     }
-    return { completed: input, options: matches }
+    return { completed: input, options: matches.map(m => '/' + m) }
   }
 
   // completing path argument
@@ -311,7 +337,7 @@ export function completeInput(
     if (options.length === 1) {
       // single match - complete it
       const beforePath = parts.slice(0, -1).join(' ')
-      const prefix = beforePath ? beforePath + ' ' : cmd + ' '
+      const prefix = '/' + (beforePath ? beforePath + ' ' : cmd + ' ')
 
       // figure out the base path
       const pathParts = pathArg.split('/')
