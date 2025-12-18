@@ -26,6 +26,39 @@ const conversationHistory: Message[] = [
   { role: 'system', content: SYSTEM_PROMPT }
 ]
 
+// Stop sequences - patterns that indicate the model is generating dialogue markers
+const STOP_PATTERNS = [
+  /\n*<dialogue>/i,
+  /\n*<\/dialogue>/i,
+  /\n*system:/i,
+  /\n*user:/i,
+  /\n*assistant:/i,
+  /\n*<\|/,  // Common special tokens like <|end|>, <|user|>, etc.
+]
+
+/**
+ * Clean up response by removing trailing dialogue markers and artifacts
+ */
+function cleanResponse(text: string): string {
+  let cleaned = text
+
+  // Find the earliest stop pattern and truncate there
+  let earliestIdx = cleaned.length
+  for (const pattern of STOP_PATTERNS) {
+    const match = cleaned.match(pattern)
+    if (match && match.index !== undefined && match.index < earliestIdx) {
+      earliestIdx = match.index
+    }
+  }
+
+  cleaned = cleaned.slice(0, earliestIdx)
+
+  // Trim trailing whitespace and newlines
+  cleaned = cleaned.trimEnd()
+
+  return cleaned
+}
+
 /**
  * Streaming chat handler compatible with useTerminal's ChatHandler type
  */
@@ -56,24 +89,45 @@ export async function handleChat(
   let assistantResponse = ''
 
   try {
+    let shouldStop = false
+
     for await (const token of fetchStream(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body,
       signal,
     })) {
+      if (shouldStop) break
+
       // Each token has { step, token_id, token_text, token_display }
       // Skip if token_text is missing or undefined
       if (token.token_text === undefined || token.token_text === null) {
         console.warn('Received token without token_text:', token)
         continue
       }
+
       const text = token.token_text
       assistantResponse += text
-      onToken(text)
+
+      // Check if we've hit a stop pattern - don't emit tokens after stop
+      for (const pattern of STOP_PATTERNS) {
+        if (pattern.test(assistantResponse)) {
+          shouldStop = true
+          // Clean response before final emit
+          assistantResponse = cleanResponse(assistantResponse)
+          break
+        }
+      }
+
+      if (!shouldStop) {
+        onToken(text)
+      }
     }
 
-    // Stream finished - add response to history
+    // Stream finished - clean up and add response to history
+    // Remove any trailing dialogue/system markers the model might generate
+    assistantResponse = cleanResponse(assistantResponse)
+
     if (assistantResponse) {
       conversationHistory.push({ role: 'assistant', content: assistantResponse })
       // Trim history if too long (keep system + last 20 messages)
