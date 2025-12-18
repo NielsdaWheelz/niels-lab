@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import { buildFileSystem } from '@/lib/filesystem'
+import { handleChat } from '@/lib/nielsGpt'
 import { Terminal } from './index'
 
 export type ContentData = {
@@ -21,6 +22,5 @@ export function TerminalWrapper({ data }: TerminalWrapperProps) {
     [data]
   )
 
-  return <Terminal filesystem={filesystem} />
+  return <Terminal filesystem={filesystem} onChat={handleChat} />
 }
-

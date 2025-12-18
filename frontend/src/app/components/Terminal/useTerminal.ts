@@ -23,10 +23,17 @@ function generateLineId(): string {
   return `line-${++lineIdCounter}-${Date.now()}`
 }
 
+// Streaming chat handler - supports both streaming and non-streaming responses
 export type ChatHandler = (
   message: string,
-  context: { cwd: string; fs: FileSystem }
-) => Promise<{ response: string | React.ReactNode; isError?: boolean }>
+  context: { cwd: string; fs: FileSystem },
+  callbacks: {
+    onToken: (token: string) => void
+    onDone: () => void
+    onError: (error: Error) => void
+    signal: AbortSignal
+  }
+) => Promise<void>
 
 export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
   const pathname = usePathname()
@@ -102,49 +109,49 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
       setInput('')
 
       if (onChat) {
-        // LLM handler provided - use it
+        // LLM handler provided - use streaming
         setIsThinking(true)
         setStatus('thinking...')
-        addOutput([{ type: 'thinking', content: '', id: generateLineId() }])
+
+        // Create a placeholder assistant line that we'll stream into
+        const assistantLineId = generateLineId()
+        addOutput([{ type: 'assistant', content: '', id: assistantLineId }])
 
         // Create abort controller for this request
         abortControllerRef.current = new AbortController()
 
-        try {
-          const { response, isError } = await onChat(trimmed, { cwd, fs })
-
-          // Remove thinking line and add response
-          setOutput(prev => {
-            const withoutThinking = prev.filter(line => line.type !== 'thinking')
-            const newLine: OutputLine = {
-              type: isError ? 'error' : 'assistant',
-              content: response,
-              id: generateLineId(),
-              isTyping: typeof response === 'string' && !isError,
-            }
-            return [...withoutThinking, newLine].slice(-MAX_OUTPUT)
-          })
-
-          setStatus(isError ? 'error' : (typeof response === 'string' ? 'typing...' : 'idle'))
-        } catch (err) {
-          // Handle abort or error
-          setOutput(prev => {
-            const withoutThinking = prev.filter(line => line.type !== 'thinking')
-            if ((err as Error).name === 'AbortError') {
-              return withoutThinking // silently remove thinking on abort
-            }
-            const errorLine: OutputLine = {
-              type: 'error',
-              content: `error: ${(err as Error).message || 'something went wrong'}`,
-              id: generateLineId(),
-            }
-            return [...withoutThinking, errorLine].slice(-MAX_OUTPUT)
-          })
-          setStatus('error')
-        } finally {
-          setIsThinking(false)
-          abortControllerRef.current = null
-        }
+        await onChat(
+          trimmed,
+          { cwd, fs },
+          {
+            signal: abortControllerRef.current.signal,
+            onToken: (token) => {
+              // Append token to the assistant line
+              setOutput(prev => prev.map(line =>
+                line.id === assistantLineId
+                  ? { ...line, content: (line.content as string) + token }
+                  : line
+              ))
+              setStatus('streaming...')
+            },
+            onDone: () => {
+              setIsThinking(false)
+              setStatus('idle')
+              abortControllerRef.current = null
+            },
+            onError: (err) => {
+              // Replace assistant line with error
+              setOutput(prev => prev.map(line =>
+                line.id === assistantLineId
+                  ? { ...line, type: 'error', content: `error: ${err.message}` }
+                  : line
+              ))
+              setIsThinking(false)
+              setStatus('error')
+              abortControllerRef.current = null
+            },
+          }
+        )
       } else {
         // No LLM handler - show placeholder message
         addOutput([{
