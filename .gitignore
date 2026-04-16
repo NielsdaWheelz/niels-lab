@@ -47,3 +47,4 @@ frontend/.turbo/
 # Editor & tooling
 .idea/
 .vscode/
+.vercel
