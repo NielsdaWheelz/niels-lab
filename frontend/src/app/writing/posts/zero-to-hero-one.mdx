@@ -1,7 +1,7 @@
 ---
 title: 'Zero to Hero - One'
 publishedAt: '2025-11-18'
-summary: ''
+summary: 'A plain-English walkthrough of embeddings, hidden layers, logits, loss, and backprop.'
 ---
 
 a network is a group of people trying to guess the next note based on the the last few notes. each has their own opinions, tries to guess what comes next, updates microscopically when they're wrong, and slowly the whole group becomes good at predicting notes.
@@ -76,4 +76,3 @@ to generate a song, you just let the room guess over and over:
 - it predicts a rest ('.') again
 
 in one sentence: three notes go in, get turned into coordinates, mixed around by a bunch of weights and biases, scored against possible next notes, and the whole system nudges its numbers slightly depending on how wrong it was; then repeat.
-

@@ -1,7 +1,7 @@
 ---
 title: 'Zero to Hero - Two'
 publishedAt: '2025-11-18'
-summary: ''
+summary: 'Why bad initialization breaks learning, and how Kaiming init and batch normalization keep the signal alive.'
 ---
 
 recap:
@@ -64,4 +64,3 @@ that wiggle in the mean/std creates wiggle in the activations -> wiggle in the l
 big models + big batches drown it out, but in small models it is very visible.
 
 bad initialization makes neurons saturate, kaiming fixes the scale, batchnorm keeps activations well-behaved during training, and gamma/beta ensure the network still has full expressive power.
-

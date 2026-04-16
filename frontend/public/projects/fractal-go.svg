@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" fill="none">
+  <rect width="1200" height="800" fill="#F8EFE0"/>
+  <rect x="64" y="64" width="1072" height="672" rx="28" fill="#FAF3E0" stroke="#D4A84A" stroke-width="4"/>
+  <text x="120" y="170" fill="#3D3D3D" font-family="JetBrains Mono, monospace" font-size="48" font-weight="700">Fractal Go</text>
+  <text x="120" y="236" fill="#6B6B6B" font-family="JetBrains Mono, monospace" font-size="26">realtime multiplayer rules engine</text>
+  <rect x="180" y="300" width="520" height="520" rx="28" fill="#F2CC8F" stroke="#3D3D3D" stroke-width="3"/>
+  <path d="M244 364H636M244 428H636M244 492H636M244 556H636M244 620H636M244 684H636M244 748H636" stroke="#3D3D3D" stroke-width="3"/>
+  <path d="M244 364V748M308 364V748M372 364V748M436 364V748M500 364V748M564 364V748M628 364V748" stroke="#3D3D3D" stroke-width="3"/>
+  <circle cx="308" cy="428" r="22" fill="#3D3D3D"/>
+  <circle cx="436" cy="492" r="22" fill="#FAF3E0" stroke="#3D3D3D" stroke-width="3"/>
+  <circle cx="500" cy="620" r="22" fill="#3D3D3D"/>
+  <circle cx="628" cy="556" r="22" fill="#FAF3E0" stroke="#3D3D3D" stroke-width="3"/>
+  <text x="760" y="430" fill="#1A7080" font-family="JetBrains Mono, monospace" font-size="26">WebSockets</text>
+  <text x="760" y="494" fill="#1A7080" font-family="JetBrains Mono, monospace" font-size="26">capture logic</text>
+  <text x="760" y="558" fill="#1A7080" font-family="JetBrains Mono, monospace" font-size="26">ko rule</text>
+  <text x="760" y="622" fill="#1A7080" font-family="JetBrains Mono, monospace" font-size="26">territory scoring</text>
+</svg>

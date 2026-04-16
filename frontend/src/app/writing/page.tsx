@@ -1,14 +1,14 @@
 import Link from 'next/link'
-import { formatDate, getBlogPosts } from '@/app/blog/utils'
+import { formatDate, getWritingPosts } from '@/app/writing/utils'
 import { PageTitle } from '@/app/components/PageTitle'
 
 export const metadata = {
-  title: 'blog',
-  description: 'writing',
+  title: 'writing',
+  description: 'Technical notes and build writeups',
 }
 
 export default function Page() {
-  const posts = getBlogPosts().sort((a, b) => {
+  const posts = getWritingPosts().sort((a, b) => {
     if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
       return -1
     }
@@ -17,16 +17,19 @@ export default function Page() {
 
   return (
     <section>
-      <PageTitle>blog</PageTitle>
-      <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem' }}>
+      <PageTitle>writing</PageTitle>
+      <p className="page-intro">
+        Notes on model-building, engineering practice, and what I learned while
+        shipping things that were hard enough to matter.
+      </p>
+      <ul className="writing-list">
         {posts.map((post) => (
-          <li key={post.slug} style={{ marginBottom: '0.5rem' }}>
-            <Link href={`/blog/${post.slug}`}>
-              <span style={{ color: '#666', marginRight: '1rem', fontVariantNumeric: 'tabular-nums' }}>
-                {formatDate(post.metadata.publishedAt)}
-              </span>
+          <li key={post.slug} className="writing-item">
+            <Link href={`/writing/${post.slug}`} className="writing-title">
               {post.metadata.title}
             </Link>
+            <p className="writing-meta">{formatDate(post.metadata.publishedAt)}</p>
+            <p className="writing-summary">{post.metadata.summary}</p>
           </li>
         ))}
       </ul>

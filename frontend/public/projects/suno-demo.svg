@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" fill="none">
+  <rect width="1200" height="800" fill="#F8EFE0"/>
+  <rect x="64" y="64" width="1072" height="672" rx="28" fill="#FAF3E0" stroke="#D4A84A" stroke-width="4"/>
+  <text x="120" y="162" fill="#3D3D3D" font-family="JetBrains Mono, monospace" font-size="44" font-weight="700">Suno Session Lab</text>
+  <text x="120" y="224" fill="#6B6B6B" font-family="JetBrains Mono, monospace" font-size="26">music generation as a navigable space</text>
+  <circle cx="222" cy="500" r="90" fill="#E06B3C" fill-opacity="0.18" stroke="#E06B3C" stroke-width="4"/>
+  <circle cx="432" cy="420" r="76" fill="#1A7080" fill-opacity="0.16" stroke="#1A7080" stroke-width="4"/>
+  <circle cx="592" cy="562" r="82" fill="#D4A84A" fill-opacity="0.18" stroke="#D4A84A" stroke-width="4"/>
+  <circle cx="812" cy="438" r="96" fill="#E06B3C" fill-opacity="0.14" stroke="#E06B3C" stroke-width="4"/>
+  <circle cx="980" cy="552" r="70" fill="#1A7080" fill-opacity="0.16" stroke="#1A7080" stroke-width="4"/>
+  <path d="M222 500C316 470 358 448 432 420M432 420C492 462 520 504 592 562M592 562C684 506 720 472 812 438M812 438C874 494 910 520 980 552" stroke="#3D3D3D" stroke-width="6" stroke-linecap="round"/>
+  <text x="120" y="708" fill="#6B6B6B" font-family="JetBrains Mono, monospace" font-size="22">branch, cluster, label, regenerate</text>
+</svg>

@@ -1,63 +1,85 @@
-import { ProjectsList } from '@/app/components/projects'
-import { Hero } from '@/app/components/Hero'
-import { DrawHeading } from '@/app/components/DrawHeading'
 import Link from 'next/link'
+import { DrawHeading } from '@/app/components/DrawHeading'
+import { ProjectsList } from '@/app/components/projects'
+import { getWritingPosts, formatDate } from '@/app/writing/utils'
+import { githubUrl, linkedinUrl } from '@/app/site'
 
 export default function Page() {
+  const writingPosts = getWritingPosts()
+    .sort((a, b) => {
+      if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
+        return -1
+      }
+      return 1
+    })
+    .slice(0, 3)
+
   return (
-    <section>
-      <Hero />
-      
-      <DrawHeading as="h2" underlineColor="sage" delay={2200}>
-        projects
-      </DrawHeading>
-      <ProjectsList limit={5} />
-      <div style={{ marginTop: '1rem', marginBottom: '2rem' }}>
-        <Link href="/projects" className="view-all-link" style={{ fontSize: '0.95em' }}>
-          view all projects →
-        </Link>
-      </div>
-      
-      <DrawHeading as="h2" underlineColor="terracotta" delay={500}>
-        skills
-      </DrawHeading>
-      <div style={{ marginBottom: '2rem' }}>
-        <p style={{ marginBottom: '0.75rem', fontSize: '0.95em' }}>
-          <strong>Languages:</strong> Python, TypeScript, SQL
+    <section className="home-page">
+      <section className="home-hero">
+        <p className="home-kicker">Niels Erik Nandal</p>
+        <h1 className="home-title">
+          Engineer building AI products, systems, and readable software.
+        </h1>
+        <p className="home-summary">
+          I work across Python, TypeScript, and ML-heavy product surfaces. I care
+          about deterministic backends, sharp product loops, and code a maintainer
+          can understand in one pass.
         </p>
-        <p style={{ marginBottom: '0.75rem', fontSize: '0.95em' }}>
-          <strong>Backend:</strong> FastAPI, Alembic, SQLAlchemy, SQLModel, PostgreSQL, Redis, Celery, Express
+        <p className="home-summary">
+          I am currently open to full-time engineering roles.
         </p>
-        <p style={{ marginBottom: '0.75rem', fontSize: '0.95em' }}>
-          <strong>AI/ML:</strong> Pytorch, Scikit-learn, Pandas, Numpy, RAG, LangGraph, Agent Orchestration
-        </p>
-        <p style={{ marginBottom: '0.75rem', fontSize: '0.95em' }}>
-          <strong>Frontend:</strong> React, Next.js, TanStack Query, Tailwind, Vite
-        </p>
-        <p style={{ fontSize: '0.95em' }}>
-          <strong>Tools:</strong> Docker, Git, JSON, Linux, Bash, Make
-        </p>
-      </div>
-      
-      <DrawHeading as="h2" underlineColor="sage" delay={500}>
-        get in touch
-      </DrawHeading>
-      <div style={{ marginBottom: '2rem' }}>
-        <p style={{ marginBottom: '0.75rem', fontSize: '0.95em' }}>
-          Looking to hire? I&apos;m currently available for full-time opportunities.
-        </p>
-        <p style={{ fontSize: '0.95em' }}>
-          <Link href="/cv">view my CV</Link>
+        <p className="home-links">
+          <Link href="/cv">view CV</Link>
           {' · '}
-          <a href="https://www.linkedin.com/in/nielseriknandal/" target="_blank" rel="noopener noreferrer">
-            linkedin
-          </a>
-          {' · '}
-          <a href="https://github.com/NielsdaWheelz" target="_blank" rel="noopener noreferrer">
+          <a href={githubUrl} target="_blank" rel="noopener noreferrer">
             github
           </a>
+          {' · '}
+          <a href={linkedinUrl} target="_blank" rel="noopener noreferrer">
+            linkedin
+          </a>
         </p>
-      </div>
+      </section>
+
+      <DrawHeading as="h2" underlineColor="sage" delay={2200}>
+        featured projects
+      </DrawHeading>
+      <p className="section-intro">
+        Selected work that best reflects how I think, what I ship, and the level
+        of technical depth I want to be judged on.
+      </p>
+      <ProjectsList
+        slugs={['niels-gpt', 'nexus', 'factory-simulator', 'suno-demo']}
+      />
+      <p className="section-link">
+        <Link href="/projects" className="view-all-link">
+          view all projects →
+        </Link>
+      </p>
+
+      <DrawHeading as="h2" underlineColor="terracotta" delay={500}>
+        writing
+      </DrawHeading>
+      <p className="section-intro">
+        Technical notes and build writeups. Short, direct, and focused on the work.
+      </p>
+      <ul className="writing-list">
+        {writingPosts.map((post) => (
+          <li key={post.slug} className="writing-item">
+            <Link href={`/writing/${post.slug}`} className="writing-title">
+              {post.metadata.title}
+            </Link>
+            <p className="writing-meta">{formatDate(post.metadata.publishedAt)}</p>
+            <p className="writing-summary">{post.metadata.summary}</p>
+          </li>
+        ))}
+      </ul>
+      <p className="section-link">
+        <Link href="/writing" className="view-all-link">
+          view all writing →
+        </Link>
+      </p>
     </section>
   )
 }

@@ -1,18 +1,18 @@
 import { notFound } from 'next/navigation'
 import { CustomMDX } from '@/app/components/mdx'
-import { formatDate, getBlogPosts } from '@/app/blog/utils'
-import { baseUrl } from '@/app/sitemap'
+import { formatDate, getWritingPosts } from '@/app/writing/utils'
 import { PageTitle } from '@/app/components/PageTitle'
 import { ContentReveal } from '@/app/components/ContentReveal'
+import { baseUrl } from '@/app/site'
 
 export async function generateStaticParams() {
-  const posts = getBlogPosts()
+  const posts = getWritingPosts()
   return posts.map((post) => ({ slug: post.slug }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = getBlogPosts().find((post) => post.slug === slug)
+  const post = getWritingPosts().find((post) => post.slug === slug)
   if (!post) return
 
   const { title, publishedAt: publishedTime, summary: description } = post.metadata
@@ -25,14 +25,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       type: 'article',
       publishedTime,
-      url: `${baseUrl}/blog/${post.slug}`,
+      url: `${baseUrl}/writing/${post.slug}`,
     },
   }
 }
 
-export default async function Blog({ params }: { params: Promise<{ slug: string }> }) {
+export default async function WritingPost({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = getBlogPosts().find((post) => post.slug === slug)
+  const post = getWritingPosts().find((post) => post.slug === slug)
 
   if (!post) {
     notFound()
@@ -41,11 +41,11 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
   return (
     <section>
       <PageTitle>{post.metadata.title}</PageTitle>
-      <p style={{ color: '#666', marginBottom: '2rem' }}>
+      <p className="article-meta">
         {formatDate(post.metadata.publishedAt)}
       </p>
       <ContentReveal loadingText="loading post">
-        <article className="prose">
+        <article className="prose article-body">
           <CustomMDX source={post.content} />
         </article>
       </ContentReveal>

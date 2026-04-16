@@ -22,6 +22,24 @@ export type FileSystem = {
   completePath: (partial: string, cwd: string) => string[]
 }
 
+export type ContentEntry = {
+  slug: string
+  metadata: Record<string, string>
+  content: string
+}
+
+export type CVEntry = {
+  slug?: string
+  metadata: Record<string, string>
+  content: string
+}
+
+export type CanonicalContentData = {
+  projects: ContentEntry[]
+  writing: ContentEntry[]
+  cv: CVEntry
+}
+
 // normalize path (resolve . and .., handle leading/trailing slashes)
 export function normalizePath(path: string, cwd: string = '/'): string {
   // handle relative paths
@@ -44,29 +62,16 @@ export function normalizePath(path: string, cwd: string = '/'): string {
 }
 
 // build filesystem from content
-export function buildFileSystem(
-  blogPosts: Array<{ slug: string; metadata: Record<string, string>; content: string }>,
-  projects: Array<{ slug: string; metadata: Record<string, string>; content: string }>,
-  braindumps: Array<{ slug: string; metadata: Record<string, string>; content: string }>,
-  cv: { slug?: string; metadata: Record<string, string>; content: string }
-): FileSystem {
+export function buildFileSystem({
+  projects,
+  writing,
+  cv,
+}: CanonicalContentData): FileSystem {
   const root: FSNode = {
     type: 'directory',
     name: '/',
     path: '/',
     children: [
-      {
-        type: 'directory',
-        name: 'blog',
-        path: '/blog',
-        children: blogPosts.map(post => ({
-          type: 'file' as const,
-          name: post.slug,
-          path: `/blog/${post.slug}`,
-          content: post.content,
-          metadata: post.metadata,
-        })),
-      },
       {
         type: 'directory',
         name: 'projects',
@@ -95,14 +100,14 @@ export function buildFileSystem(
       },
       {
         type: 'directory',
-        name: 'braindumps',
-        path: '/braindumps',
-        children: braindumps.map(dump => ({
+        name: 'writing',
+        path: '/writing',
+        children: writing.map(entry => ({
           type: 'file' as const,
-          name: dump.slug,
-          path: `/braindumps/${dump.slug}`,
-          content: dump.content,
-          metadata: dump.metadata,
+          name: entry.slug,
+          path: `/writing/${entry.slug}`,
+          content: entry.content,
+          metadata: entry.metadata,
         })),
       },
       {
@@ -176,4 +181,3 @@ export function buildFileSystem(
     },
   }
 }
-

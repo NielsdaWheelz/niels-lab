@@ -4,13 +4,12 @@ import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { NeuralPathway } from './NeuralPathway'
 
-const navItems = {
-  '/': 'home',
-  '/blog': 'blog',
-  '/projects': 'projects',
-  '/braindumps': 'braindumps',
-  '/cv': 'cv',
-}
+const navItems = [
+  ['/', 'home'],
+  ['/projects', 'projects'],
+  ['/writing', 'writing'],
+  ['/cv', 'cv'],
+] as const
 
 export function Navbar() {
   const navRef = useRef<HTMLElement>(null)
@@ -18,7 +17,7 @@ export function Navbar() {
 
   return (
     <nav ref={navRef} className="nav-with-pathway">
-      {Object.entries(navItems).map(([path, name]) => (
+      {navItems.map(([path, name]) => (
         <Link 
           key={path} 
           href={path}

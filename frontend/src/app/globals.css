@@ -277,41 +277,6 @@ nav a:hover {
   z-index: 0;
 }
 
-/* neural section wrapper */
-.neural-section {
-  position: relative;
-}
-
-.neural-section h1,
-.neural-section h2,
-.neural-section h3,
-.neural-section a,
-.neural-section strong {
-  position: relative;
-  z-index: 1;
-}
-
-/* neural heading section - for h2 sections with pathway */
-.neural-heading-section {
-  position: relative;
-  margin-bottom: 0;
-}
-
-.neural-heading-section h2 {
-  position: relative;
-  z-index: 2;
-  cursor: default;
-}
-
-.neural-heading-section h2:hover {
-  z-index: 3;
-}
-
-.neural-heading-section a {
-  position: relative;
-  z-index: 1;
-}
-
 /* footer */
 footer {
   margin-top: 3rem;
@@ -535,193 +500,50 @@ body.draw-mode-active footer {
   }
 }
 
+.home-page {
+  padding-bottom: 2rem;
+}
 
-/* hero section */
-.hero {
-  position: relative;
-  padding: 2rem 0 2.5rem 0;
+.home-hero {
+  max-width: 760px;
   margin-bottom: 1rem;
-  overflow: visible;
 }
 
-.hero-content h1,
-.hero-content p {
-  position: relative;
-  z-index: 1;
+.home-kicker {
+  margin: 0 0 0.75rem;
+  color: var(--color-sage);
+  font-size: 0.95rem;
 }
 
-@media (min-width: 640px) {
-  .hero {
-    padding: 3rem 0 3.5rem 0;
-    margin-bottom: 1.5rem;
-  }
+.home-title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.2;
 }
 
-.hero-greeting {
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin: 0 0 1.25rem 0;
-  color: var(--color-text);
-  line-height: 1.3;
-}
-
-@media (min-width: 640px) {
-  .hero-greeting {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-  }
-}
-
-.hero-bio {
-  max-width: 580px;
-}
-
-.hero-bio p {
-  margin: 0.75em 0;
+.home-summary {
+  max-width: 680px;
   color: var(--color-text);
 }
 
-.hero-bio p:first-child {
-  margin-top: 0;
+.home-links {
+  margin-top: 1.25rem;
 }
 
-.hero-interests {
-  color: var(--color-text-muted) !important;
-  font-size: 0.95em;
+.section-intro,
+.page-intro {
+  max-width: 680px;
+  margin: 0.75rem 0 1.5rem;
+  color: var(--color-text-muted);
 }
 
-/* decorative scribble */
-.hero-scribble {
-  position: absolute;
-  top: -0.5rem;
-  left: -1rem;
-  width: 80px;
-  height: 28px;
-  opacity: 0.6;
+.section-link {
+  margin: 0.75rem 0 0;
 }
 
 @media (min-width: 640px) {
-  .hero-scribble {
-    width: 100px;
-    height: 35px;
-    top: -0.75rem;
-    left: -1.5rem;
-  }
-}
-
-.scribble-path {
-  stroke-dasharray: 200;
-  stroke-dashoffset: 200;
-  animation: draw-scribble 1.2s ease-out 0.5s forwards;
-}
-
-@keyframes draw-scribble {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* decorative dots */
-.hero-dots {
-  position: absolute;
-  right: 0;
-  top: 1.5rem;
-  display: flex;
-  gap: 0.4rem;
-}
-
-@media (min-width: 640px) {
-  .hero-dots {
-    top: 2rem;
-    gap: 0.5rem;
-  }
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  opacity: 0;
-  animation: dot-appear 0.4s ease-out forwards;
-}
-
-@media (min-width: 640px) {
-  .dot {
-    width: 8px;
-    height: 8px;
-  }
-}
-
-.dot-1 {
-  background: var(--color-terracotta);
-  animation-delay: 0.8s;
-}
-
-.dot-2 {
-  background: var(--color-sage);
-  animation-delay: 1s;
-}
-
-.dot-3 {
-  background: var(--color-gold);
-  animation-delay: 1.2s;
-}
-
-@keyframes dot-appear {
-  from {
-    opacity: 0;
-    transform: scale(0);
-  }
-  to {
-    opacity: 0.7;
-    transform: scale(1);
-  }
-}
-
-/* ============================================
-   SKETCH DIVIDER - hand-drawn section breaks
-   ============================================ */
-.sketch-divider {
-  width: 100%;
-  max-width: 320px;
-  height: 30px;
-  margin: 2rem 0;
-  opacity: 0.7;
-}
-
-.sketch-divider svg {
-  width: 100%;
-  height: 100%;
-}
-
-.sketch-divider-path {
-  stroke-dasharray: 800;
-  stroke-dashoffset: 800;
-  transition: stroke-dashoffset 1.2s ease-out;
-}
-
-.sketch-divider-path.animate {
-  stroke-dashoffset: 0;
-}
-
-.sketch-dot {
-  opacity: 0;
-  transform-origin: center;
-  animation: sketch-dot-pop 0.4s ease-out forwards;
-}
-
-@keyframes sketch-dot-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  60% {
-    opacity: 0.8;
-    transform: scale(1.3);
-  }
-  100% {
-    opacity: 0.6;
-    transform: scale(1);
+  .home-title {
+    font-size: 2.7rem;
   }
 }
 
@@ -817,6 +639,9 @@ body.draw-mode-active footer {
   position: relative;
   overflow: hidden;
   background: var(--color-bg-alt);
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
 }
 
 @media (min-width: 640px) {
@@ -915,6 +740,65 @@ body.draw-mode-active footer {
 
 .project-link:hover {
   color: var(--color-terracotta);
+}
+
+.writing-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.writing-item {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.writing-item:last-child {
+  border-bottom: none;
+}
+
+.writing-title {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.writing-title:hover {
+  color: var(--color-terracotta);
+}
+
+.writing-meta,
+.article-meta {
+  margin: 0 0 0.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.writing-summary,
+.article-summary {
+  max-width: 720px;
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.article-image {
+  width: 100%;
+  margin: 1.5rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+}
+
+.article-links {
+  margin: 0 0 2rem;
+}
+
+.article-body {
+  max-width: 760px;
 }
 
 /* View all links */

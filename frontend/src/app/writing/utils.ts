@@ -54,8 +54,8 @@ function getMDXData(dir: string) {
   })
 }
 
-export function getBlogPosts() {
-  return getMDXData(path.join(process.cwd(), 'src', 'app', 'blog', 'posts'))
+export function getWritingPosts() {
+  return getMDXData(path.join(process.cwd(), 'src', 'app', 'writing', 'posts'))
 }
 
 export function formatDate(date: string) {
@@ -70,4 +70,3 @@ export function formatDate(date: string) {
 
   return `${day}/${month}/${year}`
 }
-

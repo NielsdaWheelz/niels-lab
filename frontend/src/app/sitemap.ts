@@ -1,12 +1,10 @@
-import { getBlogPosts } from '@/app/blog/utils'
 import { getProjects } from '@/app/projects/utils'
-import { getBraindumps } from '@/app/braindumps/utils'
+import { getWritingPosts } from '@/app/writing/utils'
+import { baseUrl } from '@/app/site'
 
-export const baseUrl = 'https://niels.dev'
-
-export default async function sitemap() {
-  const blogs = getBlogPosts().map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
+export default function sitemap() {
+  const writing = getWritingPosts().map((post) => ({
+    url: `${baseUrl}/writing/${post.slug}`,
     lastModified: post.metadata.publishedAt,
   }))
 
@@ -15,15 +13,10 @@ export default async function sitemap() {
     lastModified: project.metadata.publishedAt,
   }))
 
-  const braindumps = getBraindumps().map((dump) => ({
-    url: `${baseUrl}/braindumps/${dump.slug}`,
-    lastModified: dump.metadata.publishedAt,
-  }))
-
-  const routes = ['', '/blog', '/projects', '/braindumps', '/cv'].map((route) => ({
+  const routes = ['', '/projects', '/writing', '/cv'].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date().toISOString().split('T')[0],
   }))
 
-  return [...routes, ...blogs, ...projects, ...braindumps]
+  return [...routes, ...projects, ...writing]
 }

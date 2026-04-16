@@ -1,11 +1,12 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { getProjects, formatDate } from '@/app/projects/utils'
 
 interface ProjectsListProps {
-  limit?: number
+  slugs?: string[]
 }
 
-export function ProjectsList({ limit }: ProjectsListProps) {
+export function ProjectsList({ slugs }: ProjectsListProps) {
   const allProjects = getProjects()
     .sort((a, b) => {
       if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
@@ -14,14 +15,27 @@ export function ProjectsList({ limit }: ProjectsListProps) {
       return 1
     })
 
-  const projects = limit ? allProjects.slice(0, limit) : allProjects
+  const projects = slugs
+    ? slugs.flatMap((slug) => {
+        const project = allProjects.find((candidate) => candidate.slug === slug)
+        return project ? [project] : []
+      })
+    : allProjects
 
   return (
     <ul className="projects-list">
       {projects.map((project) => (
         <li key={project.slug} className="project-item">
           <div className="project-content">
-            <div className="project-image-card" />
+            <Link href={`/projects/${project.slug}`} className="project-image-card">
+              <Image
+                src={project.metadata.image}
+                alt=""
+                width={1200}
+                height={800}
+                className="project-image"
+              />
+            </Link>
             <div className="project-text">
               <Link href={`/projects/${project.slug}`} className="project-title">
                 {project.metadata.title}

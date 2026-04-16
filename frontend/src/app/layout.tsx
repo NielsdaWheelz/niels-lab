@@ -1,35 +1,29 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { JetBrains_Mono } from 'next/font/google'
+import { GeistMono } from 'geist/font/mono'
 import { Navbar } from '@/app/components/nav'
 import Footer from '@/app/components/footer'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
-import { baseUrl } from '@/app/sitemap'
+import { baseUrl, siteDescription, siteName } from '@/app/site'
 import { SketchCanvas } from '@/app/components/SketchCanvas'
 import { TerminalWrapper, ContentData } from '@/app/components/Terminal/TerminalWrapper'
-import { getBlogPosts } from '@/app/blog/utils'
 import { getProjects } from '@/app/projects/utils'
-import { getBraindumps } from '@/app/braindumps/utils'
+import { getWritingPosts } from '@/app/writing/utils'
 import { getCVContent } from '@/app/cv/utils'
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
-})
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'niels',
-    template: '%s - niels',
+    default: siteName,
+    template: `%s | ${siteName}`,
   },
-  description: 'welcome to my stuff.',
+  description: siteDescription,
   openGraph: {
-    title: 'niels',
-    description: 'welcome to my stuff.',
+    title: siteName,
+    description: siteDescription,
     url: baseUrl,
-    siteName: 'niels',
+    siteName,
     locale: 'en_US',
     type: 'website',
   },
@@ -47,31 +41,25 @@ export const metadata: Metadata = {
 }
 
 function getTerminalData(): ContentData {
-  const blogPosts = getBlogPosts().map(p => ({
+  const writingPosts = getWritingPosts().map(p => ({
     slug: p.slug,
     metadata: p.metadata as Record<string, string>,
     content: p.content,
   }))
-  
+
   const projects = getProjects().map(p => ({
     slug: p.slug,
     metadata: p.metadata as Record<string, string>,
     content: p.content,
   }))
-  
-  const braindumps = getBraindumps().map(p => ({
-    slug: p.slug,
-    metadata: p.metadata as Record<string, string>,
-    content: p.content,
-  }))
-  
+
   const cvContent = getCVContent()
   const cv = {
     metadata: cvContent.metadata as Record<string, string>,
     content: cvContent.content,
   }
-  
-  return { blogPosts, projects, braindumps, cv }
+
+  return { writingPosts, projects, cv }
 }
 
 export default function RootLayout({
@@ -80,9 +68,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   const terminalData = getTerminalData()
-  
+
   return (
-    <html lang="en" className={jetbrainsMono.variable}>
+    <html lang="en" className={GeistMono.variable}>
       <body>
         <SketchCanvas />
         <Navbar />

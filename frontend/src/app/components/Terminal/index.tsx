@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { FileSystem } from '@/lib/filesystem'
 import { useTerminal, OutputLine, ChatHandler } from './useTerminal'
 import { TextReveal } from '../TextReveal'
+import { githubUrl, linkedinUrl } from '@/app/site'
 
 interface TerminalProps {
   filesystem: FileSystem
@@ -74,7 +75,7 @@ function highlightMatches(text: string, query: string): React.ReactNode {
 // Linkify paths and highlight commands in string output
 function formatStringOutput(content: string): React.ReactNode {
   // Paths to linkify
-  const pathPattern = /(\/(?:blog|projects|braindumps|cv)(?:\/[^\s,]+)?)/g
+  const pathPattern = /(\/(?:projects|writing|cv)(?:\/[^\s,]+)*)/g
   // Commands to highlight
   const commandNames = ['help', 'search', 'grep', 'whois', 'visualize', 'sudo', 'pwd', 'ls', 'cd', 'cat', 'clear']
   // Backticked words
@@ -207,28 +208,28 @@ function WhoisCard() {
         <span className="terminal-card-role">software engineer</span>
       </div>
       <p className="terminal-card-bio">
-        old movies, older books. soccer enthusiast. currently at fractal bootcamp.
+        engineer building ai products, systems, and readable software.
       </p>
       <div className="terminal-card-facts">
         <div className="terminal-card-fact">
           <span className="terminal-card-label">focus</span>
-          <span>systems & neural networks</span>
+          <span>ai products & backend systems</span>
         </div>
         <div className="terminal-card-fact">
           <span className="terminal-card-label">stack</span>
-          <span>typescript, go, python</span>
+          <span>python, typescript, sql</span>
         </div>
         <div className="terminal-card-fact">
           <span className="terminal-card-label">interests</span>
-          <span>building things that work</span>
+          <span>product loops, ml systems, maintainable code</span>
         </div>
       </div>
       <div className="terminal-card-links">
-        <a href="https://github.com/nielsandersn" target="_blank" rel="noopener noreferrer" className="terminal-link">
+        <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="terminal-link">
           github
         </a>
         <span className="terminal-card-sep">|</span>
-        <a href="https://linkedin.com/in/nielsandersn" target="_blank" rel="noopener noreferrer" className="terminal-link">
+        <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="terminal-link">
           linkedin
         </a>
         <span className="terminal-card-sep">|</span>

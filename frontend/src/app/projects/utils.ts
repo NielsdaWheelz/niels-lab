@@ -5,7 +5,7 @@ type Metadata = {
   title: string
   publishedAt: string
   summary: string
-  image?: string
+  image: string
   repoUrl?: string
   liveUrl?: string
 }
@@ -72,4 +72,3 @@ export function formatDate(date: string) {
 
   return `${day}/${month}/${year}`
 }
-
