@@ -14,6 +14,7 @@ Multi-agent LLM orchestration paired with deterministic factory scheduling simul
 **Input**: Free-form factory description + today's situation/priorities (text)
 
 **Output**: JSON response containing:
+
 - Parsed factory config (machines, jobs, routing)
 - 1–3 scenario variations (baseline, rush order, machine slowdown)
 - Performance metrics per scenario (makespan, lateness, bottlenecks, utilization)
@@ -29,6 +30,7 @@ Factory planners need to answer: "What will go wrong today? Which jobs are at ri
 ### two integrated pipelines
 
 **Onboarding Pipeline (O0–O4)**: Factory description → FactoryConfig
+
 - O0: Explicit ID extraction (regex)
 - O1: Coarse structure enumeration (LLM)
 - O2: Fine extraction - jobs → steps (LLM)
@@ -36,6 +38,7 @@ Factory planners need to answer: "What will go wrong today? Which jobs are at ri
 - O4: Coverage assessment
 
 **Decision Pipeline (D1–D5)**: Factory + situation → metrics + briefing
+
 - D1: Intent classification (LLM)
 - D2: Futures expansion (LLM)
 - D3: Simulation (deterministic EDD scheduler)
@@ -63,31 +66,39 @@ Factory planners need to answer: "What will go wrong today? Which jobs are at ri
 ```markdown
 # Factory Day Simulator
 
-Multi-agent LLM orchestration paired with deterministic factory 
+Multi-agent LLM orchestration paired with deterministic factory
 scheduling simulation.
 
 ## Quick Start
 
 # Python dependencies
+
 pip install -U openai pydantic pytest fastapi uvicorn
 
 # Frontend
+
 cd frontend && npm install
 
 # Environment
+
 export OPENAI_API_KEY="sk-..."
 
 ## Running
 
 # API server
+
 uvicorn backend.server:app --reload
+
 # → http://localhost:8000
 
 # Frontend
+
 cd frontend && npm run dev
+
 # → http://localhost:5173
 
 # CLI
+
 python -m backend.main "we have a rush order for J2"
 
 ## Testing
@@ -98,8 +109,8 @@ python -m pytest -v
 
 POST /api/simulate
 {
-  "factory_description": "3 machines (M1, M2, M3), 3 jobs",
-  "situation_text": "rush order for J2 today"
+"factory_description": "3 machines (M1, M2, M3), 3 jobs",
+"situation_text": "rush order for J2 today"
 }
 
 Returns: factory, specs, metrics, briefing, meta, debug

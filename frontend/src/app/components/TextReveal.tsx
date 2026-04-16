@@ -20,7 +20,6 @@ export function TextReveal({
   onComplete,
 }: TextRevealProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isComplete, setIsComplete] = useState(false)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const onCompleteRef = useRef(onComplete)
   const hasCalledComplete = useRef(false)
@@ -32,13 +31,17 @@ export function TextReveal({
 
   // Reset when text changes
   useEffect(() => {
-    setCurrentIndex(0)
-    setIsComplete(false)
-    hasCalledComplete.current = false
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
       timeoutRef.current = null
     }
+
+    const frameId = requestAnimationFrame(() => {
+      hasCalledComplete.current = false
+      setCurrentIndex(0)
+    })
+
+    return () => cancelAnimationFrame(frameId)
   }, [text])
 
   // Typing effect
@@ -46,7 +49,6 @@ export function TextReveal({
     if (currentIndex >= text.length) {
       if (!hasCalledComplete.current) {
         hasCalledComplete.current = true
-        setIsComplete(true)
         onCompleteRef.current?.()
       }
       return
@@ -56,7 +58,7 @@ export function TextReveal({
     const startTime = currentIndex === 0 ? delay : 0
 
     timeoutRef.current = setTimeout(() => {
-      setCurrentIndex(prev => prev + 1)
+      setCurrentIndex((prev) => prev + 1)
     }, startTime + speed)
 
     return () => {
@@ -68,6 +70,7 @@ export function TextReveal({
   }, [currentIndex, text.length, speed, delay])
 
   const displayedText = text.slice(0, currentIndex)
+  const isComplete = currentIndex >= text.length
 
   return (
     <span className={className}>
@@ -106,4 +109,3 @@ export function TextFadeIn({
     </div>
   )
 }
-

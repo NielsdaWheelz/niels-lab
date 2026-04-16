@@ -10,12 +10,12 @@ interface DrawHeadingProps {
   underlineColor?: 'terracotta' | 'sage' | 'gold' | 'muted'
 }
 
-export function DrawHeading({ 
-  children, 
+export function DrawHeading({
+  children,
   as: Component = 'h2',
   className = '',
   delay = 0,
-  underlineColor = 'terracotta'
+  underlineColor = 'terracotta',
 }: DrawHeadingProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [hasAnimated, setHasAnimated] = useState(false)
@@ -33,26 +33,24 @@ export function DrawHeading({
     return h >>> 0
   }, [pathId])
 
-  const random = useMemo(() => {
+  const underlinePath = useMemo(() => {
     let t = seed + 0x6d2b79f5
-    return () => {
+    const random = () => {
       t = Math.imul(t ^ (t >>> 15), 1 | t)
       t = t + Math.imul(t ^ (t >>> 7), 61 | t)
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296
     }
-  }, [seed])
 
-  const underlinePath = useMemo(() => {
     const points: string[] = []
     const segments = 8
     const width = 100 // percentage based
-    
+
     for (let i = 0; i <= segments; i++) {
       const x = (i / segments) * width
       // Add subtle vertical wobble deterministically
       const wobble = Math.sin(i * 1.2) * 1.5 + (random() - 0.5) * 1
       const y = 3 + wobble
-      
+
       if (i === 0) {
         points.push(`M ${x} ${y}`)
       } else {
@@ -63,9 +61,9 @@ export function DrawHeading({
         points.push(`Q ${cpX} ${cpY}, ${x} ${y}`)
       }
     }
-    
+
     return points.join(' ')
-  }, [random])
+  }, [seed])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -77,7 +75,7 @@ export function DrawHeading({
           }, delay)
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.5 },
     )
 
     if (ref.current) {
@@ -91,15 +89,15 @@ export function DrawHeading({
     terracotta: 'var(--color-terracotta)',
     sage: 'var(--color-sage)',
     gold: 'var(--color-gold)',
-    muted: 'var(--color-text-muted)'
+    muted: 'var(--color-text-muted)',
   }
 
   return (
     <Component ref={ref} className={`draw-heading ${className}`}>
       <span className="draw-heading-text">{children}</span>
-      <svg 
+      <svg
         className={`draw-heading-underline ${isVisible ? 'animate' : ''}`}
-        viewBox="0 0 100 8" 
+        viewBox="0 0 100 8"
         preserveAspectRatio="none"
         aria-hidden="true"
       >
@@ -125,4 +123,3 @@ export function DrawHeading({
     </Component>
   )
 }
-

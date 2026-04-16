@@ -1,5 +1,6 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 type Metadata = {
   title: string
@@ -56,8 +57,13 @@ function getMDXData(dir: string) {
   })
 }
 
+const projectsDirectory = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  'posts',
+)
+
 export function getProjects() {
-  return getMDXData(path.join(process.cwd(), 'src', 'app', 'projects', 'posts'))
+  return getMDXData(projectsDirectory)
 }
 
 export function formatDate(date: string) {

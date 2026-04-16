@@ -1,5 +1,6 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 type Metadata = {
   title: string
@@ -31,7 +32,10 @@ function parseFrontmatter(fileContent: string) {
 }
 
 export function getCVContent() {
-  const cvPath = path.join(process.cwd(), 'src', 'app', 'cv', 'cv.mdx')
+  const cvPath = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    'cv.mdx',
+  )
   const rawContent = fs.readFileSync(cvPath, 'utf-8')
   return parseFrontmatter(rawContent)
 }

@@ -9,7 +9,7 @@ repoUrl: 'https://github.com/NielsdaWheelz/fractal-chat'
 
 # Fractal Chat: A Reading Companion for Infinite Text
 
-*A chat-first reader built to ingest messy documents.*
+_A chat-first reader built to ingest messy documents._
 
 ---
 
@@ -32,7 +32,7 @@ Single pages aren't enough, so there's a breadth-first crawler:
 const pages = await crawlSite(normalizedUrl, {
   maxPages: 50,
   sameHostOnly: true,
-  delayMs: 500
+  delayMs: 500,
 })
 ```
 
@@ -41,19 +41,19 @@ Aggregate pages or keep them separate; archives and docs need both.
 **2) PDFs** - Dual extractor because PDFs are hostile:
 
 ```typescript
-const parsed = await extractPdfText(buffer);
+const parsed = await extractPdfText(buffer)
 if (!textResult?.text?.trim()) {
-  return runFallbackExtraction(buffer, primaryError);
+  return runFallbackExtraction(buffer, primaryError)
 }
 ```
 
 **3) EPUBs** - EPUB is structured HTML. Pull chapters, glue them, keep metadata.
 
 ```typescript
-const book = await EPub.createAsync(tmpPath);
+const book = await EPub.createAsync(tmpPath)
 const htmlChapters = await Promise.all(
-  book.flow.map((ch) => book.getChapterRawAsync(ch.id))
-);
+  book.flow.map((ch) => book.getChapterRawAsync(ch.id)),
+)
 ```
 
 ### Metadata resolution
@@ -62,10 +62,10 @@ Site metadata is sloppy. The pipeline combines rules and LLM inference:
 
 ```typescript
 const { object } = await generateObject({
-  model: openai("gpt-5-nano"),
+  model: openai('gpt-5-nano'),
   schema: metadataSchema,
   prompt: contextualPrompt,
-});
+})
 ```
 
 Schema-constrained output stops hallucinated fields.
@@ -78,7 +78,7 @@ Text gets split with LangChain's recursive splitter to keep concepts intact:
 const splitter = new RecursiveCharacterTextSplitter({
   chunkSize: 500,
   chunkOverlap: 50,
-});
+})
 ```
 
 Embeddings: OpenAI `text-embedding-3-small` at 512 dims to balance cost and recall.
@@ -88,7 +88,7 @@ const { embeddings } = await embedMany({
   model: openai.textEmbeddingModel('text-embedding-3-small'),
   values: chunkTexts,
   providerOptions: { openai: { dimensions: 512 } },
-});
+})
 ```
 
 Stored in Postgres with `pgvector` so cosine search runs in the database:
@@ -114,10 +114,10 @@ Anchors stick to text, not the DOM:
 const annotation = {
   start: 1420,
   end: 1580,
-  quote: "...",
-  prefix: "...",
-  suffix: "...",
-};
+  quote: '...',
+  prefix: '...',
+  suffix: '...',
+}
 ```
 
 If HTML shifts, offsets still line up unless the words change. Prefix/suffix support fuzzy re-anchoring after minor edits.
@@ -130,7 +130,7 @@ Annotations inherit document visibility. Groups add another layer: share a doc w
 export async function computeAccessLevel(
   userId: string,
   resourceType: ResourceType,
-  resourceId: string
+  resourceId: string,
 ): Promise<PermissionLevel> {
   // direct permissions
   // creator checks
@@ -151,9 +151,9 @@ It's query-heavy, but correctness beats premature caching.
 Chats are bound to a document; the system prompt names it and its author and reminds the model it has a search tool. Less drift, better answers.
 
 ```typescript
-systemPrompt += `\n\nContext: You are discussing the document "${document.title}"`;
-if (authorNames) systemPrompt += ` by ${authorNames}`;
-systemPrompt += `. You have access to a searchDocuments tool.`;
+systemPrompt += `\n\nContext: You are discussing the document "${document.title}"`
+if (authorNames) systemPrompt += ` by ${authorNames}`
+systemPrompt += `. You have access to a searchDocuments tool.`
 ```
 
 ### Retrieval as a tool
@@ -197,7 +197,8 @@ Cyberpunk skin with a job: signal hierarchy and interactivity.
 
 ```css
 .cyber-border::before {
-  background: linear-gradient(45deg,
+  background: linear-gradient(
+    45deg,
     var(--color-cyber-cyan),
     var(--color-cyber-pink),
     var(--color-cyber-purple)
@@ -217,9 +218,9 @@ Cyberpunk skin with a job: signal hierarchy and interactivity.
 Annotation popovers get layered shadows to feel tactile:
 
 ```typescript
-boxShadow: "0 0 30px rgba(0,0,0,0.4), \
+boxShadow: '0 0 30px rgba(0,0,0,0.4), \
             0 0 60px rgba(0,0,0,0.2), \
-            inset 0 1px 0 rgba(255,255,255,0.1)"
+            inset 0 1px 0 rgba(255,255,255,0.1)'
 ```
 
 Looks serve clarity, not vibes.
@@ -239,8 +240,8 @@ Looks serve clarity, not vibes.
 
 ## Lessons
 
-1) Metadata beats content in difficulty. Sites are inconsistent; expect cleanup.  
-2) Permissions grow teeth fast. Hierarchies and overrides are inevitable.  
-3) PDFs fight back. Test against pathological files or users will do it for you.  
-4) LLMs work best as tools with constraints, not as oracles.  
-5) Visual coherence reduces cognitive load; good UI teaches itself.
+1. Metadata beats content in difficulty. Sites are inconsistent; expect cleanup.
+2. Permissions grow teeth fast. Hierarchies and overrides are inevitable.
+3. PDFs fight back. Test against pathological files or users will do it for you.
+4. LLMs work best as tools with constraints, not as oracles.
+5. Visual coherence reduces cognitive load; good UI teaches itself.

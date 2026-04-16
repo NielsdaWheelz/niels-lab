@@ -10,7 +10,7 @@ they start out terrible. they guess randomly. but every time they're wrong, they
 
 1. embeddings
 
-first you have to turn the notes into something the people can understand. unfortunately they're autistic and don't understand notes or sounds, so you just turn them into numbers. think of it like giving each note a little personality profile: a bunch of random numbers between -1 and 1. 
+first you have to turn the notes into something the people can understand. unfortunately they're autistic and don't understand notes or sounds, so you just turn them into numbers. think of it like giving each note a little personality profile: a bunch of random numbers between -1 and 1.
 
 a -> [0.1, -0.3, 0.2, …]
 b -> [0.7, -0.1, 0.0, …]
@@ -26,7 +26,7 @@ we'll use 2-dimensions for now (like x and y)
 
 2. context
 
-the network of guessers looks at the input (last three notes) to guess the next note. remember, each of these notes isn't actually a note, but a series of numbers (aka a vector). we'll squash these 3 vectors into one big vector; 3 * 2-dimensions = 6-dimensional vector. literally just concatenation. this is the context the people receive.
+the network of guessers looks at the input (last three notes) to guess the next note. remember, each of these notes isn't actually a note, but a series of numbers (aka a vector). we'll squash these 3 vectors into one big vector; 3 \* 2-dimensions = 6-dimensional vector. literally just concatenation. this is the context the people receive.
 
 3. the hidden layer
 
@@ -44,6 +44,7 @@ the output of these 10 people is 10 new numbers: the hidden layer. these numbers
 4. the final guesser
 
 now all 10 hidden outputs are passed to one final, slightly fussy guesser who:
+
 - looks at those 10 numbers
 - scores every possible next note
 - outputs a list of 7 scores (for 7 notes: a b c d e f g) - the 'logits'
@@ -67,6 +68,7 @@ do this 200,000 times, and the room becomes _really_ good at guessing the next n
 6. generating songs
 
 to generate a song, you just let the room guess over and over:
+
 - start with a rest ('.')
 - guess the next note -> 'e'
 - feed 'e' back in

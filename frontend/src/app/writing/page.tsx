@@ -28,7 +28,9 @@ export default function Page() {
             <Link href={`/writing/${post.slug}`} className="writing-title">
               {post.metadata.title}
             </Link>
-            <p className="writing-meta">{formatDate(post.metadata.publishedAt)}</p>
+            <p className="writing-meta">
+              {formatDate(post.metadata.publishedAt)}
+            </p>
             <p className="writing-summary">{post.metadata.summary}</p>
           </li>
         ))}

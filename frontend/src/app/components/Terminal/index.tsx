@@ -1,6 +1,12 @@
 'use client'
 
-import React, { useRef, useEffect, useState, KeyboardEvent, useMemo } from 'react'
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  KeyboardEvent,
+  useMemo,
+} from 'react'
 import Link from 'next/link'
 import { FileSystem } from '@/lib/filesystem'
 import { useTerminal, OutputLine, ChatHandler } from './useTerminal'
@@ -24,7 +30,12 @@ function seededRandom(seed: number) {
 type SearchResult = {
   __type: 'search'
   query: string
-  results: Array<{ title: string; path: string; snippet: string; lineNum?: number }>
+  results: Array<{
+    title: string
+    path: string
+    snippet: string
+    lineNum?: number
+  }>
 }
 
 type WhoisOutput = {
@@ -59,7 +70,7 @@ function highlightMatches(text: string, query: string): React.ReactNode {
     parts.push(
       <mark key={index} className="terminal-highlight">
         {text.slice(index, index + query.length)}
-      </mark>
+      </mark>,
     )
     lastIndex = index + query.length
     index = lowerText.indexOf(lowerQuery, lastIndex)
@@ -77,7 +88,19 @@ function formatStringOutput(content: string): React.ReactNode {
   // Paths to linkify
   const pathPattern = /(\/(?:projects|writing|cv)(?:\/[^\s,]+)*)/g
   // Commands to highlight
-  const commandNames = ['help', 'search', 'grep', 'whois', 'visualize', 'sudo', 'pwd', 'ls', 'cd', 'cat', 'clear']
+  const commandNames = [
+    'help',
+    'search',
+    'grep',
+    'whois',
+    'visualize',
+    'sudo',
+    'pwd',
+    'ls',
+    'cd',
+    'cat',
+    'clear',
+  ]
   // Backticked words
   const backtickPattern = /`([^`]+)`/g
 
@@ -95,20 +118,42 @@ function formatStringOutput(content: string): React.ReactNode {
           let lastIdx = 0
           for (const match of pathMatches) {
             const before = line.slice(lastIdx, match.index)
-            if (before) parts.push(<span key={partKey++}>{processCommandsAndBackticks(before, commandNames, backtickPattern)}</span>)
+            if (before)
+              parts.push(
+                <span key={partKey++}>
+                  {processCommandsAndBackticks(
+                    before,
+                    commandNames,
+                    backtickPattern,
+                  )}
+                </span>,
+              )
 
             const path = match[0]
             parts.push(
               <Link key={partKey++} href={path} className="terminal-link">
                 {path}
-              </Link>
+              </Link>,
             )
             lastIdx = (match.index || 0) + path.length
           }
           const after = line.slice(lastIdx)
-          if (after) parts.push(<span key={partKey++}>{processCommandsAndBackticks(after, commandNames, backtickPattern)}</span>)
+          if (after)
+            parts.push(
+              <span key={partKey++}>
+                {processCommandsAndBackticks(
+                  after,
+                  commandNames,
+                  backtickPattern,
+                )}
+              </span>,
+            )
         } else {
-          parts.push(<span key={partKey++}>{processCommandsAndBackticks(line, commandNames, backtickPattern)}</span>)
+          parts.push(
+            <span key={partKey++}>
+              {processCommandsAndBackticks(line, commandNames, backtickPattern)}
+            </span>,
+          )
         }
 
         return (
@@ -122,7 +167,11 @@ function formatStringOutput(content: string): React.ReactNode {
   )
 }
 
-function processCommandsAndBackticks(text: string, commandNames: string[], backtickPattern: RegExp): React.ReactNode {
+function processCommandsAndBackticks(
+  text: string,
+  commandNames: string[],
+  backtickPattern: RegExp,
+): React.ReactNode {
   // First handle backticks
   const backtickMatches = [...text.matchAll(backtickPattern)]
   if (backtickMatches.length > 0) {
@@ -132,24 +181,35 @@ function processCommandsAndBackticks(text: string, commandNames: string[], backt
 
     for (const match of backtickMatches) {
       const before = text.slice(lastIdx, match.index)
-      if (before) parts.push(<span key={partKey++}>{highlightCommands(before, commandNames)}</span>)
+      if (before)
+        parts.push(
+          <span key={partKey++}>
+            {highlightCommands(before, commandNames)}
+          </span>,
+        )
 
       parts.push(
         <span key={partKey++} className="terminal-command">
           {match[1]}
-        </span>
+        </span>,
       )
       lastIdx = (match.index || 0) + match[0].length
     }
     const after = text.slice(lastIdx)
-    if (after) parts.push(<span key={partKey++}>{highlightCommands(after, commandNames)}</span>)
+    if (after)
+      parts.push(
+        <span key={partKey++}>{highlightCommands(after, commandNames)}</span>,
+      )
     return <>{parts}</>
   }
 
   return highlightCommands(text, commandNames)
 }
 
-function highlightCommands(text: string, commandNames: string[]): React.ReactNode {
+function highlightCommands(
+  text: string,
+  commandNames: string[],
+): React.ReactNode {
   // Create pattern for standalone command words
   const pattern = new RegExp(`\\b(${commandNames.join('|')})\\b`, 'g')
   const matches = [...text.matchAll(pattern)]
@@ -167,7 +227,7 @@ function highlightCommands(text: string, commandNames: string[]): React.ReactNod
     parts.push(
       <span key={partKey++} className="terminal-command">
         {match[0]}
-      </span>
+      </span>,
     )
     lastIdx = (match.index || 0) + match[0].length
   }
@@ -190,7 +250,9 @@ function SearchResults({ data }: { data: SearchResult }) {
           </div>
           <div className="terminal-result-path">{result.path}</div>
           <div className="terminal-result-snippet">
-            {result.lineNum && <span className="terminal-line-num">{result.lineNum}: </span>}
+            {result.lineNum && (
+              <span className="terminal-line-num">{result.lineNum}: </span>
+            )}
             {highlightMatches(result.snippet, data.query)}
           </div>
         </div>
@@ -225,11 +287,21 @@ function WhoisCard() {
         </div>
       </div>
       <div className="terminal-card-links">
-        <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="terminal-link">
+        <a
+          href={githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="terminal-link"
+        >
           github
         </a>
         <span className="terminal-card-sep">|</span>
-        <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="terminal-link">
+        <a
+          href={linkedinUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="terminal-link"
+        >
           linkedin
         </a>
         <span className="terminal-card-sep">|</span>
@@ -250,7 +322,12 @@ function WhoisCard() {
 function VisualizeScribble({ seed }: { seed: number }) {
   const paths = useMemo(() => {
     const rand = seededRandom(seed)
-    const colors = ['var(--color-terracotta)', 'var(--color-sage)', 'var(--color-gold)', 'var(--color-text)']
+    const colors = [
+      'var(--color-terracotta)',
+      'var(--color-sage)',
+      'var(--color-gold)',
+      'var(--color-text)',
+    ]
     const elements: React.ReactNode[] = []
 
     // Generate 3-5 wobbly lines
@@ -279,7 +356,7 @@ function VisualizeScribble({ seed }: { seed: number }) {
           strokeLinecap="round"
           fill="none"
           opacity={0.6 + rand() * 0.4}
-        />
+        />,
       )
     }
 
@@ -294,7 +371,7 @@ function VisualizeScribble({ seed }: { seed: number }) {
           r={2 + rand() * 3}
           fill={colors[Math.floor(rand() * colors.length)]}
           opacity={0.4 + rand() * 0.5}
-        />
+        />,
       )
     }
 
@@ -325,7 +402,7 @@ function ThinkingIndicator() {
 
 function OutputLineContent({
   line,
-  onTypewriterComplete
+  onTypewriterComplete,
 }: {
   line: OutputLine
   onTypewriterComplete?: (id: string) => void
@@ -352,7 +429,11 @@ function OutputLineContent({
   if (typeof content === 'string') {
     if (line.type === 'output') {
       // Check if this looks like ls output (directories need special formatting)
-      if (content.includes('/') && !content.includes('\n') && content.split(/\s+/).length <= 20) {
+      if (
+        content.includes('/') &&
+        !content.includes('\n') &&
+        content.split(/\s+/).length <= 20
+      ) {
         const parts = content.split(/\s+/).filter(Boolean)
         if (line.isTyping) {
           return (
@@ -426,7 +507,11 @@ export function Terminal({ filesystem, onChat }: TerminalProps) {
   } = useTerminal(filesystem, onChat)
 
   useEffect(() => {
-    setMounted(true)
+    const frameId = requestAnimationFrame(() => {
+      setMounted(true)
+    })
+
+    return () => cancelAnimationFrame(frameId)
   }, [])
 
   // auto-scroll output
@@ -516,7 +601,8 @@ export function Terminal({ filesystem, onChat }: TerminalProps) {
 
   const hasOutput = output.length > 0
   // Map status values to display text
-  const statusText = status === 'idle' ? 'ready.' : status === 'error' ? 'error.' : status
+  const statusText =
+    status === 'idle' ? 'ready.' : status === 'error' ? 'error.' : status
 
   return (
     <div
@@ -527,7 +613,9 @@ export function Terminal({ filesystem, onChat }: TerminalProps) {
       {!expanded && (
         <div className="assistant-collapsed" onClick={handleToggle}>
           <span className="assistant-prompt-hint">~</span>
-          <span className="assistant-placeholder">chat or /help for commands</span>
+          <span className="assistant-placeholder">
+            chat or /help for commands
+          </span>
           <kbd className="assistant-shortcut">^K</kbd>
         </div>
       )}
@@ -564,7 +652,9 @@ export function Terminal({ filesystem, onChat }: TerminalProps) {
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               className="assistant-input"
-              placeholder={hasOutput ? '' : 'chat or type /help for commands...'}
+              placeholder={
+                hasOutput ? '' : 'chat or type /help for commands...'
+              }
               spellCheck={false}
               autoComplete="off"
               autoCorrect="off"
@@ -578,9 +668,7 @@ export function Terminal({ filesystem, onChat }: TerminalProps) {
           </div>
 
           {/* Status line */}
-          <div className="assistant-status">
-            {statusText}
-          </div>
+          <div className="assistant-status">{statusText}</div>
         </>
       )}
     </div>

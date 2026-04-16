@@ -12,7 +12,25 @@ export type Message = {
   content: string
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_NIELS_GPT_API_BASE || 'https://niels-gpt-api.onrender.com'
+function getApiBase() {
+  const value = process.env.NEXT_PUBLIC_NIELS_GPT_API_BASE?.trim()
+
+  if (!value) {
+    throw new Error(
+      'Missing NEXT_PUBLIC_NIELS_GPT_API_BASE. Set it to the public base URL for the terminal chat API.',
+    )
+  }
+
+  try {
+    new URL(value)
+  } catch {
+    throw new Error(
+      'Invalid NEXT_PUBLIC_NIELS_GPT_API_BASE. Set it to an absolute URL such as http://localhost:8000.',
+    )
+  }
+
+  return value.replace(/\/+$/, '')
+}
 
 // System prompt for the assistant
 const SYSTEM_PROMPT = `you are the terminal assistant for niels erik nandal's portfolio website.
@@ -24,7 +42,7 @@ don't invent facts about niels - stick to what's in the terminal filesystem or a
 
 // Conversation history - maintained across chat sessions
 const conversationHistory: Message[] = [
-  { role: 'system', content: SYSTEM_PROMPT }
+  { role: 'system', content: SYSTEM_PROMPT },
 ]
 
 // Stop sequences - patterns that indicate the model is generating dialogue markers
@@ -34,7 +52,7 @@ const STOP_PATTERNS = [
   /\n*system:/i,
   /\n*user:/i,
   /\n*assistant:/i,
-  /\n*<\|/,  // Common special tokens like <|end|>, <|user|>, etc.
+  /\n*<\|/, // Common special tokens like <|end|>, <|user|>, etc.
 ]
 
 /**
@@ -71,20 +89,28 @@ export async function handleChat(
     onDone: () => void
     onError: (error: Error) => void
     signal: AbortSignal
-  }
+  },
 ): Promise<void> {
   const { onToken, onDone, onError, signal } = callbacks
+  let apiBase: string
+
+  try {
+    apiBase = getApiBase()
+  } catch (err) {
+    onError(err as Error)
+    return
+  }
 
   // Add user message to history
   conversationHistory.push({ role: 'user', content: userMessage })
 
-  const url = `${API_BASE}/chat/stream`
+  const url = new URL('/chat/stream', `${apiBase}/`).toString()
 
   const body = JSON.stringify({
     messages: conversationHistory,
     max_new_tokens: 256,
     temperature: 0.7,
-    trace_layer: 0,  // Required by backend
+    trace_layer: 0, // Required by backend
   })
 
   let assistantResponse = ''
@@ -130,7 +156,10 @@ export async function handleChat(
     assistantResponse = cleanResponse(assistantResponse)
 
     if (assistantResponse) {
-      conversationHistory.push({ role: 'assistant', content: assistantResponse })
+      conversationHistory.push({
+        role: 'assistant',
+        content: assistantResponse,
+      })
       // Trim history if too long (keep system + last 20 messages)
       if (conversationHistory.length > 21) {
         conversationHistory.splice(1, conversationHistory.length - 21)
@@ -141,7 +170,10 @@ export async function handleChat(
     if ((err as Error).name === 'AbortError') {
       // Request cancelled - still save partial response if any
       if (assistantResponse) {
-        conversationHistory.push({ role: 'assistant', content: assistantResponse + ' [cancelled]' })
+        conversationHistory.push({
+          role: 'assistant',
+          content: assistantResponse + ' [cancelled]',
+        })
       }
       onDone()
       return

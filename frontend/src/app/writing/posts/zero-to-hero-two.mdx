@@ -5,6 +5,7 @@ summary: 'Why bad initialization breaks learning, and how Kaiming init and batch
 ---
 
 recap:
+
 - each note gets turned into coordinates (a little embedding vector)
 - everyone in the room mixes those numbers in their own weird way
 - they pass their result to a final guesser
@@ -27,7 +28,7 @@ and every guesser outputs -1 or 1, which tells you fuck-all. worse still, these 
 
 2. how big should the starting weights be? ('kaiming init')
 
-we want `variance_out ≈ variance_in` so the signal stays alive. for a guesser with N inputs, the general rule is 
+we want `variance_out ≈ variance_in` so the signal stays alive. for a guesser with N inputs, the general rule is
 
 `weight scale ≈ 1 / sqrt(N)`
 
@@ -38,6 +39,7 @@ the more inputs a neuron has, the smaller its weights need to be. more inputs? s
 even if you initialize perfectly, signals can still drift because the weights change every step - some people in the room might start producing giant numbers again or shrink to tiny ones.
 
 enter `batchnorm`:
+
 - takes a mini-batch of examples
 - computes their mean and standard deviation
 - centers and scales the activations: `z_norm = (z - mean) / std`
@@ -46,7 +48,7 @@ this way the room's activations are always nicely distributed between 0 and 1.
 
 to allow the weights to actually learn and change, the model is scaled and shifted every pass:
 
-y = gamma * z_norm + beta
+y = gamma \* z_norm + beta
 
 these gamma (scale) and beta (shift) are learned, changed, just like the weights
 

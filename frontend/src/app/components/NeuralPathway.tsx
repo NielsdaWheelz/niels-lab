@@ -18,11 +18,11 @@ interface Node {
   isHovered?: boolean
 }
 
-export function NeuralPathway({ 
-  containerRef, 
+export function NeuralPathway({
+  containerRef,
   nodeSelectors = ['a'],
   className = '',
-  hoveredElement = null
+  hoveredElement = null,
 }: NeuralPathwayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number | null>(null)
@@ -48,7 +48,7 @@ export function NeuralPathway({
       nodesRef.current = []
       const elements = container.querySelectorAll(nodeSelectors.join(', '))
       const hovered = hoverStateRef.current
-      
+
       elements.forEach((el, index) => {
         if (el instanceof HTMLElement) {
           const rect = el.getBoundingClientRect()
@@ -74,12 +74,12 @@ export function NeuralPathway({
 
     const draw = () => {
       if (!ctx) return
-      
+
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       const nodes = nodesRef.current
-      const hasHovered = nodes.some(n => n.isHovered)
-      const hoveredNode = nodes.find(n => n.isHovered)
+      const hasHovered = nodes.some((n) => n.isHovered)
+      const hoveredNode = nodes.find((n) => n.isHovered)
 
       if (nodes.length < 2) {
         animationFrameRef.current = requestAnimationFrame(draw)
@@ -92,38 +92,40 @@ export function NeuralPathway({
         for (let j = i + 1; j < nodes.length; j++) {
           const n1 = nodes[i]
           const n2 = nodes[j]
-          
+
           const dist = Math.hypot(n2.x - n1.x, n2.y - n1.y)
-          
+
           // Increase connection distance and opacity on hover
           const MAX_DISTANCE = hasHovered ? 250 : 150
           const MIN_DISTANCE = 25
-          
+
           // Prefer horizontal connections (for nav) but allow vertical ones too
           const horizontalDist = Math.abs(n2.x - n1.x)
           const verticalDist = Math.abs(n2.y - n1.y)
-          
+
           if (dist < MAX_DISTANCE && dist > MIN_DISTANCE) {
             // Slightly favor connections where horizontal distance isn't too large
             // (avoids connecting wrapped nav items)
-            if (!hasHovered && horizontalDist > 200 && verticalDist < 40) continue
-            
+            if (!hasHovered && horizontalDist > 200 && verticalDist < 40)
+              continue
+
             // Check if this connection involves the hovered node
             const involvesHovered = n1.isHovered || n2.isHovered
-            const isDirectToHovered = involvesHovered && (n1.isHovered || n2.isHovered)
-            
+            const isDirectToHovered =
+              involvesHovered && (n1.isHovered || n2.isHovered)
+
             // Base opacity scales with hover state
             let baseOpacity = hasHovered ? 0.25 : 0.1
             if (isDirectToHovered) {
               baseOpacity = 0.4 // Stronger for connections to hovered node
             }
-            
+
             const connectionOpacity = (1 - dist / MAX_DISTANCE) * baseOpacity
             ctx.globalAlpha = connectionOpacity
-            
+
             // Make hovered connections slightly thicker
             const strokeWidth = isDirectToHovered ? 0.8 : 0.5
-            
+
             rc.line(n1.x, n1.y, n2.x, n2.y, {
               stroke: 'var(--color-text)',
               strokeWidth: strokeWidth,
@@ -137,7 +139,7 @@ export function NeuralPathway({
         const node = nodes[i]
         const nodeOpacity = node.isHovered ? 0.15 : 0.06
         const nodeSize = node.isHovered ? 4 : 2.5
-        
+
         ctx.globalAlpha = nodeOpacity
         rc.circle(node.x, node.y, nodeSize, {
           stroke: 'var(--color-text)',
@@ -147,21 +149,24 @@ export function NeuralPathway({
           fillStyle: 'solid',
         })
       }
-      
+
       // On hover, draw additional secondary connections (more complex network)
       if (hasHovered && hoveredNode) {
         // Connect hovered node to nodes it might not directly connect to
         for (let i = 0; i < nodes.length; i++) {
           const node = nodes[i]
           if (node === hoveredNode) continue
-          
-          const dist = Math.hypot(node.x - hoveredNode.x, node.y - hoveredNode.y)
-          
+
+          const dist = Math.hypot(
+            node.x - hoveredNode.x,
+            node.y - hoveredNode.y,
+          )
+
           // Secondary connections to nodes further away
           if (dist > 150 && dist < 350) {
             const connectionOpacity = (1 - (dist - 150) / 200) * 0.12
             ctx.globalAlpha = connectionOpacity
-            
+
             // Slightly wavier connection for secondary paths
             rc.line(hoveredNode.x, hoveredNode.y, node.x, node.y, {
               stroke: 'var(--color-text)',
@@ -172,7 +177,7 @@ export function NeuralPathway({
           }
         }
       }
-      
+
       ctx.restore()
 
       animationFrameRef.current = requestAnimationFrame(draw)
@@ -180,7 +185,7 @@ export function NeuralPathway({
 
     resize()
     window.addEventListener('resize', resize)
-    
+
     // Update nodes when container changes (e.g., on route change)
     const observer = new MutationObserver(() => {
       updateNodes()
@@ -212,4 +217,3 @@ export function NeuralPathway({
     />
   )
 }
-

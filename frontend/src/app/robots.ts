@@ -1,12 +1,21 @@
-import { baseUrl } from '@/app/site'
+import type { MetadataRoute } from 'next'
+import { getSiteUrl, shouldIndexSite } from '@/app/site'
 
-export default function robots() {
+export default function robots(): MetadataRoute.Robots {
+  const siteUrl = getSiteUrl()
+  const shouldIndex = shouldIndexSite()
+
   return {
-    rules: [
-      {
-        userAgent: '*',
-      },
-    ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    rules: shouldIndex
+      ? {
+          userAgent: '*',
+          allow: '/',
+        }
+      : {
+          userAgent: '*',
+          disallow: '/',
+        },
+    sitemap: `${siteUrl}/sitemap.xml`,
+    host: siteUrl,
   }
 }

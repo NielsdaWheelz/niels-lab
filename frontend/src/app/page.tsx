@@ -22,9 +22,9 @@ export default function Page() {
           Engineer building AI products, systems, and readable software.
         </h1>
         <p className="home-summary">
-          I work across Python, TypeScript, and ML-heavy product surfaces. I care
-          about deterministic backends, sharp product loops, and code a maintainer
-          can understand in one pass.
+          I work across Python, TypeScript, and ML-heavy product surfaces. I
+          care about deterministic backends, sharp product loops, and code a
+          maintainer can understand in one pass.
         </p>
         <p className="home-summary">
           I am currently open to full-time engineering roles.
@@ -62,7 +62,8 @@ export default function Page() {
         writing
       </DrawHeading>
       <p className="section-intro">
-        Technical notes and build writeups. Short, direct, and focused on the work.
+        Technical notes and build writeups. Short, direct, and focused on the
+        work.
       </p>
       <ul className="writing-list">
         {writingPosts.map((post) => (
@@ -70,7 +71,9 @@ export default function Page() {
             <Link href={`/writing/${post.slug}`} className="writing-title">
               {post.metadata.title}
             </Link>
-            <p className="writing-meta">{formatDate(post.metadata.publishedAt)}</p>
+            <p className="writing-meta">
+              {formatDate(post.metadata.publishedAt)}
+            </p>
             <p className="writing-summary">{post.metadata.summary}</p>
           </li>
         ))}

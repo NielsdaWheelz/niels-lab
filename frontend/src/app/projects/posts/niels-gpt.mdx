@@ -9,7 +9,7 @@ repoUrl: 'https://github.com/NielsdaWheelz/niels-gpt'
 
 A tiny, end-to-end LLM pipeline. Tokenizer → cache → pretrain → SFT → kv-cache inference → chat CLI. Minimal dependencies. Strict guardrails. Laptop-first.
 
-This is not a frontier model. It's a **complete** model *system*.
+This is not a frontier model. It's a **complete** model _system_.
 
 ## what I shipped
 
@@ -18,7 +18,7 @@ This is not a frontier model. It's a **complete** model *system*.
 - **caching** - token caches written to disk with metadata, including tokenizer SHA; training hard-fails on mismatch
 - **model** - decoder-only transformer with RoPE, RMSNorm, SwiGLU, weight tying
 - **training** - AdamW, warmup + cosine LR, grad clipping, optional AMP on MPS, optional activation checkpointing
-- **inference** - both naive autoregressive generation *and* kv-cache `prefill` + `decode_step` (with optional attention row tracing)
+- **inference** - both naive autoregressive generation _and_ kv-cache `prefill` + `decode_step` (with optional attention row tracing)
 - **ops hygiene** - resolved settings written per run; checkpoint sidecars carry provenance; config coverage audit exists
 
 If you want the full beginner deep-dive, it's in `WALKTHROUGH.md`. This post is the executive/technical narrative.
@@ -27,7 +27,7 @@ If you want the full beginner deep-dive, it's in `WALKTHROUGH.md`. This post is 
 
 - **hardware reality** - I wanted this to run on a Mac (MPS) or CPU. That means embracing constraints instead of pretending CUDA is "default"
 - **debuggability over magic** - I'd rather write 200 lines of explicit code than import a framework that makes it impossible to prove invariants
-- **reproducibility as a feature** - caches and checkpoints should tell you *exactly* what created them. Mismatches should crash early, loudly, and descriptively
+- **reproducibility as a feature** - caches and checkpoints should tell you _exactly_ what created them. Mismatches should crash early, loudly, and descriptively
 
 ## architecture in one pass
 
@@ -137,7 +137,7 @@ A lot of layers to connect:
 - chat formatting + special tokens → SFT masking → alignment outcomes
 - kv-cache correctness → latency + product experience
 
-`niels-gpt` is built to keep those causal links visible. It's how you build intuition *and* ship a system you can trust.
+`niels-gpt` is built to keep those causal links visible. It's how you build intuition _and_ ship a system you can trust.
 
 You get a clean sandbox to test architectural swaps (norms, MLP type, RoPE theta, masking policies) without reverse-engineering a framework stack.
 
@@ -161,4 +161,4 @@ You get a clean sandbox to test architectural swaps (norms, MLP type, RoPE theta
 
 The point of this repo is not to impress you with parameter counts. It's to show that I can take an LLM system from raw text to a chatting checkpoint, with strong guardrails, in a way that stays readable under pressure.
 
-If you're building LLM infra, you want engineers who can move fast *and* keep the failure modes crisp. This is my proof-of-work.
+If you're building LLM infra, you want engineers who can move fast _and_ keep the failure modes crisp. This is my proof-of-work.

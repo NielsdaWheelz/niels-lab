@@ -15,6 +15,7 @@ A complete document management and semantic search system built as a production 
 The system enforces privacy-first design: all data is indexed by user ID, search results respect ACLs, and every resource uses prefixed typed IDs (`doc_`, `hl_`, `conv_`, `msg_`, etc.) for type safety at the API boundary.
 
 **What it does:**
+
 1. Upload documents → deterministic canonical text extraction (same file always produces identical UTF-8 output)
 2. Highlight & annotate → anchors stored as byte offsets into canonical text that survive re-extraction via fuzzy text matching
 3. Semantic search → hybrid BM25 + pgvector-powered similarity search with ACL enforcement
@@ -33,22 +34,22 @@ The system enforces privacy-first design: all data is indexed by user ID, search
 
 ## current state
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Document ingestion | ✅ Complete | PDF (PyMuPDF), EPUB, HTML (Readability) |
-| Canonical text extraction | ✅ Complete | Deterministic UTF-8 with content-addressable storage |
-| Chunking pipeline | ✅ Complete | Paragraph-aware, byte offsets preserved |
-| Embeddings | ✅ Complete | OpenAI embeddings, pgvector storage |
-| Semantic search | ✅ Complete | Vector similarity search with ACL enforcement |
-| Highlights/Annotations | ✅ Backend complete | Anchor validation, byte-range storage, remapping on re-ingestion |
-| Conversations | ✅ Backend complete | Thread management, message storage |
-| Permissions system | ✅ Complete | User-scoped ACL, 404 for unauthorized resources |
-| Document list UI | ✅ Complete | Infinite scroll, status badges |
-| Document detail UI | ✅ Partial | Shows metadata, needs reader view |
-| LLM integration | 🚧 Not started | RAG pipeline, chat completion |
-| Chat UI | 🚧 Not started | Message interface, citations |
-| Document upload UI | 🚧 Not started | File picker, progress tracking |
-| Highlight creation UI | 🚧 Not started | Text selection, annotation panel |
+| Component                 | Status              | Notes                                                            |
+| ------------------------- | ------------------- | ---------------------------------------------------------------- |
+| Document ingestion        | ✅ Complete         | PDF (PyMuPDF), EPUB, HTML (Readability)                          |
+| Canonical text extraction | ✅ Complete         | Deterministic UTF-8 with content-addressable storage             |
+| Chunking pipeline         | ✅ Complete         | Paragraph-aware, byte offsets preserved                          |
+| Embeddings                | ✅ Complete         | OpenAI embeddings, pgvector storage                              |
+| Semantic search           | ✅ Complete         | Vector similarity search with ACL enforcement                    |
+| Highlights/Annotations    | ✅ Backend complete | Anchor validation, byte-range storage, remapping on re-ingestion |
+| Conversations             | ✅ Backend complete | Thread management, message storage                               |
+| Permissions system        | ✅ Complete         | User-scoped ACL, 404 for unauthorized resources                  |
+| Document list UI          | ✅ Complete         | Infinite scroll, status badges                                   |
+| Document detail UI        | ✅ Partial          | Shows metadata, needs reader view                                |
+| LLM integration           | 🚧 Not started      | RAG pipeline, chat completion                                    |
+| Chat UI                   | 🚧 Not started      | Message interface, citations                                     |
+| Document upload UI        | 🚧 Not started      | File picker, progress tracking                                   |
+| Highlight creation UI     | 🚧 Not started      | Text selection, annotation panel                                 |
 
 ## architecture
 
@@ -66,15 +67,15 @@ The system enforces privacy-first design: all data is indexed by user ID, search
 
 **Pipeline Stages**
 
-| Stage | Component | Status |
-|-------|-----------|--------|
-| 1. Ingest | Document upload, file storage, media detection | ✅ Complete |
-| 2. Extract | Canonical text extraction (PDF/EPUB/HTML) | ✅ Complete |
-| 3. Chunk | Paragraph-aware chunking with byte offsets | ✅ Complete |
-| 4. Embed | OpenAI embeddings + pgvector storage | ✅ Complete |
-| 5. Search | Hybrid BM25 + vector similarity | ✅ Complete |
-| 6. Retrieve | ACL-filtered chunk retrieval | ✅ Complete |
-| 7. Chat | LLM with RAG-assembled context | ✅ Complete |
+| Stage       | Component                                      | Status      |
+| ----------- | ---------------------------------------------- | ----------- |
+| 1. Ingest   | Document upload, file storage, media detection | ✅ Complete |
+| 2. Extract  | Canonical text extraction (PDF/EPUB/HTML)      | ✅ Complete |
+| 3. Chunk    | Paragraph-aware chunking with byte offsets     | ✅ Complete |
+| 4. Embed    | OpenAI embeddings + pgvector storage           | ✅ Complete |
+| 5. Search   | Hybrid BM25 + vector similarity                | ✅ Complete |
+| 6. Retrieve | ACL-filtered chunk retrieval                   | ✅ Complete |
+| 7. Chat     | LLM with RAG-assembled context                 | ✅ Complete |
 
 **API Overview**
 
@@ -105,6 +106,7 @@ All endpoints require Clerk JWT (except `/health`). Key endpoints:
 - **Stage 8**: Links + Hardening (document linking, comprehensive tests, production readiness)
 
 **V1.1+ (Future)**
+
 - Multi-tab document interface
 - Evergreen linked-notes panel
 - Global conversations (currently per-document)

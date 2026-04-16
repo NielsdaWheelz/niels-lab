@@ -14,4 +14,3 @@ export function PageTitle({ children, speed = 25 }: PageTitleProps) {
     </h1>
   )
 }
-

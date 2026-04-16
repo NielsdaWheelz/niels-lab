@@ -18,8 +18,8 @@ export function Navbar() {
   return (
     <nav ref={navRef} className="nav-with-pathway">
       {navItems.map(([path, name]) => (
-        <Link 
-          key={path} 
+        <Link
+          key={path}
           href={path}
           onMouseEnter={(e) => setHoveredElement(e.currentTarget)}
           onMouseLeave={() => setHoveredElement(null)}
@@ -27,8 +27,8 @@ export function Navbar() {
           {name}
         </Link>
       ))}
-      <NeuralPathway 
-        containerRef={navRef} 
+      <NeuralPathway
+        containerRef={navRef}
         nodeSelectors={['a']}
         hoveredElement={hoveredElement}
       />

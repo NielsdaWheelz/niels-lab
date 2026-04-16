@@ -4,33 +4,58 @@ import { CustomMDX } from '@/app/components/mdx'
 import { getProjects } from '@/app/projects/utils'
 import { PageTitle } from '@/app/components/PageTitle'
 import { ContentReveal } from '@/app/components/ContentReveal'
-import { baseUrl } from '@/app/site'
+import { baseUrl, getOgImageUrl } from '@/app/site'
 
 export async function generateStaticParams() {
   const projects = getProjects()
   return projects.map((project) => ({ slug: project.slug }))
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const { slug } = await params
   const project = getProjects().find((p) => p.slug === slug)
   if (!project) return
 
   const { title, summary: description } = project.metadata
+  const image = getOgImageUrl(title)
 
   return {
     title,
     description,
+    alternates: {
+      canonical: `/projects/${project.slug}`,
+    },
     openGraph: {
       title,
       description,
       url: `${baseUrl}/projects/${project.slug}`,
-      images: project.metadata.image ? [`${baseUrl}${project.metadata.image}`] : [],
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
     },
   }
 }
 
-export default async function Project({ params }: { params: Promise<{ slug: string }> }) {
+export default async function Project({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const { slug } = await params
   const project = getProjects().find((p) => p.slug === slug)
 
@@ -41,9 +66,7 @@ export default async function Project({ params }: { params: Promise<{ slug: stri
   return (
     <section>
       <PageTitle>{project.metadata.title}</PageTitle>
-      <p className="article-summary">
-        {project.metadata.summary}
-      </p>
+      <p className="article-summary">{project.metadata.summary}</p>
       <Image
         src={project.metadata.image}
         alt=""
@@ -54,13 +77,21 @@ export default async function Project({ params }: { params: Promise<{ slug: stri
       {(project.metadata.repoUrl || project.metadata.liveUrl) && (
         <p className="article-links">
           {project.metadata.repoUrl && (
-            <a href={project.metadata.repoUrl} target="_blank" rel="noopener noreferrer">
+            <a
+              href={project.metadata.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               repo
             </a>
           )}
           {project.metadata.repoUrl && project.metadata.liveUrl && ' · '}
           {project.metadata.liveUrl && (
-            <a href={project.metadata.liveUrl} target="_blank" rel="noopener noreferrer">
+            <a
+              href={project.metadata.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               live
             </a>
           )}

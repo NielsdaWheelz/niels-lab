@@ -76,7 +76,7 @@ export function buildFileSystem({
         type: 'directory',
         name: 'projects',
         path: '/projects',
-        children: projects.map(project => ({
+        children: projects.map((project) => ({
           type: 'directory' as const,
           name: project.slug,
           path: `/projects/${project.slug}`,
@@ -102,7 +102,7 @@ export function buildFileSystem({
         type: 'directory',
         name: 'writing',
         path: '/writing',
-        children: writing.map(entry => ({
+        children: writing.map((entry) => ({
           type: 'file' as const,
           name: entry.slug,
           path: `/writing/${entry.slug}`,
@@ -129,7 +129,7 @@ export function buildFileSystem({
 
     for (const part of parts) {
       if (current.type !== 'directory' || !current.children) return null
-      const child = current.children.find(c => c.name === part)
+      const child = current.children.find((c) => c.name === part)
       if (!child) return null
       current = child
     }
@@ -176,8 +176,8 @@ export function buildFileSystem({
       if (!parent || parent.type !== 'directory' || !parent.children) return []
 
       return parent.children
-        .filter(c => c.name.startsWith(lastPart))
-        .map(c => c.name + (c.type === 'directory' ? '/' : ''))
+        .filter((c) => c.name.startsWith(lastPart))
+        .map((c) => c.name + (c.type === 'directory' ? '/' : ''))
     },
   }
 }

@@ -3,7 +3,12 @@
 import { useState, useCallback, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { FileSystem } from '@/lib/filesystem'
-import { executeCommand, completeInput, CommandResult, isSlashCommand } from './commands'
+import {
+  executeCommand,
+  completeInput,
+  CommandResult,
+  isSlashCommand,
+} from './commands'
 
 export type OutputLine = {
   type: 'prompt' | 'output' | 'error' | 'thinking' | 'user' | 'assistant'
@@ -32,7 +37,7 @@ export type ChatHandler = (
     onDone: () => void
     onError: (error: Error) => void
     signal: AbortSignal
-  }
+  },
 ) => Promise<void>
 
 export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
@@ -58,7 +63,7 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
   const prompt = cwd === '/' ? '~ $ ' : `~${cwd} $ `
 
   const addOutput = useCallback((lines: OutputLine[]) => {
-    setOutput(prev => [...prev, ...lines].slice(-MAX_OUTPUT))
+    setOutput((prev) => [...prev, ...lines].slice(-MAX_OUTPUT))
   }, [])
 
   const execute = useCallback(async () => {
@@ -72,11 +77,13 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
     const isCommand = trimmed.startsWith('/')
 
     // Add user message/prompt to output
-    addOutput([{
-      type: isCommand ? 'prompt' : 'user',
-      content: isCommand ? (prompt + trimmed) : trimmed,
-      id: generateLineId()
-    }])
+    addOutput([
+      {
+        type: isCommand ? 'prompt' : 'user',
+        content: isCommand ? prompt + trimmed : trimmed,
+        id: generateLineId(),
+      },
+    ])
 
     // Set status to running
     if (isCommand) {
@@ -92,8 +99,11 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
       setInput('')
       setStatus('idle')
       // add to history
-      if (trimmed && (history.length === 0 || history[history.length - 1] !== trimmed)) {
-        setHistory(prev => [...prev, trimmed].slice(-MAX_HISTORY))
+      if (
+        trimmed &&
+        (history.length === 0 || history[history.length - 1] !== trimmed)
+      ) {
+        setHistory((prev) => [...prev, trimmed].slice(-MAX_HISTORY))
       }
       setHistoryIndex(-1)
       return
@@ -102,8 +112,11 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
     // handle chat message (non-slash input)
     if (result.output === '__CHAT__') {
       // add to history
-      if (trimmed && (history.length === 0 || history[history.length - 1] !== trimmed)) {
-        setHistory(prev => [...prev, trimmed].slice(-MAX_HISTORY))
+      if (
+        trimmed &&
+        (history.length === 0 || history[history.length - 1] !== trimmed)
+      ) {
+        setHistory((prev) => [...prev, trimmed].slice(-MAX_HISTORY))
       }
       setHistoryIndex(-1)
       setInput('')
@@ -127,11 +140,13 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
             signal: abortControllerRef.current.signal,
             onToken: (token) => {
               // Append token to the assistant line
-              setOutput(prev => prev.map(line =>
-                line.id === assistantLineId
-                  ? { ...line, content: (line.content as string) + token }
-                  : line
-              ))
+              setOutput((prev) =>
+                prev.map((line) =>
+                  line.id === assistantLineId
+                    ? { ...line, content: (line.content as string) + token }
+                    : line,
+                ),
+              )
               setStatus('streaming...')
             },
             onDone: () => {
@@ -141,25 +156,34 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
             },
             onError: (err) => {
               // Replace assistant line with error
-              setOutput(prev => prev.map(line =>
-                line.id === assistantLineId
-                  ? { ...line, type: 'error', content: `error: ${err.message}` }
-                  : line
-              ))
+              setOutput((prev) =>
+                prev.map((line) =>
+                  line.id === assistantLineId
+                    ? {
+                        ...line,
+                        type: 'error',
+                        content: `error: ${err.message}`,
+                      }
+                    : line,
+                ),
+              )
               setIsThinking(false)
               setStatus('error')
               abortControllerRef.current = null
             },
-          }
+          },
         )
       } else {
         // No LLM handler - show placeholder message
-        addOutput([{
-          type: 'assistant',
-          content: "i'm not connected to an AI yet. use /help to see available commands.",
-          id: generateLineId(),
-          isTyping: true,
-        }])
+        addOutput([
+          {
+            type: 'assistant',
+            content:
+              "i'm not connected to an AI yet. use /help to see available commands.",
+            id: generateLineId(),
+            isTyping: true,
+          },
+        ])
         setStatus('typing...')
       }
 
@@ -171,15 +195,20 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
     if (result.output) {
       const lineId = generateLineId()
       const isStringOutput = typeof result.output === 'string'
-      const isReactOutput = !isStringOutput && typeof result.output === 'object' && result.output !== null
+      const isReactOutput =
+        !isStringOutput &&
+        typeof result.output === 'object' &&
+        result.output !== null
 
-      addOutput([{
-        type: result.isError ? 'error' : 'output',
-        content: result.output,
-        id: lineId,
-        // Only string outputs get typewriter effect (not errors)
-        isTyping: isStringOutput && !result.isError,
-      }])
+      addOutput([
+        {
+          type: result.isError ? 'error' : 'output',
+          content: result.output,
+          id: lineId,
+          // Only string outputs get typewriter effect (not errors)
+          isTyping: isStringOutput && !result.isError,
+        },
+      ])
 
       // Set status based on result
       if (result.status) {
@@ -204,8 +233,11 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
     }
 
     // add to history (avoid consecutive duplicates)
-    if (trimmed && (history.length === 0 || history[history.length - 1] !== trimmed)) {
-      setHistory(prev => [...prev, trimmed].slice(-MAX_HISTORY))
+    if (
+      trimmed &&
+      (history.length === 0 || history[history.length - 1] !== trimmed)
+    ) {
+      setHistory((prev) => [...prev, trimmed].slice(-MAX_HISTORY))
     }
 
     setInput('')
@@ -216,9 +248,8 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
   const handleHistoryUp = useCallback(() => {
     if (history.length === 0) return
 
-    const newIndex = historyIndex === -1
-      ? history.length - 1
-      : Math.max(0, historyIndex - 1)
+    const newIndex =
+      historyIndex === -1 ? history.length - 1 : Math.max(0, historyIndex - 1)
 
     setHistoryIndex(newIndex)
     setInput(history[newIndex])
@@ -268,10 +299,10 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
 
   // Called when typewriter finishes
   const onTypewriterComplete = useCallback((lineId: string) => {
-    setOutput(prev =>
-      prev.map(line =>
-        line.id === lineId ? { ...line, isTyping: false } : line
-      )
+    setOutput((prev) =>
+      prev.map((line) =>
+        line.id === lineId ? { ...line, isTyping: false } : line,
+      ),
     )
     setStatus('idle')
   }, [])
@@ -293,21 +324,26 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
     addOutput([{ type: 'thinking', content: '', id: generateLineId() }])
   }, [addOutput])
 
-  const stopThinking = useCallback((response: string | React.ReactNode, isError = false) => {
-    setIsThinking(false)
-    // Remove the thinking line and add the response
-    setOutput(prev => {
-      const withoutThinking = prev.filter(line => line.type !== 'thinking')
-      const newLine: OutputLine = {
-        type: isError ? 'error' : 'assistant',
-        content: response,
-        id: generateLineId(),
-        isTyping: typeof response === 'string' && !isError,
-      }
-      return [...withoutThinking, newLine].slice(-MAX_OUTPUT)
-    })
-    setStatus(isError ? 'error' : (typeof response === 'string' ? 'typing...' : 'idle'))
-  }, [])
+  const stopThinking = useCallback(
+    (response: string | React.ReactNode, isError = false) => {
+      setIsThinking(false)
+      // Remove the thinking line and add the response
+      setOutput((prev) => {
+        const withoutThinking = prev.filter((line) => line.type !== 'thinking')
+        const newLine: OutputLine = {
+          type: isError ? 'error' : 'assistant',
+          content: response,
+          id: generateLineId(),
+          isTyping: typeof response === 'string' && !isError,
+        }
+        return [...withoutThinking, newLine].slice(-MAX_OUTPUT)
+      })
+      setStatus(
+        isError ? 'error' : typeof response === 'string' ? 'typing...' : 'idle',
+      )
+    },
+    [],
+  )
 
   return {
     cwd,

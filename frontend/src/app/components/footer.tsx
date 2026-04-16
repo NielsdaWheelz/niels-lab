@@ -16,12 +16,8 @@ export default function Footer() {
           x
         </a>
       </p>
-      <p style={{ marginTop: '0.5rem' }}>
-        terminal: ctrl+k
-      </p>
-      <p style={{ marginTop: '0.5rem' }}>
-        © {new Date().getFullYear()}
-      </p>
+      <p style={{ marginTop: '0.5rem' }}>terminal: ctrl+k</p>
+      <p style={{ marginTop: '0.5rem' }}>© {new Date().getFullYear()}</p>
     </footer>
   )
 }

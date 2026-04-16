@@ -55,14 +55,14 @@ function parseFrontmatter(rawContent, relativePath, errors) {
   for (const [index, line] of lines.entries()) {
     if (!line.trim()) {
       errors.push(
-        `${relativePath}:${index + 1}: blank lines inside frontmatter are not supported`
+        `${relativePath}:${index + 1}: blank lines inside frontmatter are not supported`,
       )
       continue
     }
 
     if (!line.includes(': ')) {
       errors.push(
-        `${relativePath}:${index + 1}: frontmatter lines must use "key: value"`
+        `${relativePath}:${index + 1}: frontmatter lines must use "key: value"`,
       )
       continue
     }
@@ -76,7 +76,9 @@ function parseFrontmatter(rawContent, relativePath, errors) {
     }
 
     if (Object.prototype.hasOwnProperty.call(metadata, key)) {
-      errors.push(`${relativePath}:${index + 1}: duplicate frontmatter key "${key}"`)
+      errors.push(
+        `${relativePath}:${index + 1}: duplicate frontmatter key "${key}"`,
+      )
       continue
     }
 
@@ -138,7 +140,10 @@ function validateMetadata(metadata, source, relativePath, errors) {
     errors.push(`${relativePath}: title must be present and non-empty`)
   }
 
-  if (typeof metadata.publishedAt !== 'string' || metadata.publishedAt.trim() === '') {
+  if (
+    typeof metadata.publishedAt !== 'string' ||
+    metadata.publishedAt.trim() === ''
+  ) {
     errors.push(`${relativePath}: publishedAt must be present and non-empty`)
   } else {
     validatePublishedAt(metadata.publishedAt, relativePath, errors)
@@ -153,7 +158,10 @@ function validateMetadata(metadata, source, relativePath, errors) {
   }
 
   for (const fieldName of ['repoUrl', 'liveUrl']) {
-    if (typeof metadata[fieldName] === 'string' && metadata[fieldName].trim() !== '') {
+    if (
+      typeof metadata[fieldName] === 'string' &&
+      metadata[fieldName].trim() !== ''
+    ) {
       validateUrl(metadata[fieldName], fieldName, relativePath, errors)
     }
   }

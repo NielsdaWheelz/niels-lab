@@ -9,10 +9,10 @@ interface ContentRevealProps {
   loadingDuration?: number // ms to show loading state
 }
 
-export function ContentReveal({ 
-  children, 
+export function ContentReveal({
+  children,
   loadingText = 'generating',
-  loadingDuration = 800 
+  loadingDuration = 800,
 }: ContentRevealProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isVisible, setIsVisible] = useState(false)
@@ -46,4 +46,3 @@ export function ContentReveal({
     </div>
   )
 }
-

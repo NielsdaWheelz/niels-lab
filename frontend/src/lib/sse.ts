@@ -12,7 +12,7 @@ export type StreamToken = {
 
 export async function* fetchStream(
   url: string,
-  init: RequestInit
+  init: RequestInit,
 ): AsyncGenerator<StreamToken> {
   const res = await fetch(url, init)
 
@@ -42,7 +42,7 @@ export async function* fetchStream(
       // Find the start of a JSON object
       const startIdx = buf.indexOf('{')
       if (startIdx === -1) {
-        buf = ''  // No objects, clear buffer
+        buf = '' // No objects, clear buffer
         break
       }
 
@@ -116,14 +116,26 @@ export async function* fetchStream(
 
     for (let i = startIdx; i < buf.length; i++) {
       const char = buf[i]
-      if (escapeNext) { escapeNext = false; continue }
-      if (char === '\\' && inString) { escapeNext = true; continue }
-      if (char === '"') { inString = !inString; continue }
+      if (escapeNext) {
+        escapeNext = false
+        continue
+      }
+      if (char === '\\' && inString) {
+        escapeNext = true
+        continue
+      }
+      if (char === '"') {
+        inString = !inString
+        continue
+      }
       if (inString) continue
       if (char === '{') depth++
       else if (char === '}') {
         depth--
-        if (depth === 0) { endIdx = i; break }
+        if (depth === 0) {
+          endIdx = i
+          break
+        }
       }
     }
 

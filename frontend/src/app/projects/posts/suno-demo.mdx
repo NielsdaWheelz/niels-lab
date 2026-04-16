@@ -1,5 +1,5 @@
 ---
-title: "Suno Session Lab: turning clip generation into a navigable space"
+title: 'Suno Session Lab: turning clip generation into a navigable space'
 publishedAt: '2025-12-11'
 summary: 'Turns music generation into a navigable space, layering LLM labeling over CLAP/embedding-driven clustering and centroid-guided regeneration'
 image: '/projects/suno-demo.svg'
@@ -126,7 +126,7 @@ Note: KMeans is Euclidean, while “more like this” uses cosine similarity. Fo
 
 ### “more like this” is similarity-filtered generation
 
-The backend’s `more_like_cluster` does *not* query a vector index or retrieve existing tracks. Instead it:
+The backend’s `more_like_cluster` does _not_ query a vector index or retrieve existing tracks. Instead it:
 
 1. generates `num_clips` candidates,
 2. embeds them,

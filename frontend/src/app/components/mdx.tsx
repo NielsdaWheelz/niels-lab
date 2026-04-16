@@ -44,7 +44,11 @@ function CustomLink(props: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   return <a target="_blank" rel="noopener noreferrer" {...props} />
 }
 
-function RoundedImage({ className, alt = '', ...props }: React.ComponentProps<typeof Image>) {
+function RoundedImage({
+  className,
+  alt = '',
+  ...props
+}: React.ComponentProps<typeof Image>) {
   return <Image className={className} alt={alt} {...props} />
 }
 
@@ -67,11 +71,7 @@ function slugify(str: string) {
 function createHeading(level: number) {
   const Heading = ({ children }: { children: string }) => {
     const slug = slugify(children)
-    return React.createElement(
-      `h${level}`,
-      { id: slug },
-      children
-    )
+    return React.createElement(`h${level}`, { id: slug }, children)
   }
 
   Heading.displayName = `Heading${level}`

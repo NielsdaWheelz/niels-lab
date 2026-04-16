@@ -32,7 +32,19 @@ keyboard:
 tip: type without / to chat with the assistant`
 
 // Commands that can be executed with / prefix
-const SLASH_COMMANDS = ['pwd', 'ls', 'cd', 'cat', 'clear', 'help', 'search', 'grep', 'whois', 'visualize', 'sudo']
+const SLASH_COMMANDS = [
+  'pwd',
+  'ls',
+  'cd',
+  'cat',
+  'clear',
+  'help',
+  'search',
+  'grep',
+  'whois',
+  'visualize',
+  'sudo',
+]
 
 // Check if input is a slash command
 export function isSlashCommand(input: string): boolean {
@@ -44,7 +56,7 @@ export function isSlashCommand(input: string): boolean {
 
 export function executeCommand(
   input: string,
-  ctx: CommandContext
+  ctx: CommandContext,
 ): CommandResult {
   const trimmed = input.trim()
   if (!trimmed) {
@@ -90,7 +102,10 @@ export function executeCommand(
     case 'visualize':
       return cmdVisualize()
     default:
-      return { output: `unknown command: /${cmd}\ntype /help for available commands`, isError: true }
+      return {
+        output: `unknown command: /${cmd}\ntype /help for available commands`,
+        isError: true,
+      }
   }
 }
 
@@ -120,8 +135,8 @@ function cmdLs(path: string | undefined, ctx: CommandContext): CommandResult {
     return { output: '', isError: false }
   }
 
-  const items = children.map(c =>
-    c.type === 'directory' ? `${c.name}/` : c.name
+  const items = children.map((c) =>
+    c.type === 'directory' ? `${c.name}/` : c.name,
   )
   return { output: items.join('  '), isError: false }
 }
@@ -203,7 +218,14 @@ function cmdSearch(args: string[], ctx: CommandContext): CommandResult {
     lineNum?: number
   }> = []
 
-  function searchNode(node: { type: string; name: string; path: string; content?: string; metadata?: Record<string, string>; children?: typeof node[] }) {
+  function searchNode(node: {
+    type: string
+    name: string
+    path: string
+    content?: string
+    metadata?: Record<string, string>
+    children?: (typeof node)[]
+  }) {
     if (node.type === 'file' && node.content) {
       const content = node.content.toLowerCase()
       const title = node.metadata?.title || node.name
@@ -227,7 +249,10 @@ function cmdSearch(args: string[], ctx: CommandContext): CommandResult {
           const idx = snippetLine.toLowerCase().indexOf(query)
           const start = Math.max(0, idx - 30)
           const end = Math.min(snippetLine.length, idx + query.length + 30)
-          snippetLine = (start > 0 ? '...' : '') + snippetLine.slice(start, end) + (end < snippetLine.length ? '...' : '')
+          snippetLine =
+            (start > 0 ? '...' : '') +
+            snippetLine.slice(start, end) +
+            (end < snippetLine.length ? '...' : '')
         }
 
         results.push({
@@ -247,7 +272,10 @@ function cmdSearch(args: string[], ctx: CommandContext): CommandResult {
   searchNode(ctx.fs.root)
 
   if (results.length === 0) {
-    return { output: `no matches for '${queryParts.join(' ')}'`, isError: false }
+    return {
+      output: `no matches for '${queryParts.join(' ')}'`,
+      isError: false,
+    }
   }
 
   // Return structured data for React rendering
@@ -255,7 +283,11 @@ function cmdSearch(args: string[], ctx: CommandContext): CommandResult {
   const limitedResults = results.slice(0, limit)
 
   return {
-    output: { __type: 'search', query: queryParts.join(' '), results: limitedResults } as unknown as string,
+    output: {
+      __type: 'search',
+      query: queryParts.join(' '),
+      results: limitedResults,
+    } as unknown as string,
     isError: false,
     status: `found ${results.length} result${results.length === 1 ? '' : 's'}`,
   }
@@ -286,20 +318,20 @@ function cmdSudo(input: string): CommandResult {
 
   if (afterSudo === 'make me a sandwich') {
     return {
-      output: "what? make it yourself.",
+      output: 'what? make it yourself.',
       isError: true,
     }
   }
 
   return {
-    output: "user is not in the sudoers file. this incident will be reported.",
+    output: 'user is not in the sudoers file. this incident will be reported.',
     isError: true,
   }
 }
 
 export function completeInput(
   input: string,
-  ctx: CommandContext
+  ctx: CommandContext,
 ): { completed: string; options: string[] } {
   const trimmed = input.trimStart()
 
@@ -314,12 +346,12 @@ export function completeInput(
   // completing command name
   if (parts.length === 1 && !input.endsWith(' ')) {
     const partial = parts[0]
-    const matches = SLASH_COMMANDS.filter(c => c.startsWith(partial))
+    const matches = SLASH_COMMANDS.filter((c) => c.startsWith(partial))
 
     if (matches.length === 1) {
       return { completed: '/' + matches[0] + ' ', options: [] }
     }
-    return { completed: input, options: matches.map(m => '/' + m) }
+    return { completed: input, options: matches.map((m) => '/' + m) }
   }
 
   // completing path argument
@@ -346,7 +378,7 @@ export function completeInput(
 
       return {
         completed: prefix + basePath + options[0],
-        options: []
+        options: [],
       }
     }
 

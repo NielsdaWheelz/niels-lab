@@ -1,7 +1,11 @@
 'use client'
 
 import { useMemo } from 'react'
-import { buildFileSystem, type ContentEntry, type CVEntry } from '@/lib/filesystem'
+import {
+  buildFileSystem,
+  type ContentEntry,
+  type CVEntry,
+} from '@/lib/filesystem'
 import { handleChat } from '@/lib/nielsGpt'
 import { Terminal } from './index'
 
@@ -23,7 +27,7 @@ export function TerminalWrapper({ data }: TerminalWrapperProps) {
         writing: data.writingPosts ?? [],
         cv: data.cv,
       }),
-    [data.cv, data.projects, data.writingPosts]
+    [data.cv, data.projects, data.writingPosts],
   )
 
   return <Terminal filesystem={filesystem} onChat={handleChat} />

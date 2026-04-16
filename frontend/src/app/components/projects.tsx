@@ -7,13 +7,12 @@ interface ProjectsListProps {
 }
 
 export function ProjectsList({ slugs }: ProjectsListProps) {
-  const allProjects = getProjects()
-    .sort((a, b) => {
-      if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
-        return -1
-      }
-      return 1
-    })
+  const allProjects = getProjects().sort((a, b) => {
+    if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
+      return -1
+    }
+    return 1
+  })
 
   const projects = slugs
     ? slugs.flatMap((slug) => {
@@ -27,7 +26,10 @@ export function ProjectsList({ slugs }: ProjectsListProps) {
       {projects.map((project) => (
         <li key={project.slug} className="project-item">
           <div className="project-content">
-            <Link href={`/projects/${project.slug}`} className="project-image-card">
+            <Link
+              href={`/projects/${project.slug}`}
+              className="project-image-card"
+            >
               <Image
                 src={project.metadata.image}
                 alt=""
@@ -37,21 +39,27 @@ export function ProjectsList({ slugs }: ProjectsListProps) {
               />
             </Link>
             <div className="project-text">
-              <Link href={`/projects/${project.slug}`} className="project-title">
+              <Link
+                href={`/projects/${project.slug}`}
+                className="project-title"
+              >
                 {project.metadata.title}
               </Link>
               {project.metadata.summary && (
                 <p className="project-summary">{project.metadata.summary}</p>
               )}
               <div className="project-meta">
-                <time dateTime={project.metadata.publishedAt} className="project-date">
+                <time
+                  dateTime={project.metadata.publishedAt}
+                  className="project-date"
+                >
                   {formatDate(project.metadata.publishedAt)}
                 </time>
                 {project.metadata.repoUrl && (
                   <span className="project-link-sep"> • </span>
                 )}
                 {project.metadata.repoUrl && (
-                  <a 
+                  <a
                     href={project.metadata.repoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -64,7 +72,7 @@ export function ProjectsList({ slugs }: ProjectsListProps) {
                   <span className="project-link-sep"> • </span>
                 )}
                 {project.metadata.liveUrl && (
-                  <a 
+                  <a
                     href={project.metadata.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
