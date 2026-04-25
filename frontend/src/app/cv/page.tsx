@@ -1,8 +1,7 @@
 import Link from 'next/link'
-import { CustomMDX } from '@/app/components/mdx'
-import { getCVContent } from '@/app/cv/utils'
 import { PageTitle } from '@/app/components/PageTitle'
 import { ContentReveal } from '@/app/components/ContentReveal'
+import Timeline from './Timeline'
 
 export const metadata = {
   title: 'cv',
@@ -10,12 +9,10 @@ export const metadata = {
 }
 
 export default function CVPage() {
-  const { metadata, content } = getCVContent()
-
   return (
     <section>
       <PageTitle>cv</PageTitle>
-      <p className="page-intro">{metadata.summary}</p>
+      <p className="page-intro">Professional experience and background</p>
       <p
         style={{
           marginTop: '0.5rem',
@@ -32,9 +29,7 @@ export default function CVPage() {
         </Link>
       </p>
       <ContentReveal loadingText="loading cv">
-        <article className="prose article-body">
-          <CustomMDX source={content} />
-        </article>
+        <Timeline />
       </ContentReveal>
     </section>
   )

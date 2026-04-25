@@ -19,7 +19,7 @@ import {
 } from '@/app/components/Terminal/TerminalWrapper'
 import { getProjects } from '@/app/projects/utils'
 import { getWritingPosts } from '@/app/writing/utils'
-import { getCVContent } from '@/app/cv/utils'
+import { entries as cvEntries, skills as cvSkills } from '@/app/cv/data'
 
 const siteUrl = getSiteUrl()
 const shouldIndex = shouldIndexSite()
@@ -83,10 +83,23 @@ function getTerminalData(): ContentData {
     content: p.content,
   }))
 
-  const cvContent = getCVContent()
   const cv = {
-    metadata: cvContent.metadata as Record<string, string>,
-    content: cvContent.content,
+    metadata: {
+      title: 'CV',
+      publishedAt: '2025-12-01',
+      summary: 'Professional experience and background',
+    },
+    content:
+      cvEntries
+        .map(
+          (e) =>
+            `${e.title}${'subtitle' in e && e.subtitle ? ' – ' + e.subtitle : ''}\n${e.date}${'bullets' in e && e.bullets ? '\n' + e.bullets.map((b) => '- ' + b).join('\n') : ''}`,
+        )
+        .join('\n\n') +
+      '\n\nSKILLS\n' +
+      Object.entries(cvSkills)
+        .map(([k, v]) => `${k}: ${v.join(', ')}`)
+        .join('\n'),
   }
 
   return { writingPosts, projects, cv }

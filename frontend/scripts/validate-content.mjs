@@ -22,11 +22,6 @@ const contentSources = [
     directory: 'src/app/writing/posts',
     requiredKeys: ['title', 'publishedAt', 'summary'],
   },
-  {
-    name: 'cv',
-    file: 'src/app/cv/cv.mdx',
-    requiredKeys: ['title', 'publishedAt', 'summary'],
-  },
 ]
 
 function stripOuterQuotes(value) {

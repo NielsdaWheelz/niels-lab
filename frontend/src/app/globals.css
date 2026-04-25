@@ -355,30 +355,171 @@ footer a:hover {
   margin-top: 0;
 }
 
-/* CV-specific styling */
-.prose h2 {
-  margin-top: 2em;
-  margin-bottom: 1em;
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 0.5em;
+/* ============================================
+   TIMELINE - interactive CV chronology
+   ============================================ */
+.timeline {
+  position: relative;
+  padding-left: 48px;
+  margin-top: 1rem;
 }
 
-.prose h2:first-of-type {
-  margin-top: 0;
+.timeline-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.prose h3 {
-  margin-top: 1.2em;
-  margin-bottom: 0.25em;
-  color: var(--color-text);
+.timeline-entry {
+  position: relative;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  transform: translateX(-12px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.timeline-entry.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -40px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid;
+  transition:
+    transform 0.3s ease,
+    background-color 0.3s ease;
+  z-index: 1;
+}
+
+.timeline-dot.visible {
+  transform: scale(1.2);
+}
+
+.timeline-card {
+  padding: 1rem 1.25rem;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition:
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.timeline-card:hover {
+  border-color: var(--color-text-muted);
+  transform: translateY(-1px);
+}
+
+.timeline-title {
   font-weight: 700;
+  margin: 0;
 }
 
-.prose h3 + p {
-  margin-top: 0.25em;
-  margin-bottom: 0.75em;
+.timeline-subtitle {
   color: var(--color-text-muted);
   font-size: 0.95em;
+  margin: 0.15rem 0 0;
+}
+
+.timeline-date {
+  color: var(--color-text-muted);
+  font-size: 0.85em;
+  margin: 0.25rem 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline-bullets {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.timeline-bullets li {
+  margin: 0.35rem 0;
+  line-height: 1.5;
+  font-size: 0.9em;
+}
+
+.timeline-gap {
+  position: relative;
+  margin: 1.5rem 0;
+  padding-left: 0;
+}
+
+.timeline-gap-note {
+  font-style: italic;
+  color: var(--color-text-muted);
+  font-size: 0.85em;
+  margin: 0;
+}
+
+.timeline-skills {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.timeline-skill-group {
+  margin-bottom: 1.25rem;
+}
+
+.timeline-skill-label {
+  font-weight: 600;
+  font-size: 0.9em;
+  margin: 0 0 0.5rem;
+}
+
+.timeline-skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.timeline-skill-tag {
+  padding: 0.25rem 0.6rem;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.8em;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.timeline-skill-tag.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 639px) {
+  .timeline {
+    padding-left: 36px;
+  }
+
+  .timeline-dot {
+    left: -28px;
+    width: 8px;
+    height: 8px;
+  }
+
+  .timeline-card {
+    padding: 0.75rem 1rem;
+  }
+
+  .timeline-entry {
+    margin-bottom: 2rem;
+  }
 }
 
 .prose ul,
