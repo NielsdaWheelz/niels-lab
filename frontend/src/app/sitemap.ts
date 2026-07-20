@@ -14,7 +14,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${siteUrl}/projects/${project.slug}`,
   }))
 
-  const routes = ['', '/projects', '/writing', '/cv'].map((route) => ({
+  const routes = [
+    '',
+    '/projects',
+    '/writing',
+    '/cv',
+    '/now',
+    '/colophon',
+    '/lab',
+    '/lab/sampling',
+  ].map((route) => ({
     url: `${siteUrl}${route}`,
   }))
 

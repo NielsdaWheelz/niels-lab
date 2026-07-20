@@ -1,3 +1,4 @@
+import './print.css'
 import Link from 'next/link'
 import { PageTitle } from '@/app/components/PageTitle'
 import { JsonLd } from '@/app/components/StructuredData'

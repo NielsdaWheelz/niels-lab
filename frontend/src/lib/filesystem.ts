@@ -117,6 +117,37 @@ export function buildFileSystem({
         content: cv.content,
         metadata: cv.metadata,
       },
+      {
+        type: 'directory',
+        name: 'lab',
+        path: '/lab',
+        children: [
+          {
+            type: 'file',
+            name: 'sampling',
+            path: '/lab/sampling',
+            content:
+              '# sampling playground\nAn interactive next-token sampler: feel what temperature, top-k, and top-p actually do to a distribution.\n\nRun: cd /lab/sampling',
+            metadata: { title: 'sampling playground' },
+          },
+        ],
+      },
+      {
+        type: 'file',
+        name: 'now',
+        path: '/now',
+        content:
+          '# now\nWhat Niels is doing these days — a dated, living page.\n\nRun: cd /now to read the current entry.',
+        metadata: { title: 'now' },
+      },
+      {
+        type: 'file',
+        name: 'colophon',
+        path: '/colophon',
+        content:
+          '# colophon\nHow this site is designed and built: live design tokens, type specimens, the full stack, and provenance.\n\nRun: cd /colophon',
+        metadata: { title: 'colophon' },
+      },
     ],
   }
 

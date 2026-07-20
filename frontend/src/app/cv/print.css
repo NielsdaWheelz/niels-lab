@@ -1,0 +1,114 @@
+@media print {
+  /* Force all reveal-animated timeline elements visible */
+  .timeline-entry {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .timeline-entry.visible {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .timeline-dot {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .timeline-dot.visible {
+    transform: none !important;
+  }
+
+  .timeline-skill-tag {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .timeline-skill-tag.visible {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Hide site chrome and decorative elements */
+  .site-nav,
+  .site-footer,
+  .skip-link,
+  .cursor,
+  .assistant-launcher,
+  .assistant-panel,
+  body::after {
+    display: none !important;
+  }
+
+  /* Remove custom cursors */
+  html,
+  a {
+    cursor: auto !important;
+  }
+
+  /* Page setup and background */
+  @page {
+    margin: 1.6cm;
+  }
+
+  html {
+    background: white;
+    color: #111;
+    font-size: 11pt;
+  }
+
+  body {
+    background: white;
+    color: #111;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Override theme colors for light print output */
+  :root,
+  :root[data-theme='dark'] {
+    --color-bg: #ffffff;
+    --color-bg-alt: #f9f9f9;
+    --color-text: #111111;
+    --color-text-muted: #666666;
+    --color-terracotta: #8b3e2e;
+    --color-sage: #2d5a5f;
+    --color-gold: #8b6914;
+    --color-border: #d0d0d0;
+    --color-ruling: transparent;
+    --color-shadow: rgba(0, 0, 0, 0.1);
+  }
+
+  /* Timeline styling for print */
+  .timeline-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .timeline-entry {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Remove link underline for print readability */
+  a {
+    text-decoration: none;
+    color: #2d5a5f;
+  }
+
+  /* Hide responsive padding excess */
+  main {
+    width: 100%;
+  }
+
+  /* Ensure text is readable */
+  p,
+  li {
+    line-height: 1.6;
+  }
+}

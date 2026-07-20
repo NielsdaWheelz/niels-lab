@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { githubUrl, linkedinUrl, xUrl } from '@/app/site'
 
 export default function Footer() {
@@ -26,6 +27,15 @@ export default function Footer() {
           <a href={xUrl} target="_blank" rel="me noopener noreferrer">
             x
           </a>
+        </p>
+        <p className="footer-links">
+          <Link href="/now">now</Link>
+          {' · '}
+          <Link href="/colophon">colophon</Link>
+          {' · '}
+          <a href="/rss">rss</a>
+          {' · '}
+          <a href="/llms.txt">llms.txt</a>
         </p>
         <p className="footer-note">paper, ink, code · terminal: ctrl+k</p>
         <p>© {new Date().getFullYear()} Niels Erik Nandal</p>
