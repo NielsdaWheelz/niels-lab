@@ -1,43 +1,57 @@
 import {
-  siteName,
+  getCanonicalUrl,
+  getPersonSchemaId,
+  getWebsiteSchemaId,
   siteDescription,
-  githubUrl,
-  linkedinUrl,
-  xUrl,
-  getSiteUrl,
+  siteName,
+  socialProfileUrls,
 } from '@/app/site'
 
-export function StructuredData() {
-  const siteUrl = getSiteUrl()
+type JsonLdProps = {
+  data: Record<string, unknown>
+}
 
+export function JsonLd({ data }: JsonLdProps) {
+  const json = JSON.stringify(data)
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: json.replace(/</g, '\\u003c') }}
+    />
+  )
+}
+
+export function StructuredData() {
+  const siteUrl = getCanonicalUrl('/')
+  const personId = getPersonSchemaId()
+  const websiteId = getWebsiteSchemaId()
   const personSchema = {
-    '@context': 'https://schema.org',
     '@type': 'Person',
+    '@id': personId,
     name: siteName,
     url: siteUrl,
-    jobTitle: 'Software Engineer',
+    jobTitle: 'AI Systems Engineer',
     description: siteDescription,
-    sameAs: [githubUrl, linkedinUrl, xUrl],
+    sameAs: socialProfileUrls,
   }
 
   const websiteSchema = {
-    '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': websiteId,
     name: siteName,
     url: siteUrl,
     description: siteDescription,
+    inLanguage: 'en-US',
+    publisher: { '@id': personId },
   }
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-      />
-    </>
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@graph': [personSchema, websiteSchema],
+      }}
+    />
   )
 }

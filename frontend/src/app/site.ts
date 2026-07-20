@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 const DEFAULT_SITE_URL = 'https://nielseriknandal.com'
 
 function readEnv(name: string) {
@@ -34,10 +36,13 @@ function normalizeSiteUrl(value: string | undefined, assumeHttps = false) {
 
 export const siteName = 'Niels Erik Nandal'
 export const siteDescription =
-  'Engineer building AI products, systems, and readable software.'
+  'AI systems engineer building ambitious products with deterministic backends, legible interfaces, and readable software.'
 export const githubUrl = 'https://github.com/NielsdaWheelz'
 export const linkedinUrl = 'https://www.linkedin.com/in/nielseriknandal/'
 export const xUrl = 'https://x.com/the_powertool'
+export const huggingFaceUrl = 'https://huggingface.co/nnandal'
+export const xHandle = '@the_powertool'
+export const socialProfileUrls = [githubUrl, linkedinUrl, xUrl, huggingFaceUrl]
 
 export function getSiteUrl() {
   return (
@@ -52,6 +57,18 @@ export function getSiteUrl() {
 
 export const baseUrl = getSiteUrl()
 
+export function getCanonicalUrl(pathname = '/') {
+  return new URL(pathname, `${getSiteUrl()}/`).toString()
+}
+
+export function getPersonSchemaId() {
+  return `${getCanonicalUrl('/')}#person`
+}
+
+export function getWebsiteSchemaId() {
+  return `${getCanonicalUrl('/')}#website`
+}
+
 export function shouldIndexSite() {
   const vercelEnv = readEnv('VERCEL_ENV')
 
@@ -62,12 +79,77 @@ export function shouldIndexSite() {
   return getSiteUrl() === DEFAULT_SITE_URL
 }
 
-export function getOgImageUrl(title?: string) {
+export function getOgImageUrl(title?: string, description?: string) {
   const url = new URL('/og', getSiteUrl())
 
   if (title) {
     url.searchParams.set('title', title)
   }
+  if (description) {
+    url.searchParams.set('description', description)
+  }
 
   return url.toString()
+}
+
+type PageMetadataOptions = {
+  title: string
+  description: string
+  path: string
+  type?: 'website' | 'article'
+  publishedTime?: string
+}
+
+export function createPageMetadata({
+  title,
+  description,
+  path,
+  type = 'website',
+  publishedTime,
+}: PageMetadataOptions): Metadata {
+  const canonicalUrl = getCanonicalUrl(path)
+  const image = getOgImageUrl(title, description)
+
+  return {
+    title,
+    description,
+    authors: [{ name: siteName, url: getCanonicalUrl('/') }],
+    creator: siteName,
+    publisher: siteName,
+    alternates: {
+      canonical: canonicalUrl,
+      types: {
+        'application/rss+xml': getCanonicalUrl('/rss'),
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName,
+      locale: 'en_US',
+      type,
+      ...(type === 'article' && publishedTime
+        ? {
+            publishedTime,
+            authors: [getCanonicalUrl('/')],
+          }
+        : {}),
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: `${title} — ${siteName}`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      creator: xHandle,
+      images: [image],
+    },
+  }
 }

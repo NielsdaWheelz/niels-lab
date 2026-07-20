@@ -14,10 +14,12 @@ import { useTerminal, OutputLine, ChatHandler } from './useTerminal'
 import { TextReveal } from '../TextReveal'
 import { githubUrl, linkedinUrl } from '@/app/site'
 import { getTheme, Theme, THEME_CHANGE_EVENT } from '@/lib/theme'
+import { TERMINAL_OPEN_EVENT } from '@/lib/terminal'
 
 interface TerminalProps {
   filesystem: FileSystem
   onChat?: ChatHandler
+  initiallyExpanded?: boolean
 }
 
 // Seeded PRNG for deterministic randomness (avoid hydration mismatch)
@@ -602,13 +604,17 @@ function OutputLineContent({
   return <>{content}</>
 }
 
-export function Terminal({ filesystem, onChat }: TerminalProps) {
+export function Terminal({
+  filesystem,
+  onChat,
+  initiallyExpanded = false,
+}: TerminalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const outputRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [focused, setFocused] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(initiallyExpanded)
 
   const {
     prompt,
@@ -628,10 +634,13 @@ export function Terminal({ filesystem, onChat }: TerminalProps) {
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
       setMounted(true)
+      if (initiallyExpanded) {
+        setTimeout(() => inputRef.current?.focus(), 50)
+      }
     })
 
     return () => cancelAnimationFrame(frameId)
-  }, [])
+  }, [initiallyExpanded])
 
   // auto-scroll output
   useEffect(() => {
@@ -642,16 +651,24 @@ export function Terminal({ filesystem, onChat }: TerminalProps) {
 
   // global ctrl+k handler
   useEffect(() => {
+    const openTerminal = () => {
+      setExpanded(true)
+      setTimeout(() => inputRef.current?.focus(), 50)
+    }
+
     const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
       if (e.key === 'k' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault()
-        setExpanded(true)
-        setTimeout(() => inputRef.current?.focus(), 50)
+        openTerminal()
       }
     }
 
     window.addEventListener('keydown', handleGlobalKeyDown)
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown)
+    window.addEventListener(TERMINAL_OPEN_EVENT, openTerminal)
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown)
+      window.removeEventListener(TERMINAL_OPEN_EVENT, openTerminal)
+    }
   }, [])
 
   // click outside to collapse
@@ -730,13 +747,19 @@ export function Terminal({ filesystem, onChat }: TerminalProps) {
     >
       {/* Collapsed state: just the input bar */}
       {!expanded && (
-        <div className="assistant-collapsed" onClick={handleToggle}>
+        <button
+          type="button"
+          className="assistant-collapsed"
+          onClick={handleToggle}
+          aria-expanded="false"
+          aria-label="Open the interactive site terminal"
+        >
           <span className="assistant-prompt-hint">~</span>
           <span className="assistant-placeholder">
             chat or /help for commands
           </span>
           <kbd className="assistant-shortcut">^K</kbd>
-        </div>
+        </button>
       )}
 
       {/* Expanded state: output + input + status */}
@@ -744,7 +767,12 @@ export function Terminal({ filesystem, onChat }: TerminalProps) {
         <>
           {/* Output area */}
           {hasOutput && (
-            <div ref={outputRef} className="assistant-output">
+            <div
+              ref={outputRef}
+              className="assistant-output"
+              aria-live="polite"
+              aria-label="Terminal output"
+            >
               {output.map((line) => (
                 <div
                   key={line.id}
@@ -787,7 +815,9 @@ export function Terminal({ filesystem, onChat }: TerminalProps) {
           </div>
 
           {/* Status line */}
-          <div className="assistant-status">{statusText}</div>
+          <div className="assistant-status" role="status">
+            {statusText}
+          </div>
         </>
       )}
     </div>

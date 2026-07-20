@@ -1,11 +1,14 @@
 import Link from 'next/link'
 import { formatDate, getWritingPosts } from '@/app/writing/utils'
 import { PageTitle } from '@/app/components/PageTitle'
+import { createPageMetadata } from '@/app/site'
 
-export const metadata = {
-  title: 'writing',
-  description: 'Technical notes and build writeups',
-}
+export const metadata = createPageMetadata({
+  title: 'Writing',
+  description:
+    'Technical notes on machine learning, AI systems, and software engineering by Niels Erik Nandal.',
+  path: '/writing',
+})
 
 export default function Page() {
   const posts = getWritingPosts().sort((a, b) => {
@@ -29,7 +32,9 @@ export default function Page() {
               {post.metadata.title}
             </Link>
             <p className="writing-meta">
-              {formatDate(post.metadata.publishedAt)}
+              <time dateTime={post.metadata.publishedAt}>
+                {formatDate(post.metadata.publishedAt)}
+              </time>
             </p>
             <p className="writing-summary">{post.metadata.summary}</p>
           </li>

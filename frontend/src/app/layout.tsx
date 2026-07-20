@@ -1,6 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { GeistMono } from 'geist/font/mono'
+import { GeistSans } from 'geist/font/sans'
 import { Newsreader, Caveat } from 'next/font/google'
 import { themeInitScript } from '@/lib/theme'
 import { Navbar } from '@/app/components/nav'
@@ -8,13 +9,12 @@ import Footer from '@/app/components/footer'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import {
-  getOgImageUrl,
+  createPageMetadata,
   getSiteUrl,
   shouldIndexSite,
   siteDescription,
   siteName,
 } from '@/app/site'
-import { SketchCanvas } from '@/app/components/SketchCanvas'
 import { StructuredData } from '@/app/components/StructuredData'
 import {
   TerminalWrapper,
@@ -22,7 +22,6 @@ import {
 } from '@/app/components/Terminal/TerminalWrapper'
 import { getProjects } from '@/app/projects/utils'
 import { getWritingPosts } from '@/app/writing/utils'
-import { entries as cvEntries, skills as cvSkills } from '@/app/cv/data'
 
 const newsreader = Newsreader({
   subsets: ['latin'],
@@ -39,39 +38,18 @@ const caveat = Caveat({
 
 const siteUrl = getSiteUrl()
 const shouldIndex = shouldIndexSite()
-const ogImageUrl = getOgImageUrl(siteName)
+const rootMetadata = createPageMetadata({
+  title: `${siteName} — AI Systems Engineer`,
+  description: siteDescription,
+  path: '/',
+})
 
 export const metadata: Metadata = {
+  ...rootMetadata,
   metadataBase: new URL(siteUrl),
   title: {
-    default: siteName,
-    template: `%s | ${siteName}`,
-  },
-  description: siteDescription,
-  alternates: {
-    canonical: '/',
-  },
-  openGraph: {
-    title: siteName,
-    description: siteDescription,
-    url: '/',
-    siteName,
-    locale: 'en_US',
-    type: 'website',
-    images: [
-      {
-        url: ogImageUrl,
-        width: 1200,
-        height: 630,
-        alt: siteName,
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: siteName,
-    description: siteDescription,
-    images: [ogImageUrl],
+    default: `${siteName} — AI Systems Engineer`,
+    template: `%s — ${siteName}`,
   },
   robots: {
     index: shouldIndex,
@@ -90,13 +68,13 @@ function getTerminalData(): ContentData {
   const writingPosts = getWritingPosts().map((p) => ({
     slug: p.slug,
     metadata: p.metadata as Record<string, string>,
-    content: p.content,
+    content: `${p.metadata.summary}\n\nRead the full note at /writing/${p.slug}`,
   }))
 
   const projects = getProjects().map((p) => ({
     slug: p.slug,
     metadata: p.metadata as Record<string, string>,
-    content: p.content,
+    content: `${p.metadata.summary}\n\nInspect the full case study at /projects/${p.slug}`,
   }))
 
   const cv = {
@@ -106,16 +84,7 @@ function getTerminalData(): ContentData {
       summary: 'Professional experience and background',
     },
     content:
-      cvEntries
-        .map(
-          (e) =>
-            `${e.title}${'subtitle' in e && e.subtitle ? ' – ' + e.subtitle : ''}\n${e.date}${'bullets' in e && e.bullets ? '\n' + e.bullets.map((b) => '- ' + b).join('\n') : ''}`,
-        )
-        .join('\n\n') +
-      '\n\nSKILLS\n' +
-      Object.entries(cvSkills)
-        .map(([k, v]) => `${k}: ${v.join(', ')}`)
-        .join('\n'),
+      'Software engineer working across AI systems, deterministic backends, and product interfaces.\n\nRead the full background at /cv',
   }
 
   return { writingPosts, projects, cv }
@@ -131,7 +100,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${GeistMono.variable} ${newsreader.variable} ${caveat.variable}`}
+      className={`${GeistSans.variable} ${GeistMono.variable} ${newsreader.variable} ${caveat.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -139,9 +108,11 @@ export default function RootLayout({
         <StructuredData />
       </head>
       <body>
-        <SketchCanvas />
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <Navbar />
-        <main>{children}</main>
+        <main id="main-content">{children}</main>
         <Footer />
         <TerminalWrapper data={terminalData} />
         <Analytics />

@@ -1,8 +1,8 @@
 /* TEAM */
-Niels Erik Nandal, Engineer
+Niels Erik Nandal, AI Systems Engineer
 
 /* SITE STACK */
-Next.js 16, React 19, Bun, Tailwind, MDX, rough.js
+Next.js 16, React 19, Bun, MDX, rough.js, handcrafted CSS
 
 /* FEATURES */
 This site has a real terminal. Try it: ctrl+k

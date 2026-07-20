@@ -3,11 +3,10 @@ title: 'Fractal Chat'
 publishedAt: '2025-10-05'
 summary: 'Chat-first reader that ingests URLs/PDFs/EPUBs and stays grounded'
 image: '/projects/fractal-chat.svg'
-liveUrl: 'https://fractal-chat.vercel.app/'
 repoUrl: 'https://github.com/NielsdaWheelz/fractal-chat'
 ---
 
-# Fractal Chat: A Reading Companion for Infinite Text
+## A reading companion for infinite text
 
 _A chat-first reader built to ingest messy documents._
 
@@ -68,7 +67,7 @@ const { object } = await generateObject({
 })
 ```
 
-Schema-constrained output stops hallucinated fields.
+Schema-constrained output prevents malformed or unexpected fields; grounding and citation checks handle factual reliability separately.
 
 ### Chunking and embeddings
 

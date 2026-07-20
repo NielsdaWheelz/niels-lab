@@ -1,16 +1,7 @@
-'use client'
-
-import { TextReveal } from './TextReveal'
-
 interface PageTitleProps {
   children: string
-  speed?: number
 }
 
-export function PageTitle({ children, speed = 25 }: PageTitleProps) {
-  return (
-    <h1>
-      <TextReveal text={children} speed={speed} showCursor={true} />
-    </h1>
-  )
+export function PageTitle({ children }: PageTitleProps) {
+  return <h1 className="page-title">{children}</h1>
 }

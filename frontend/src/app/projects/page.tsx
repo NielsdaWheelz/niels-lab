@@ -1,10 +1,13 @@
 import { ProjectsList } from '@/app/components/projects'
 import { PageTitle } from '@/app/components/PageTitle'
+import { createPageMetadata } from '@/app/site'
 
-export const metadata = {
-  title: 'projects',
-  description: 'Selected engineering work',
-}
+export const metadata = createPageMetadata({
+  title: 'Projects',
+  description:
+    'Selected AI, machine learning, and software engineering projects by Niels Erik Nandal.',
+  path: '/projects',
+})
 
 export default function Page() {
   return (
@@ -14,7 +17,7 @@ export default function Page() {
         The work here is the clearest picture of how I build: product-forward,
         technically sharp, and explicit about tradeoffs.
       </p>
-      <ProjectsList />
+      <ProjectsList variant="showcase" />
     </section>
   )
 }
