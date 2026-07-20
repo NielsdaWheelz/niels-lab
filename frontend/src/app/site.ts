@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = 'https://niels.dev'
+const DEFAULT_SITE_URL = 'https://nielseriknandal.com'
 
 function readEnv(name: string) {
   if (typeof process === 'undefined') {
