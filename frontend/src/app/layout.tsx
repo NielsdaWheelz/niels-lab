@@ -1,6 +1,8 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { GeistMono } from 'geist/font/mono'
+import { Newsreader, Caveat } from 'next/font/google'
+import { themeInitScript } from '@/lib/theme'
 import { Navbar } from '@/app/components/nav'
 import Footer from '@/app/components/footer'
 import { Analytics } from '@vercel/analytics/react'
@@ -13,6 +15,7 @@ import {
   siteName,
 } from '@/app/site'
 import { SketchCanvas } from '@/app/components/SketchCanvas'
+import { StructuredData } from '@/app/components/StructuredData'
 import {
   TerminalWrapper,
   ContentData,
@@ -20,6 +23,19 @@ import {
 import { getProjects } from '@/app/projects/utils'
 import { getWritingPosts } from '@/app/writing/utils'
 import { entries as cvEntries, skills as cvSkills } from '@/app/cv/data'
+
+const newsreader = Newsreader({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
+  display: 'swap',
+})
+
+const caveat = Caveat({
+  subsets: ['latin'],
+  variable: '--font-hand',
+  display: 'swap',
+})
 
 const siteUrl = getSiteUrl()
 const shouldIndex = shouldIndexSite()
@@ -113,7 +129,15 @@ export default function RootLayout({
   const terminalData = getTerminalData()
 
   return (
-    <html lang="en" className={GeistMono.variable}>
+    <html
+      lang="en"
+      className={`${GeistMono.variable} ${newsreader.variable} ${caveat.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <StructuredData />
+      </head>
       <body>
         <SketchCanvas />
         <Navbar />

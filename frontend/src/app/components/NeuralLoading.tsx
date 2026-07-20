@@ -37,7 +37,7 @@ export function NeuralLoading({
   }, [charIndex, text, speed])
 
   return (
-    <span style={{ color: '#666' }}>
+    <span style={{ color: 'var(--color-text-muted)' }}>
       {displayedText}
       <span className="cursor" />
     </span>
@@ -47,7 +47,7 @@ export function NeuralLoading({
 // simpler dots version
 export function LoadingDots() {
   return (
-    <span style={{ color: '#666' }}>
+    <span style={{ color: 'var(--color-text-muted)' }}>
       <span className="loading-dot">.</span>
       <span className="loading-dot">.</span>
       <span className="loading-dot">.</span>

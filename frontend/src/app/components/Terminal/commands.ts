@@ -1,4 +1,5 @@
 import { FileSystem, normalizePath } from '@/lib/filesystem'
+import { setTheme, toggleTheme, Theme } from '@/lib/theme'
 
 export type CommandResult = {
   output: string | React.ReactNode
@@ -20,6 +21,9 @@ const HELP_TEXT = `slash commands (prefix with /):
   /search <query>  search content (alias: /grep)
   /whois           display persona card
   /visualize       generate decorative scribble
+  /theme [mode]    toggle or set theme (dark|light)
+  /fortune         print an engineering aphorism
+  /neofetch        show system info, sketchbook-style
   /clear           clear terminal output
   /help            show this message
 
@@ -43,7 +47,11 @@ const SLASH_COMMANDS = [
   'grep',
   'whois',
   'visualize',
+  'theme',
+  'fortune',
+  'neofetch',
   'sudo',
+  'konami',
 ]
 
 // Check if input is a slash command
@@ -77,6 +85,11 @@ export function executeCommand(
     return cmdSudo(withoutSlash)
   }
 
+  // konami easter egg, accessible directly as a command too
+  if (withoutSlash.startsWith('konami')) {
+    return cmdKonami()
+  }
+
   const parts = withoutSlash.split(/\s+/)
   const cmd = parts[0]
   const args = parts.slice(1)
@@ -101,6 +114,12 @@ export function executeCommand(
       return cmdWhois()
     case 'visualize':
       return cmdVisualize()
+    case 'theme':
+      return cmdTheme(args[0])
+    case 'fortune':
+      return cmdFortune()
+    case 'neofetch':
+      return cmdNeofetch()
     default:
       return {
         output: `unknown command: /${cmd}\ntype /help for available commands`,
@@ -308,6 +327,77 @@ function cmdVisualize(): CommandResult {
   return {
     output: { __type: 'visualize', seed } as unknown as string,
     isError: false,
+  }
+}
+
+// Theme command - toggle or set light/dark
+function cmdTheme(arg: string | undefined): CommandResult {
+  let next: Theme
+
+  if (arg === 'dark' || arg === 'light') {
+    setTheme(arg)
+    next = arg
+  } else if (arg) {
+    return {
+      output: `theme: unknown mode '${arg}' (expected dark or light)`,
+      isError: true,
+    }
+  } else {
+    next = toggleTheme()
+  }
+
+  const message =
+    next === 'dark'
+      ? 'lights out. welcome to the midnight blueprint.'
+      : 'rise and shine.'
+
+  return { output: message, isError: false, status: `theme: ${next}` }
+}
+
+// Fortune command - curated engineering aphorisms
+const FORTUNES = [
+  'there are two ways to write error-free programs; only the third one works. — alan j. perlis',
+  'controlling complexity is the essence of computer programming. — brian kernighan',
+  'premature optimization is the root of all evil. — donald knuth',
+  "a complex system that works is invariably found to have evolved from a simple system that worked. — gall's law",
+  "hyrum's law: with enough users, every observable behavior of your system becomes someone's dependency.",
+  'there are only two hard things in computer science: cache invalidation and naming things. — phil karlton',
+  'the bug is never where you left it. it moved while you were asleep.',
+  "a comment that explains 'why' outlives the code it describes.",
+  'the sketch survives the rewrite. the rewrite rarely survives the sketch.',
+  'ship the ugly version. the beautiful one is a rumor until it ships.',
+  'tests are the only documentation that argues back.',
+  "yesterday's clever code is tomorrow's incident report.",
+  'simplicity is a prerequisite for reliability. — edsger w. dijkstra',
+  'make it work, make it right, make it fast. — kent beck',
+  "it always takes longer than you expect, even when you account for hofstadter's law. — hofstadter's law",
+]
+
+function cmdFortune(): CommandResult {
+  const pick = FORTUNES[Math.floor(Math.random() * FORTUNES.length)]
+  return { output: pick, isError: false }
+}
+
+// Neofetch command - system info card for the site itself
+function cmdNeofetch(): CommandResult {
+  return {
+    output: { __type: 'neofetch' } as unknown as string,
+    isError: false,
+  }
+}
+
+// Konami code easter egg - toggles theme with a wink
+function cmdKonami(): CommandResult {
+  const next = toggleTheme()
+  const message =
+    next === 'dark'
+      ? 'lights out. welcome to the midnight blueprint.'
+      : 'rise and shine.'
+
+  return {
+    output: `↑↑↓↓←→←→ba\ncheat code accepted. ${message}`,
+    isError: false,
+    status: `theme: ${next}`,
   }
 }
 

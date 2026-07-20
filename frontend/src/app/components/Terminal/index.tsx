@@ -4,6 +4,7 @@ import React, {
   useRef,
   useEffect,
   useState,
+  useSyncExternalStore,
   KeyboardEvent,
   useMemo,
 } from 'react'
@@ -12,6 +13,7 @@ import { FileSystem } from '@/lib/filesystem'
 import { useTerminal, OutputLine, ChatHandler } from './useTerminal'
 import { TextReveal } from '../TextReveal'
 import { githubUrl, linkedinUrl } from '@/app/site'
+import { getTheme, Theme, THEME_CHANGE_EVENT } from '@/lib/theme'
 
 interface TerminalProps {
   filesystem: FileSystem
@@ -47,7 +49,15 @@ type VisualizeOutput = {
   seed: number
 }
 
-type SpecialOutput = SearchResult | WhoisOutput | VisualizeOutput
+type NeofetchOutput = {
+  __type: 'neofetch'
+}
+
+type SpecialOutput =
+  | SearchResult
+  | WhoisOutput
+  | VisualizeOutput
+  | NeofetchOutput
 
 function isSpecialOutput(content: unknown): content is SpecialOutput {
   return typeof content === 'object' && content !== null && '__type' in content
@@ -94,6 +104,9 @@ function formatStringOutput(content: string): React.ReactNode {
     'grep',
     'whois',
     'visualize',
+    'theme',
+    'fortune',
+    'neofetch',
     'sudo',
     'pwd',
     'ls',
@@ -318,6 +331,110 @@ function WhoisCard() {
   )
 }
 
+function subscribeToTheme(onStoreChange: () => void) {
+  window.addEventListener(THEME_CHANGE_EVENT, onStoreChange)
+  return () => window.removeEventListener(THEME_CHANGE_EVENT, onStoreChange)
+}
+
+function getServerTheme(): Theme {
+  return 'light'
+}
+
+// computed at module load; the card only renders client-side on demand
+const UPTIME_YEARS = (
+  (Date.now() - new Date('2024-01-01T00:00:00Z').getTime()) /
+  (365.25 * 24 * 60 * 60 * 1000)
+).toFixed(1)
+
+// ASCII "N" logo for neofetch
+const NEOFETCH_ASCII = [
+  ' _   _ ',
+  '| \\ | |',
+  '|  \\| |',
+  '| |\\  |',
+  '|_| \\_|',
+]
+
+// Neofetch-style system info card
+function NeofetchCard() {
+  const theme = useSyncExternalStore(subscribeToTheme, getTheme, getServerTheme)
+
+  const uptime = UPTIME_YEARS
+
+  const palette: Array<[string, string]> = [
+    ['terracotta', 'var(--color-terracotta)'],
+    ['sage', 'var(--color-sage)'],
+    ['gold', 'var(--color-gold)'],
+    ['text', 'var(--color-text)'],
+    ['muted', 'var(--color-text-muted)'],
+    ['border', 'var(--color-border)'],
+  ]
+
+  return (
+    <div className="terminal-card">
+      <div className="terminal-card-header">
+        <span className="terminal-card-name">niels@lab</span>
+        <span className="terminal-card-role">neofetch</span>
+      </div>
+      <div style={{ display: 'flex', gap: '1.25rem', marginBottom: '0.75rem' }}>
+        <pre
+          style={{
+            margin: 0,
+            lineHeight: 1.25,
+            fontSize: '0.85rem',
+            color: 'var(--color-sage)',
+          }}
+          aria-hidden="true"
+        >
+          {NEOFETCH_ASCII.join('\n')}
+        </pre>
+        <div className="terminal-card-facts" style={{ marginBottom: 0 }}>
+          <div className="terminal-card-fact">
+            <span className="terminal-card-label">host</span>
+            <span>niels-lab (sketchbook edition)</span>
+          </div>
+          <div className="terminal-card-fact">
+            <span className="terminal-card-label">stack</span>
+            <span>next 16 / react 19 / bun</span>
+          </div>
+          <div className="terminal-card-fact">
+            <span className="terminal-card-label">theme</span>
+            <span>{theme}</span>
+          </div>
+          <div className="terminal-card-fact">
+            <span className="terminal-card-label">uptime</span>
+            <span>{uptime} years</span>
+          </div>
+          <div className="terminal-card-fact">
+            <span className="terminal-card-label">shell</span>
+            <span>niels-sh</span>
+          </div>
+        </div>
+      </div>
+      <div
+        className="terminal-card-stats"
+        style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}
+      >
+        {palette.map(([name, color]) => (
+          <span
+            key={name}
+            title={name}
+            aria-hidden="true"
+            style={{
+              display: 'inline-block',
+              width: '13px',
+              height: '13px',
+              borderRadius: '3px',
+              background: color,
+              border: '1px solid var(--color-border)',
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // Visualize SVG scribble
 function VisualizeScribble({ seed }: { seed: number }) {
   const paths = useMemo(() => {
@@ -422,6 +539,8 @@ function OutputLineContent({
         return <WhoisCard />
       case 'visualize':
         return <VisualizeScribble seed={content.seed} />
+      case 'neofetch':
+        return <NeofetchCard />
     }
   }
 

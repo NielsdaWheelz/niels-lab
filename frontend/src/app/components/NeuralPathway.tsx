@@ -2,6 +2,17 @@
 
 import { useEffect, useRef } from 'react'
 import rough from 'roughjs'
+import { THEME_CHANGE_EVENT } from '@/lib/theme'
+
+const FALLBACK_TEXT_COLOR = '#2e2a23'
+
+const resolveCssColor = (varName: string, fallback: string) => {
+  if (typeof window === 'undefined') return fallback
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(varName)
+    .trim()
+  return value || fallback
+}
 
 interface NeuralPathwayProps {
   containerRef: React.RefObject<HTMLElement | null>
@@ -28,6 +39,7 @@ export function NeuralPathway({
   const animationFrameRef = useRef<number | null>(null)
   const nodesRef = useRef<Node[]>([])
   const hoverStateRef = useRef<HTMLElement | null>(null)
+  const textColorRef = useRef(FALLBACK_TEXT_COLOR)
 
   // Sync hover state
   useEffect(() => {
@@ -43,6 +55,13 @@ export function NeuralPathway({
     if (!ctx) return
 
     const rc = rough.canvas(canvas)
+
+    const updateThemeColor = () => {
+      textColorRef.current = resolveCssColor(
+        '--color-text',
+        FALLBACK_TEXT_COLOR,
+      )
+    }
 
     const updateNodes = () => {
       nodesRef.current = []
@@ -127,7 +146,7 @@ export function NeuralPathway({
             const strokeWidth = isDirectToHovered ? 0.8 : 0.5
 
             rc.line(n1.x, n1.y, n2.x, n2.y, {
-              stroke: 'var(--color-text)',
+              stroke: textColorRef.current,
               strokeWidth: strokeWidth,
               roughness: 1.5,
               bowing: 0.8,
@@ -142,10 +161,10 @@ export function NeuralPathway({
 
         ctx.globalAlpha = nodeOpacity
         rc.circle(node.x, node.y, nodeSize, {
-          stroke: 'var(--color-text)',
+          stroke: textColorRef.current,
           strokeWidth: node.isHovered ? 0.8 : 0.5,
           roughness: 1,
-          fill: 'var(--color-text)',
+          fill: textColorRef.current,
           fillStyle: 'solid',
         })
       }
@@ -169,7 +188,7 @@ export function NeuralPathway({
 
             // Slightly wavier connection for secondary paths
             rc.line(hoveredNode.x, hoveredNode.y, node.x, node.y, {
-              stroke: 'var(--color-text)',
+              stroke: textColorRef.current,
               strokeWidth: 0.4,
               roughness: 2,
               bowing: 1.2,
@@ -182,6 +201,9 @@ export function NeuralPathway({
 
       animationFrameRef.current = requestAnimationFrame(draw)
     }
+
+    updateThemeColor()
+    window.addEventListener(THEME_CHANGE_EVENT, updateThemeColor)
 
     resize()
     window.addEventListener('resize', resize)
@@ -200,6 +222,7 @@ export function NeuralPathway({
     animationFrameRef.current = requestAnimationFrame(draw)
 
     return () => {
+      window.removeEventListener(THEME_CHANGE_EVENT, updateThemeColor)
       window.removeEventListener('resize', resize)
       observer.disconnect()
       clearInterval(interval)

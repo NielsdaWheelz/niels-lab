@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react'
 import rough from 'roughjs'
+import { THEME_CHANGE_EVENT } from '@/lib/theme'
 
 interface Point {
   x: number
@@ -15,11 +16,27 @@ interface Branch {
   createdAt: number
 }
 
-const COLORS = ['#E07A5F', '#81B29A', '#F2CC8F', '#3D3D3D']
+const COLOR_VARS = [
+  '--color-terracotta',
+  '--color-sage',
+  '--color-gold',
+  '--color-text',
+]
+const FALLBACK_COLORS = ['#E07A5F', '#81B29A', '#F2CC8F', '#3D3D3D']
+const CONNECTOR_VAR = '--color-text-muted'
+const FALLBACK_CONNECTOR = '#6f675a'
 const FADE_START = 3000
 const FADE_DURATION = 4000
 const POINT_INTERVAL = 8
 const BRANCH_CHANCE = 0.02
+
+const resolveCssColor = (varName: string, fallback: string) => {
+  if (typeof window === 'undefined') return fallback
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(varName)
+    .trim()
+  return value || fallback
+}
 
 export function SketchCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -30,12 +47,28 @@ export function SketchCanvas() {
   const isDrawingRef = useRef(false)
   const currentBranchRef = useRef<Branch | null>(null)
   const pointCountRef = useRef(0)
+  const themeColorsRef = useRef({
+    ink: FALLBACK_COLORS,
+    connector: FALLBACK_CONNECTOR,
+  })
 
   const [drawMode, setDrawMode] = useState(false)
   const [showHint, setShowHint] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
 
-  const getRandomColor = () => COLORS[Math.floor(Math.random() * COLORS.length)]
+  const updateThemeColors = useCallback(() => {
+    themeColorsRef.current = {
+      ink: COLOR_VARS.map((varName, i) =>
+        resolveCssColor(varName, FALLBACK_COLORS[i]),
+      ),
+      connector: resolveCssColor(CONNECTOR_VAR, FALLBACK_CONNECTOR),
+    }
+  }, [])
+
+  const getRandomColor = () => {
+    const ink = themeColorsRef.current.ink
+    return ink[Math.floor(Math.random() * ink.length)]
+  }
 
   const startNewBranch = useCallback((x: number, y: number, color?: string) => {
     const branch: Branch = {
@@ -332,7 +365,7 @@ export function SketchCanvas() {
           ctx.globalAlpha = connectionOpacity
 
           rc.line(p1.x, p1.y, p2.x, p2.y, {
-            stroke: '#3D3D3D',
+            stroke: themeColorsRef.current.connector,
             strokeWidth: 0.5,
             roughness: 1.5,
             bowing: 1,
@@ -478,6 +511,9 @@ export function SketchCanvas() {
       canvas.height = window.innerHeight
     }
 
+    updateThemeColors()
+    window.addEventListener(THEME_CHANGE_EVENT, updateThemeColors)
+
     resize()
     window.addEventListener('resize', resize)
 
@@ -493,6 +529,7 @@ export function SketchCanvas() {
     runDemo()
 
     return () => {
+      window.removeEventListener(THEME_CHANGE_EVENT, updateThemeColors)
       window.removeEventListener('resize', resize)
       canvas.removeEventListener('pointerdown', handlePointerDown)
       canvas.removeEventListener('pointermove', handlePointerMove)
@@ -513,6 +550,7 @@ export function SketchCanvas() {
     handlePointerMove,
     handlePointerUp,
     isMobile,
+    updateThemeColors,
   ])
 
   return (
