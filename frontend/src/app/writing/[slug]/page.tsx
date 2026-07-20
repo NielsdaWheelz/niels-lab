@@ -2,8 +2,13 @@ import { notFound } from 'next/navigation'
 import { CustomMDX } from '@/app/components/mdx'
 import { formatDate, getWritingPosts } from '@/app/writing/utils'
 import { PageTitle } from '@/app/components/PageTitle'
-import { ContentReveal } from '@/app/components/ContentReveal'
-import { baseUrl, getOgImageUrl } from '@/app/site'
+import { JsonLd } from '@/app/components/StructuredData'
+import {
+  createPageMetadata,
+  getCanonicalUrl,
+  getPersonSchemaId,
+  getWebsiteSchemaId,
+} from '@/app/site'
 
 export async function generateStaticParams() {
   const posts = getWritingPosts()
@@ -24,36 +29,14 @@ export async function generateMetadata({
     publishedAt: publishedTime,
     summary: description,
   } = post.metadata
-  const image = getOgImageUrl(title)
 
-  return {
+  return createPageMetadata({
     title,
     description,
-    alternates: {
-      canonical: `/writing/${post.slug}`,
-    },
-    openGraph: {
-      title,
-      description,
-      type: 'article',
-      publishedTime,
-      url: `${baseUrl}/writing/${post.slug}`,
-      images: [
-        {
-          url: image,
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [image],
-    },
-  }
+    path: `/writing/${post.slug}`,
+    type: 'article',
+    publishedTime,
+  })
 }
 
 export default async function WritingPost({
@@ -68,15 +51,38 @@ export default async function WritingPost({
     notFound()
   }
 
+  const postUrl = getCanonicalUrl(`/writing/${post.slug}`)
+
   return (
-    <section>
-      <PageTitle>{post.metadata.title}</PageTitle>
-      <p className="article-meta">{formatDate(post.metadata.publishedAt)}</p>
-      <ContentReveal loadingText="loading post">
+    <>
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': ['BlogPosting', 'TechArticle'],
+          '@id': `${postUrl}#article`,
+          headline: post.metadata.title,
+          description: post.metadata.summary,
+          url: postUrl,
+          datePublished: post.metadata.publishedAt,
+          inLanguage: 'en-US',
+          author: { '@id': getPersonSchemaId() },
+          publisher: { '@id': getPersonSchemaId() },
+          isPartOf: { '@id': getWebsiteSchemaId() },
+          mainEntityOfPage: postUrl,
+        }}
+      />
+      <section>
+        <PageTitle>{post.metadata.title}</PageTitle>
+        <p className="article-summary">{post.metadata.summary}</p>
+        <p className="article-meta">
+          <time dateTime={post.metadata.publishedAt}>
+            {formatDate(post.metadata.publishedAt)}
+          </time>
+        </p>
         <article className="prose article-body">
           <CustomMDX source={post.content} />
         </article>
-      </ContentReveal>
-    </section>
+      </section>
+    </>
   )
 }

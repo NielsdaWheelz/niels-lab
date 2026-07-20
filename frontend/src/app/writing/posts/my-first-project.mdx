@@ -1,16 +1,54 @@
 ---
-title: 'My First Project'
+title: 'Building My First Real-Time Full-Stack App'
 publishedAt: '2025-09-27'
-summary: 'What building my first real full-stack app taught me about decomposition, realtime state, and avoiding style-first work.'
+summary: 'What a multiplayer Go app taught me about decomposing game logic, synchronizing state, and designing before styling.'
 ---
 
-- I made a go app.
-- I didn't actually know the rules when I started. Then when I learned them the logic behind it seem impossible.
-- I had to learn not to try to build the whole app in my head - trying to hold all of the logic in my head at once seemed impossible. But once I started just taking it step-by-step, trying to figure out the next piece of data I needed, it all came together pretty easily.
-- I was pretty proud of the logic when I finished (both the game rules and how I built the board). The way I got it to work was very clever minimal.
-- By the end of the week it all seemed pretty quaint tho. It's frustrating to grow, isn't it.
-- React query was weird at the beginning, but pretty easy by the end once I figured out the... pattern, or format, or structure, or whatever - what to put where, and why.
-- Same thing with sockets - weird at first, fine at the end.
-- the rest of the time was wasted on styling. eugh. no vision for what it should look like resulted in a pretty lacklustre show. And learning that tailwind has a default enforced minimum height but NOT a minimim width took a _long_ time.
-- The presentation was ok. I did but better than I thought I would, in terms of not having a panick attack, not mumbling, etc.
-- But I probably should have gone over the actually interesting and difficult parts in the logic and board rendering, the stuff I found interesting. Perhaps that's the lesson there.
+My first real project at Fractal was a multiplayer Go app. I started without
+knowing the rules of Go, then discovered that understanding the rules was only
+the beginning: I still had to turn them into data and code that two connected
+players could share.
+
+## the problem was smaller than it looked
+
+At first, I tried to hold the whole game in my head. The board, legal moves,
+captures, scoring, rendering, and multiplayer state all blurred into one giant
+problem.
+
+The work became manageable when I stopped asking, “How do I build a Go app?”
+and started asking, “What is the next piece of data this decision needs?” Each
+answer exposed a smaller function, state transition, or component. Then I could
+build and test that piece before moving on.
+
+That sounds obvious now. It did not feel obvious during the first few days.
+
+## unfamiliar tools became ordinary through use
+
+React Query and sockets both felt strange at the start. By the end, their
+patterns felt much less mysterious because I had used them to solve concrete
+problems: move data between the client and server, keep two views synchronized,
+and update the board when state changed.
+
+I learned more from following one real value through the system than I would
+have learned from memorizing another abstract tutorial.
+
+## styling is not a substitute for direction
+
+I spent too much of the week styling without first deciding what the product
+should look and feel like. That produced a lot of CSS work without a coherent
+visual result.
+
+The lesson was not that styling is unimportant. It was that implementation
+cannot manufacture a design direction I have not chosen. A rough visual plan
+up front would have made the later work faster and more deliberate.
+
+## what I would do differently
+
+I would still begin with the rules and data flow, because those were the hard
+parts. But I would also sketch the interface before polishing it, and I would
+present the technical decisions that mattered—the game logic, state model, and
+board rendering—instead of giving a surface-level tour.
+
+The project made one engineering habit stick: when a system feels impossible,
+stop trying to solve the noun. Find the next piece of data, make one decision
+explicit, and keep going.

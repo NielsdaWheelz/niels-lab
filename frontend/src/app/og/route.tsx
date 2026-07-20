@@ -60,6 +60,8 @@ function underlineWidth(title: string, fontSize: number) {
 export async function GET(request: Request) {
   const url = new URL(request.url)
   const title = url.searchParams.get('title') || siteName
+  const description =
+    url.searchParams.get('description')?.slice(0, 220) || siteDescription
   const siteHost = new URL(getSiteUrl()).host
   const [boldData, regularData] = await Promise.all([
     geistMonoBold,
@@ -224,7 +226,7 @@ export async function GET(request: Request) {
             maxWidth: '760px',
           }}
         >
-          {siteDescription}
+          {description}
         </div>
       </div>
 

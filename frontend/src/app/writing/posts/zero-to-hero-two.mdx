@@ -1,68 +1,128 @@
 ---
-title: 'Zero to Hero - Two'
+title: 'Xavier, Kaiming, and Batch Normalization Explained'
 publishedAt: '2025-11-18'
-summary: 'Why bad initialization breaks learning, and how Kaiming init and batch normalization keep the signal alive.'
+summary: 'Why activation scale matters, when Xavier and Kaiming initialization apply, and what batch normalization actually normalizes.'
 ---
 
-recap:
+The first note followed a small network through its whole loop:
 
-- each note gets turned into coordinates (a little embedding vector)
-- everyone in the room mixes those numbers in their own weird way
-- they pass their result to a final guesser
-- we see how wrong the guess was
-- everyone adjusts themselves a tiny bit
+- notes become embedding vectors;
+- a hidden layer transforms the context;
+- an output layer produces logits;
+- cross-entropy measures the error;
+- backpropagation updates the parameters.
 
-but if we don't invite the right initial people into the room, they'll be completely useless.
+There is one problem hiding underneath that clean story: the scale of the
+numbers matters. A network can have the right architecture and still be hard to
+train because its activations or gradients become too large, too small, or too
+close to a flat part of the activation function.
 
-1. bad initialization
+## 1. large inputs can saturate `tanh`
 
-if we don't manage who we're inviting into the room, we get tone-deaf people, literally deaf people, bats, ants...
+A hidden unit first computes a weighted sum:
 
-each guesser does: `mix = (the sound) * (the listener's random strengths) + (their bias)`. if their random strengths are too large or small, the "mix" number they compute is huge or tiny. then tanh tries to squash it:
+```text
+z = inputs * weights + bias
+h = tanh(z)
+```
 
-squish = tanh(mix)
-tanh(very large) = 1
-tanh(very negative) = -1
+If the initial weights make `z` very large in either direction, `tanh(z)` lands
+near `-1` or `1`. Those are the flat ends of the curve, where the derivative is
+close to zero. Backpropagation then sends a very small gradient through that
+unit, so learning slows down. This is saturation.
 
-and every guesser outputs -1 or 1, which tells you fuck-all. worse still, these guessers are too fucked to even learn, so they stay that way. they're literally called 'dead neurons'.
+That is different from a dead ReLU. A ReLU outputs zero for negative inputs. A
+ReLU unit can become “dead” when it stays on that zero-gradient side for the
+data it sees. Saturated `tanh` units and dead ReLUs both create weak gradients,
+but they are not the same failure mode.
 
-2. how big should the starting weights be? ('kaiming init')
+Weights that are too small can cause a different problem: signals and gradients
+can shrink as they move through many layers. Good initialization tries to keep
+their scale useful in both directions.
 
-we want `variance_out ≈ variance_in` so the signal stays alive. for a guesser with N inputs, the general rule is
+## 2. Xavier and Kaiming solve related, different problems
 
-`weight scale ≈ 1 / sqrt(N)`
+The shared goal is to keep the variance of activations and gradients from
+exploding or disappearing as they pass through the network. The right formula
+depends on the activation.
 
-the more inputs a neuron has, the smaller its weights need to be. more inputs? shrink their weights so they don't collectively blow up.
+### Xavier for linear or `tanh`-style layers
 
-3. batch normalization
+Xavier, or Glorot, initialization accounts for both the number of inputs
+(`fan_in`) and outputs (`fan_out`). For a normal distribution, its basic scale
+is:
 
-even if you initialize perfectly, signals can still drift because the weights change every step - some people in the room might start producing giant numbers again or shrink to tiny ones.
+```text
+standard deviation ~= sqrt(2 / (fan_in + fan_out))
+```
 
-enter `batchnorm`:
+An activation-specific gain can adjust that scale. Xavier is a common starting
+point for linear and `tanh`-style layers because it balances the signal flowing
+forward with the gradient flowing backward.
 
-- takes a mini-batch of examples
-- computes their mean and standard deviation
-- centers and scales the activations: `z_norm = (z - mean) / std`
+### Kaiming for ReLU-style layers
 
-this way the room's activations are always nicely distributed between 0 and 1.
+Kaiming, or He, initialization compensates for the fact that ReLU discards the
+negative half of its input. In the common `fan_in` form for ReLU:
 
-to allow the weights to actually learn and change, the model is scaled and shifted every pass:
+```text
+standard deviation ~= sqrt(2 / fan_in)
+```
 
-y = gamma \* z_norm + beta
+So `1 / sqrt(N)` is not a universal rule called “Kaiming init.” Xavier and
+Kaiming are related variance-preserving strategies with different assumptions.
+The activation function determines which assumption fits.
 
-these gamma (scale) and beta (shift) are learned, changed, just like the weights
+## 3. batch normalization standardizes; it does not bound
 
-4. jitter
+Even with sensible initialization, activation distributions move while the
+weights are learning. Batch normalization makes that movement easier to manage.
 
-batchnorm uses the current batch to compute its mean/std, but every batch is slightly different. so even if weights don't change much, it wobbles:
+For each feature in a mini-batch, it computes the batch mean and variance, then
+standardizes the activations:
 
-batch 1 mean = 0.12
-batch 2 mean = 0.05
+```text
+z_norm = (z - batch_mean) / sqrt(batch_variance + epsilon)
+```
+
+Before the learned affine step, the normalized values have approximately zero
+mean and unit variance for that batch. They are **not** constrained to the range
+`0` to `1`; negative values and values larger than one are normal.
+
+The layer then learns a scale `gamma` and shift `beta`:
+
+```text
+y = gamma * z_norm + beta
+```
+
+That gives the network room to choose a different distribution when the task
+benefits from one. During training, batch normalization uses the current
+mini-batch statistics. During inference, it uses running estimates accumulated
+during training.
+
+## 4. batch statistics introduce noise
+
+Every mini-batch contains a different sample of the data, so its mean and
+variance differ slightly:
+
+```text
+batch 1 mean =  0.12
+batch 2 mean =  0.05
 batch 3 mean = -0.03
-...
+```
 
-that wiggle in the mean/std creates wiggle in the activations -> wiggle in the logits -> wiggle in the loss.
+That variation moves the normalized activations, which moves the logits and the
+loss. The effect depends on batch size and composition: with very small batches,
+the statistics can be noisy enough to make training unstable; with larger,
+representative batches, they are usually steadier.
 
-big models + big batches drown it out, but in small models it is very visible.
+## the practical picture
 
-bad initialization makes neurons saturate, kaiming fixes the scale, batchnorm keeps activations well-behaved during training, and gamma/beta ensure the network still has full expressive power.
+Initialization chooses a useful signal scale before training begins. Xavier is
+a natural default for the `tanh` network in this example; Kaiming is designed
+for ReLU-style activations. Batch normalization can then stabilize changing
+activation distributions during training without forcing them into a fixed
+range.
+
+They solve different parts of the same problem: keeping information and
+gradients alive long enough for the network to learn.

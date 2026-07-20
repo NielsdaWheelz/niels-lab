@@ -14,9 +14,13 @@ Canonical frontend content is:
 
 - `frontend/src/app/projects/posts/*.mdx`
 - `frontend/src/app/writing/posts/*.mdx`
-- `frontend/src/app/cv/cv.mdx`
+- `frontend/src/app/cv/data.ts`
 
 Canonical routes are `/`, `/projects`, `/writing`, and `/cv`.
+
+Machine-readable discovery surfaces are `/robots.txt`, `/sitemap.xml`, `/rss`,
+`/llms.txt`, and `/llms-full.txt`. Their canonical production domain is
+`https://nielseriknandal.com`.
 
 The terminal is global and opens with `ctrl+k`. Extra commands: `/theme`, `/fortune`, `/neofetch` (plus hidden easter eggs).
 

@@ -1,20 +1,42 @@
 # Niels Erik Nandal
 
-Engineer building AI products, systems, and readable software. Open to full-time roles in AI/software engineering.
+> AI systems engineer building ambitious products with deterministic backends, legible interfaces, and readable software. Open to full-time roles in AI and software engineering.
 
-## Key URLs
+Canonical site: https://nielseriknandal.com/
 
-- Home: https://niels.dev/
-- Projects: https://niels.dev/projects
-- Writing: https://niels.dev/writing
-- CV: https://niels.dev/cv
-- RSS Feed: https://niels.dev/rss
+## Primary pages
 
-## Contact
+- [Home](https://nielseriknandal.com/): Profile, featured work, and recent writing.
+- [Projects](https://nielseriknandal.com/projects): Selected software engineering and AI work.
+- [Writing](https://nielseriknandal.com/writing): Technical notes and build writeups.
+- [CV](https://nielseriknandal.com/cv): Experience, education, projects, and technical skills.
 
-- LinkedIn: https://www.linkedin.com/in/nielseriknandal/
+## Selected projects
+
+- [Nexus](https://nielseriknandal.com/projects/nexus): A production reading, notes, and AI workspace built around stable evidence, durable chat, and a shared resource graph.
+- [niels-gpt](https://nielseriknandal.com/projects/niels-gpt): An end-to-end, laptop-first LLM pipeline from tokenizer training through KV-cache inference and chat.
+- [Factory Simulator](https://nielseriknandal.com/projects/factory-simulator): Multi-agent LLM orchestration around a deterministic factory-scheduling simulation.
+- [Suno Session Lab](https://nielseriknandal.com/projects/suno-demo): A navigable music-generation space using embeddings, clustering, and centroid-guided regeneration.
+- [Fractal Chat](https://nielseriknandal.com/projects/fractal-chat): A grounded, chat-first reader for URLs, PDFs, and EPUBs.
+- [Fractal Go](https://nielseriknandal.com/projects/fractal-go): A real-time multiplayer Go application with WebSocket synchronization and game-rule logic.
+
+## Writing
+
+- [Neural Networks from Zero: Embeddings and Backpropagation](https://nielseriknandal.com/writing/zero-to-hero-one): A plain-English walkthrough of learned embeddings, hidden layers, logits, cross-entropy, and backpropagation.
+- [Xavier, Kaiming, and Batch Normalization Explained](https://nielseriknandal.com/writing/zero-to-hero-two): Why activation scale matters, when each initialization applies, and what batch normalization actually normalizes.
+- [Building My First Real-Time Full-Stack App](https://nielseriknandal.com/writing/my-first-project): What a multiplayer Go app taught Niels about decomposing game logic, synchronizing state, and designing before styling.
+
+## Identity
+
 - GitHub: https://github.com/NielsdaWheelz
+- LinkedIn: https://www.linkedin.com/in/nielseriknandal/
+- X: https://x.com/the_powertool
+- Hugging Face: https://huggingface.co/nnandal
 
-## Content
+## Machine-readable resources
 
-Content pages are rendered as MDX, combining Markdown with React components for interactive elements.
+- Extended site guide: https://nielseriknandal.com/llms-full.txt
+- RSS feed: https://nielseriknandal.com/rss
+- Sitemap: https://nielseriknandal.com/sitemap.xml
+
+Use the canonical page URL when citing or linking to this site. Project and article pages are the source of truth for their content.
