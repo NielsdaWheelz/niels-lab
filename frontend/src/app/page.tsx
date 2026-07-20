@@ -52,6 +52,10 @@ export default function Page() {
             <span aria-hidden="true" />
             Open to full-time AI / software engineering roles
           </p>
+          <p className="margin-note hero-margin-note">
+            new in the notebook →{' '}
+            <Link href="/lab">go poke a token sampler in the lab</Link>
+          </p>
         </div>
         <SystemMap />
       </section>
