@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import rough from 'roughjs'
 import { entries, gap, skills } from './data'
+import { THEME_CHANGE_EVENT } from '@/lib/theme'
 
 const CATEGORY_COLORS = {
   experience: 'var(--color-terracotta)',
@@ -10,17 +11,28 @@ const CATEGORY_COLORS = {
   education: 'var(--color-gold)',
 }
 
+const FALLBACK_LINE_COLOR = '#6f675a'
+
+const resolveCssColor = (varName: string, fallback: string) => {
+  if (typeof window === 'undefined') return fallback
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(varName)
+    .trim()
+  return value || fallback
+}
+
 export default function Timeline() {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const dotRefs = useRef<(HTMLDivElement | null)[]>([])
-  const drawablesRef = useRef<ReturnType<
-    ReturnType<typeof rough.generator>['line']
-  >[]>([])
+  const drawablesRef = useRef<
+    ReturnType<ReturnType<typeof rough.generator>['line']>[]
+  >([])
   const gapDrawableRef = useRef<ReturnType<
     ReturnType<typeof rough.generator>['line']
   > | null>(null)
   const rafRef = useRef<number | undefined>(undefined)
+  const lineColorRef = useRef(FALLBACK_LINE_COLOR)
   const [visible, setVisible] = useState<Set<number>>(() => new Set())
   const [skillsVisible, setSkillsVisible] = useState(false)
   const skillsRef = useRef<HTMLDivElement>(null)
@@ -50,13 +62,19 @@ export default function Timeline() {
 
     for (let i = 1; i < dotPositions.length; i++) {
       const isGapSegment = i - 1 === gap.afterIndex
-      const drawable = generator.line(16, dotPositions[i - 1], 16, dotPositions[i], {
-        stroke: '#3d3d3d',
-        strokeWidth: 1.5,
-        roughness: 0.8,
-        bowing: 0.3,
-        ...(isGapSegment ? { strokeLineDash: [6, 4] } : {}),
-      })
+      const drawable = generator.line(
+        16,
+        dotPositions[i - 1],
+        16,
+        dotPositions[i],
+        {
+          stroke: lineColorRef.current,
+          strokeWidth: 1.5,
+          roughness: 0.8,
+          bowing: 0.3,
+          ...(isGapSegment ? { strokeLineDash: [6, 4] } : {}),
+        },
+      )
       if (isGapSegment) {
         gapDrawable = drawable
       } else {
@@ -94,7 +112,8 @@ export default function Timeline() {
     const rc = rough.canvas(canvas)
     const containerRect = container.getBoundingClientRect()
     // How far into the container the viewport bottom reaches
-    const scrollProgress = (window.innerHeight - containerRect.top) / containerRect.height
+    const scrollProgress =
+      (window.innerHeight - containerRect.top) / containerRect.height
 
     const segmentCount = drawablesRef.current.length
     const visibleSegments = Math.min(
@@ -112,6 +131,11 @@ export default function Timeline() {
 
   // Generate drawables on mount and resize
   useEffect(() => {
+    lineColorRef.current = resolveCssColor(
+      '--color-text-muted',
+      FALLBACK_LINE_COLOR,
+    )
+
     // Small delay to let layout settle after ContentReveal
     const timer = setTimeout(() => {
       generateDrawables()
@@ -123,9 +147,21 @@ export default function Timeline() {
       drawLine()
     }
     window.addEventListener('resize', handleResize)
+
+    const handleThemeChange = () => {
+      lineColorRef.current = resolveCssColor(
+        '--color-text-muted',
+        FALLBACK_LINE_COLOR,
+      )
+      generateDrawables()
+      drawLine()
+    }
+    window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange)
+
     return () => {
       clearTimeout(timer)
       window.removeEventListener('resize', handleResize)
+      window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange)
     }
   }, [generateDrawables, drawLine])
 
@@ -184,11 +220,7 @@ export default function Timeline() {
 
   return (
     <div ref={containerRef} className="timeline">
-      <canvas
-        ref={canvasRef}
-        className="timeline-canvas"
-        aria-hidden="true"
-      />
+      <canvas ref={canvasRef} className="timeline-canvas" aria-hidden="true" />
 
       {entries.map((entry, i) => (
         <div key={i}>
@@ -199,7 +231,9 @@ export default function Timeline() {
           )}
           <div className={`timeline-entry${visible.has(i) ? ' visible' : ''}`}>
             <div
-              ref={(el) => { dotRefs.current[i] = el }}
+              ref={(el) => {
+                dotRefs.current[i] = el
+              }}
               className={`timeline-dot${visible.has(i) ? ' visible' : ''}`}
               style={{
                 borderColor: CATEGORY_COLORS[entry.category],
@@ -238,7 +272,9 @@ export default function Timeline() {
                 <span
                   key={tag}
                   className={`timeline-skill-tag${skillsVisible ? ' visible' : ''}`}
-                  style={{ transitionDelay: skillsVisible ? `${i * 40}ms` : '0ms' }}
+                  style={{
+                    transitionDelay: skillsVisible ? `${i * 40}ms` : '0ms',
+                  }}
                 >
                   {tag}
                 </span>

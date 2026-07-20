@@ -16,7 +16,11 @@ export default function Footer() {
           x
         </a>
       </p>
-      <p style={{ marginTop: '0.5rem' }}>terminal: ctrl+k</p>
+      <p style={{ marginTop: '0.5rem' }}>
+        <span className="margin-note">
+          drawn in ink, typeset in mono · terminal: ctrl+k
+        </span>
+      </p>
       <p style={{ marginTop: '0.5rem' }}>© {new Date().getFullYear()}</p>
     </footer>
   )

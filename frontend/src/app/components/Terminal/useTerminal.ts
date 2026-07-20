@@ -1,14 +1,29 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { FileSystem } from '@/lib/filesystem'
+import { toggleTheme } from '@/lib/theme'
 import {
   executeCommand,
   completeInput,
   CommandResult,
   isSlashCommand,
 } from './commands'
+
+// Konami code: ↑ ↑ ↓ ↓ ← → ← → B A
+const KONAMI_SEQUENCE = [
+  'arrowup',
+  'arrowup',
+  'arrowdown',
+  'arrowdown',
+  'arrowleft',
+  'arrowright',
+  'arrowleft',
+  'arrowright',
+  'b',
+  'a',
+]
 
 export type OutputLine = {
   type: 'prompt' | 'output' | 'error' | 'thinking' | 'user' | 'assistant'
@@ -65,6 +80,42 @@ export function useTerminal(fs: FileSystem, onChat?: ChatHandler) {
   const addOutput = useCallback((lines: OutputLine[]) => {
     setOutput((prev) => [...prev, ...lines].slice(-MAX_OUTPUT))
   }, [])
+
+  // Konami code easter egg - listens globally, toggles theme when matched
+  useEffect(() => {
+    let progress = 0
+
+    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+      const key = e.key.toLowerCase()
+
+      if (key === KONAMI_SEQUENCE[progress]) {
+        progress++
+        if (progress === KONAMI_SEQUENCE.length) {
+          progress = 0
+          const next = toggleTheme()
+          const message =
+            next === 'dark'
+              ? 'lights out. welcome to the midnight blueprint.'
+              : 'rise and shine.'
+          addOutput([
+            {
+              type: 'output',
+              content: `↑↑↓↓←→←→ba\ncheat code accepted. ${message}`,
+              id: generateLineId(),
+              isTyping: true,
+            },
+          ])
+          setStatus(`theme: ${next}`)
+        }
+      } else {
+        // restart the match, allowing the failed key to start a new attempt
+        progress = key === KONAMI_SEQUENCE[0] ? 1 : 0
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [addOutput, setStatus])
 
   const execute = useCallback(async () => {
     const trimmed = input.trim()

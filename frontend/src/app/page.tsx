@@ -17,17 +17,21 @@ export default function Page() {
   return (
     <section className="home-page">
       <section className="home-hero">
-        <p className="home-kicker">Niels Erik Nandal</p>
+        <p className="home-kicker">Niels Erik Nandal · engineer’s notebook</p>
         <h1 className="home-title">
-          Engineer building AI products, systems, and readable software.
+          Engineer building <em>AI products</em>, systems, and{' '}
+          <span className="circle-annotation">
+            readable
+            <svg viewBox="0 0 200 60" aria-hidden="true" focusable="false">
+              <path d="M 14 30 C 8 10, 60 4, 102 6 C 152 8, 196 14, 193 30 C 190 48, 140 56, 96 55 C 52 54, 4 50, 12 26" />
+            </svg>
+          </span>{' '}
+          software.
         </h1>
         <p className="home-summary">
           I work across Python, TypeScript, and ML-heavy product surfaces. I
           care about deterministic backends, sharp product loops, and code a
           maintainer can understand in one pass.
-        </p>
-        <p className="home-summary">
-          I am currently open to full-time engineering roles.
         </p>
         <p className="home-links">
           <Link href="/cv">view CV</Link>
@@ -39,6 +43,14 @@ export default function Page() {
           <a href={linkedinUrl} target="_blank" rel="noopener noreferrer">
             linkedin
           </a>
+        </p>
+        <p>
+          <span className="hero-stamp">open to full-time roles</span>
+        </p>
+        <p className="hero-margin-note">
+          <span className="margin-note">
+            psst — press ctrl+k. this site has a real terminal ↘
+          </span>
         </p>
       </section>
 

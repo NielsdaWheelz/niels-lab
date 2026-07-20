@@ -1,0 +1,20 @@
+# Niels Erik Nandal
+
+Engineer building AI products, systems, and readable software. Open to full-time roles in AI/software engineering.
+
+## Key URLs
+
+- Home: https://niels.dev/
+- Projects: https://niels.dev/projects
+- Writing: https://niels.dev/writing
+- CV: https://niels.dev/cv
+- RSS Feed: https://niels.dev/rss
+
+## Contact
+
+- LinkedIn: https://www.linkedin.com/in/nielseriknandal/
+- GitHub: https://github.com/NielsdaWheelz
+
+## Content
+
+Content pages are rendered as MDX, combining Markdown with React components for interactive elements.

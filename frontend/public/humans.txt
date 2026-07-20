@@ -1,0 +1,11 @@
+/* TEAM */
+Niels Erik Nandal, Engineer
+
+/* SITE STACK */
+Next.js 16, React 19, Bun, Tailwind, MDX, rough.js
+
+/* FEATURES */
+This site has a real terminal. Try it: ctrl+k
+
+/* HANDCRAFTED */
+With warm cream paper and wobbly ink lines.

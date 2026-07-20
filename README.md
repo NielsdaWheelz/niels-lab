@@ -18,7 +18,9 @@ Canonical frontend content is:
 
 Canonical routes are `/`, `/projects`, `/writing`, and `/cv`.
 
-The terminal is global and opens with `ctrl+k`.
+The terminal is global and opens with `ctrl+k`. Extra commands: `/theme`, `/fortune`, `/neofetch` (plus hidden easter eggs).
+
+The site has light ("day paper") and dark ("midnight blueprint") themes: toggled in the nav, via `/theme` in the terminal, or the konami code. Theme state lives on `html[data-theme]` with the engine in `frontend/src/lib/theme.ts`.
 
 The validator matches the current loaders: frontmatter uses `---` delimiters, one `key: value` entry per line, and `publishedAt` uses `YYYY-MM-DD`.
 

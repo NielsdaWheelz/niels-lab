@@ -12,7 +12,8 @@ export const entries = [
     category: 'education' as const,
   },
   {
-    title: 'Research Assistant – University of Toronto: Rotman School of Management',
+    title:
+      'Research Assistant – University of Toronto: Rotman School of Management',
     date: 'July 2015 – March 2016',
     category: 'experience' as const,
     bullets: [

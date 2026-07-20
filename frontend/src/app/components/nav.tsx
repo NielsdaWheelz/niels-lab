@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { NeuralPathway } from './NeuralPathway'
+import { ThemeToggle } from './ThemeToggle'
 
 const navItems = [
   ['/', 'home'],
@@ -27,6 +28,7 @@ export function Navbar() {
           {name}
         </Link>
       ))}
+      <ThemeToggle />
       <NeuralPathway
         containerRef={navRef}
         nodeSelectors={['a']}
