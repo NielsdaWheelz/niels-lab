@@ -1,0 +1,20 @@
+/* the list's one-line gloss, between heading and entries */
+.note {
+  margin: 1rem 0 0;
+  color: var(--faded);
+  font-style: italic;
+}
+
+.body {
+  margin-top: 1rem;
+}
+
+/* evidence body: the labeled link to the primary source */
+.source {
+  margin: 0.3rem 0 0.6rem;
+}
+
+.source img {
+  display: block;
+  margin-top: 0.35rem;
+}

@@ -1,0 +1,68 @@
+/* Chrome for the two MDX collections, /writing and /projects: they are the
+   same object — a dated post with a one-line summary — so they share one
+   module rather than two copies of it. */
+
+/* index: quiet text rows, hairline between, no cards */
+.index {
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+}
+
+.row + .row {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+}
+
+/* title left, date right, on one baseline; wraps on narrow screens */
+.head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+}
+
+.head > h2 {
+  margin-right: auto;
+}
+
+.head > time {
+  white-space: nowrap;
+}
+
+.head a {
+  text-decoration: none;
+}
+
+.head a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.summary {
+  margin: 0.35rem 0 0;
+  max-width: var(--measure);
+  color: var(--faded);
+}
+
+/* article: the head matter above an essay or a working note */
+.gloss {
+  margin: 1rem 0 0;
+  max-width: var(--measure);
+  color: var(--faded);
+  font-style: italic;
+}
+
+.dateline {
+  margin: 0.6rem 0 0;
+}
+
+.links {
+  margin: 0.4rem 0 0;
+}
+
+.body {
+  margin-top: 2rem;
+}

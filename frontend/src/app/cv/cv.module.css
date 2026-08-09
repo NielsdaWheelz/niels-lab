@@ -1,0 +1,101 @@
+/* /cv — the recruiter escape hatch: plain, dense, printable.
+   Margins are in rem so print.css can compact the whole page by
+   setting a smaller root font-size. */
+
+.bio {
+  margin: 0;
+}
+
+.contact {
+  margin: 0.5rem 0 0;
+  color: var(--faded);
+}
+
+.contact a {
+  color: var(--faded);
+}
+
+/* every section opens on a hairline, header included */
+.section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+}
+
+.sectionHeading {
+  font-style: italic;
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+}
+
+/* an entry never splits across printed sheets */
+.item {
+  break-inside: avoid;
+}
+
+.item + .item {
+  margin-top: 1.25rem;
+}
+
+/* title left, date right, sharing a baseline; wraps on narrow screens */
+.row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.15rem 1rem;
+}
+
+.role {
+  margin-right: auto;
+  font-size: 1.0625rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--faded);
+}
+
+.item ul {
+  margin: 0.35rem 0 0;
+}
+
+.skills {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1.5ch;
+  margin: 0;
+}
+
+.skills dt {
+  color: var(--faded);
+}
+
+.skills dd {
+  margin: 0;
+}
+
+/* Screen spacing is air the sheet cannot afford; print.css scales the rest
+   by root font-size, these are the blocks that need more than scaling. */
+@media print {
+  .section {
+    margin-top: 0.5rem;
+    padding-top: 0.4rem;
+  }
+
+  .sectionHeading {
+    font-size: 1.05rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .item + .item {
+    margin-top: 0.45rem;
+  }
+
+  .item ul {
+    margin-top: 0.1rem;
+  }
+
+  .skills {
+    row-gap: 0.15rem;
+  }
+}

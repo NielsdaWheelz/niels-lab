@@ -1,18 +1,24 @@
-import { getWritingPosts } from '@/app/writing/utils'
-import { getProjects } from '@/app/projects/utils'
-import { getSiteUrl, siteDescription, siteName } from '@/app/site'
+import { getProjects, getWritingPosts } from '@/lib/content'
+import { lastWritten, lists } from '@/content/lists'
+import { bioExtended, bookTitle, getSiteUrl, siteDescription } from '@/app/site'
 
 export const dynamic = 'force-static'
 
 export async function GET() {
   const siteUrl = getSiteUrl()
 
-  const writingPosts = [...getWritingPosts()].sort((a, b) =>
-    b.metadata.publishedAt.localeCompare(a.metadata.publishedAt),
-  )
-  const projects = [...getProjects()].sort((a, b) =>
-    b.metadata.publishedAt.localeCompare(a.metadata.publishedAt),
-  )
+  // The loader already sorts newest first (src/lib/content.ts).
+  const writingPosts = getWritingPosts()
+  const projects = getProjects()
+
+  // Generated from the typed corpus, so the map cannot drift from the pages.
+  const listsSection = lists
+    .map((list) => {
+      const gloss = list.note ? ` ${list.note}` : ''
+
+      return `- [${list.title}](${siteUrl}/lists/${list.slug}): ${list.entries.length} entries, last written ${lastWritten(list)}.${gloss}`
+    })
+    .join('\n')
 
   const writingSection = writingPosts
     .map(
@@ -29,25 +35,30 @@ export async function GET() {
     .join('\n')
 
   const pagesSection = [
-    `- [CV](${siteUrl}/cv): full career history, skills, and experience as a structured resume.`,
-    `- [Now](${siteUrl}/now): what Niels is doing these days.`,
+    `- [Log](${siteUrl}/log): a dated ledger of training, reading, and shipping, newest first; the failures stay in.`,
+    `- [CV](${siteUrl}/cv): the record — roles, projects, education, tools; prints on one page.`,
+    `- [Now](${siteUrl}/now): a dated diary page — what the work, the reading, and the training are at the moment.`,
     `- [Colophon](${siteUrl}/colophon): how this site is designed and built.`,
     `- [Lab](${siteUrl}/lab): interactive experiments on model internals.`,
-    `- [RSS feed](${siteUrl}/rss): subscribe to new writing posts.`,
-    `- [llms-full.txt](${siteUrl}/llms-full.txt): the entire corpus (bio, every project, every writing post, and the CV) as one plain-text document, meant to be read in full by a language model.`,
+    `- [How sampling works](${siteUrl}/lab/sampling): temperature, top-k, and top-p on a live token distribution.`,
+    `- [RSS feed](${siteUrl}/rss): the lists, the log, and new writing.`,
+    `- [llms-full.txt](${siteUrl}/llms-full.txt): the entire corpus (bio, every list entry, every log row, every project, every writing post, and the CV) as one plain-text document, meant to be read in full by a language model.`,
   ].join('\n')
 
-  const body = `# ${siteName}
+  const body = `# ${bookTitle}
 
 > ${siteDescription}
 
-Niels Erik Nandal is an AI systems engineer: he designs deterministic backends,
-builds legible interfaces on top of them, and writes software meant to be read,
-not just run. This site is his portfolio — production projects, technical
-writing, and a structured CV — and it is built to be as legible to a language
-model as it is to a person. Start here for an index of everything on the site,
-or read [llms-full.txt](${siteUrl}/llms-full.txt) for the complete corpus in a
-single document.
+${bioExtended}
+
+This site is a book of lists after Sei Shōnagon. Each list is dated, each entry
+is one line, and a checkable claim carries a link to its primary source; where
+no proof exists the claim is written as plain observation. Read
+[llms-full.txt](${siteUrl}/llms-full.txt) for the whole corpus in one document.
+
+## Lists
+
+${listsSection}
 
 ## Writing
 

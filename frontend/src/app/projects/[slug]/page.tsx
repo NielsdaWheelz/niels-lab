@@ -1,7 +1,6 @@
-import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { CustomMDX } from '@/app/components/mdx'
-import { formatDate, getProjects } from '@/app/projects/utils'
+import { getProjects } from '@/lib/content'
 import { PageTitle } from '@/app/components/PageTitle'
 import { JsonLd } from '@/app/components/StructuredData'
 import {
@@ -10,6 +9,11 @@ import {
   getPersonSchemaId,
   getWebsiteSchemaId,
 } from '@/app/site'
+import styles from '@/app/posts.module.css'
+
+// The projects are a closed set: no slug outside generateStaticParams exists,
+// so the loader never reads the filesystem at request time.
+export const dynamicParams = false
 
 export async function generateStaticParams() {
   const projects = getProjects()
@@ -56,7 +60,6 @@ export default async function Project({
     name: project.metadata.title,
     description: project.metadata.summary,
     url: projectUrl,
-    image: getCanonicalUrl(project.metadata.image),
     datePublished: project.metadata.publishedAt,
     inLanguage: 'en-US',
     author: { '@id': getPersonSchemaId() },
@@ -74,24 +77,17 @@ export default async function Project({
   return (
     <>
       <JsonLd data={projectSchema} />
-      <section>
+      <article>
         <PageTitle>{project.metadata.title}</PageTitle>
-        <p className="article-summary">{project.metadata.summary}</p>
-        <p className="article-meta">
-          <time dateTime={project.metadata.publishedAt}>
-            {formatDate(project.metadata.publishedAt)}
+        <p className={styles.gloss}>{project.metadata.summary}</p>
+        <p className={styles.dateline}>
+          <time className="date" dateTime={project.metadata.publishedAt}>
+            {project.metadata.publishedAt}
           </time>
         </p>
-        <Image
-          src={project.metadata.image}
-          alt={`Overview graphic for ${project.metadata.title}`}
-          width={1200}
-          height={800}
-          className="article-image"
-        />
-        {(project.metadata.repoUrl || project.metadata.liveUrl) && (
-          <p className="article-links">
-            {project.metadata.repoUrl && (
+        {project.metadata.repoUrl || project.metadata.liveUrl ? (
+          <p className={`chrome ${styles.links}`}>
+            {project.metadata.repoUrl ? (
               <a
                 href={project.metadata.repoUrl}
                 target="_blank"
@@ -99,9 +95,9 @@ export default async function Project({
               >
                 repo
               </a>
-            )}
-            {project.metadata.repoUrl && project.metadata.liveUrl && ' · '}
-            {project.metadata.liveUrl && (
+            ) : null}
+            {project.metadata.repoUrl && project.metadata.liveUrl ? ' · ' : ''}
+            {project.metadata.liveUrl ? (
               <a
                 href={project.metadata.liveUrl}
                 target="_blank"
@@ -109,13 +105,13 @@ export default async function Project({
               >
                 live
               </a>
-            )}
+            ) : null}
           </p>
-        )}
-        <article className="prose article-body">
+        ) : null}
+        <div className={`prose ${styles.body}`}>
           <CustomMDX source={project.content} />
-        </article>
-      </section>
+        </div>
+      </article>
     </>
   )
 }

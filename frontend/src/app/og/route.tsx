@@ -5,56 +5,30 @@ import { getSiteUrl, siteDescription, siteName } from '@/app/site'
 
 export const runtime = 'nodejs'
 
-const geistMonoBold = readFile(
-  path.join(
-    process.cwd(),
-    'node_modules',
-    'geist',
-    'dist',
-    'fonts',
-    'geist-mono',
-    'GeistMono-Bold.ttf',
-  ),
+// satori has no CSS custom properties: these mirror the dark-theme tokens in
+// globals.css and must be changed with them. The card is always night writing.
+const ink = '#16161d'
+const murasaki = '#a87bc4'
+const celadon = '#7fa99b'
+const faded = '#8f8a99'
+const rule = '#2a2833'
+
+// read at module scope so the bytes are cached between invocations; the files
+// reach the serverless bundle via outputFileTracingIncludes in next.config.ts.
+const newsreaderRegular = readFile(
+  path.join(process.cwd(), 'src', 'fonts', 'Newsreader-Regular.ttf'),
 )
-
-const geistMonoRegular = readFile(
-  path.join(
-    process.cwd(),
-    'node_modules',
-    'geist',
-    'dist',
-    'fonts',
-    'geist-mono',
-    'GeistMono-Regular.ttf',
-  ),
+const newsreaderItalic = readFile(
+  path.join(process.cwd(), 'src', 'fonts', 'Newsreader-Italic.ttf'),
 )
-
-const cream = '#fbf4e2'
-const ink = '#2e2a23'
-const mutedInk = '#6f675a'
-const terracotta = '#d4552a'
-const teal = '#17697a'
-const ochre = '#c0932f'
-const borderColor = '#e4d9bf'
-
-const gridBackground = [
-  'repeating-linear-gradient(to right, rgba(23,105,122,0.055) 0px, rgba(23,105,122,0.055) 1px, transparent 1px, transparent 32px)',
-  'repeating-linear-gradient(to bottom, rgba(23,105,122,0.055) 0px, rgba(23,105,122,0.055) 1px, transparent 1px, transparent 32px)',
-].join(', ')
 
 function titleFontSize(title: string) {
   const len = title.length
-  if (len <= 18) return 88
-  if (len <= 32) return 68
-  if (len <= 50) return 54
-  if (len <= 70) return 44
-  return 36
-}
-
-function underlineWidth(title: string, fontSize: number) {
-  const firstWord = title.split(' ')[0] ?? title
-  const estimate = firstWord.length * fontSize * 0.6
-  return Math.max(72, Math.min(260, estimate))
+  if (len <= 18) return 92
+  if (len <= 32) return 72
+  if (len <= 50) return 58
+  if (len <= 70) return 46
+  return 38
 }
 
 export async function GET(request: Request) {
@@ -63,11 +37,10 @@ export async function GET(request: Request) {
   const description =
     url.searchParams.get('description')?.slice(0, 220) || siteDescription
   const siteHost = new URL(getSiteUrl()).host
-  const [boldData, regularData] = await Promise.all([
-    geistMonoBold,
-    geistMonoRegular,
+  const [regularData, italicData] = await Promise.all([
+    newsreaderRegular,
+    newsreaderItalic,
   ])
-  const fontSize = titleFontSize(title)
 
   return new ImageResponse(
     <div
@@ -77,189 +50,45 @@ export async function GET(request: Request) {
         justifyContent: 'space-between',
         width: '100%',
         height: '100%',
-        position: 'relative',
-        backgroundColor: cream,
-        backgroundImage: gridBackground,
-        color: ink,
-        fontFamily: 'Geist Mono',
-        padding: '56px 64px',
+        backgroundColor: ink,
+        fontFamily: 'Newsreader',
+        padding: '72px 88px',
       }}
     >
-      {/* drafting-sheet frame */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 24,
-          left: 24,
-          right: 24,
-          bottom: 24,
-          border: `1px solid ${borderColor}`,
-        }}
-      />
-      {/* corner marks */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 24,
-          left: 24,
-          width: 28,
-          height: 28,
-          borderTop: `2px solid ${teal}`,
-          borderLeft: `2px solid ${teal}`,
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          top: 24,
-          right: 24,
-          width: 28,
-          height: 28,
-          borderTop: `2px solid ${teal}`,
-          borderRight: `2px solid ${teal}`,
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 24,
-          left: 24,
-          width: 28,
-          height: 28,
-          borderBottom: `2px solid ${teal}`,
-          borderLeft: `2px solid ${teal}`,
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 24,
-          right: 24,
-          width: 28,
-          height: 28,
-          borderBottom: `2px solid ${teal}`,
-          borderRight: `2px solid ${teal}`,
-        }}
-      />
-
-      {/* top row: terminal path + stamp badge */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            fontSize: 24,
-            fontWeight: 700,
-            color: teal,
-            letterSpacing: '0.5px',
-          }}
-        >
-          {siteHost}
-          {' ~ $ ▌'}
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            border: `2px solid ${terracotta}`,
-            padding: '10px 18px',
-            transform: 'rotate(-4deg)',
-            fontSize: 15,
-            fontWeight: 700,
-            color: terracotta,
-            letterSpacing: '2px',
-          }}
-        >
-          {"ENGINEER'S NOTEBOOK"}
-        </div>
+      <div style={{ display: 'flex', fontSize: 26, color: celadon }}>
+        {siteHost}
       </div>
-
-      {/* middle: title + underline stroke + description */}
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '20px',
-          maxWidth: '1000px',
+          gap: 28,
+          borderTop: `1px solid ${rule}`,
+          paddingTop: 44,
         }}
       >
         <div
           style={{
             display: 'flex',
-            flexDirection: 'column',
-            gap: '14px',
+            fontSize: titleFontSize(title),
+            fontStyle: 'italic',
+            lineHeight: 1.15,
+            color: murasaki,
+            maxWidth: 1000,
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              fontSize,
-              fontWeight: 700,
-              lineHeight: 1.15,
-              letterSpacing: '-1px',
-              color: ink,
-            }}
-          >
-            {title}
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              width: underlineWidth(title, fontSize),
-              height: 10,
-              backgroundColor: terracotta,
-              transform: 'rotate(-1deg)',
-            }}
-          />
+          {title}
         </div>
         <div
           style={{
             display: 'flex',
-            fontSize: 22,
-            fontWeight: 400,
-            color: mutedInk,
-            maxWidth: '760px',
+            fontSize: 26,
+            lineHeight: 1.45,
+            color: faded,
+            maxWidth: 880,
           }}
         >
           {description}
-        </div>
-      </div>
-
-      {/* bottom row: description tag + page stamp */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'flex-end',
-          justifyContent: 'space-between',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            fontSize: 15,
-            fontWeight: 400,
-            color: mutedInk,
-            letterSpacing: '1px',
-          }}
-        >
-          {'// notes on building things'}
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            fontSize: 14,
-            fontWeight: 700,
-            color: ochre,
-            letterSpacing: '3px',
-          }}
-        >
-          {'SHEET 01 · REV A'}
         </div>
       </div>
     </div>,
@@ -268,16 +97,16 @@ export async function GET(request: Request) {
       height: 630,
       fonts: [
         {
-          name: 'Geist Mono',
-          data: boldData,
-          weight: 700,
-          style: 'normal',
-        },
-        {
-          name: 'Geist Mono',
+          name: 'Newsreader',
           data: regularData,
           weight: 400,
           style: 'normal',
+        },
+        {
+          name: 'Newsreader',
+          data: italicData,
+          weight: 400,
+          style: 'italic',
         },
       ],
     },

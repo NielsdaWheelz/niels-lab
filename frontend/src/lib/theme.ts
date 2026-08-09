@@ -1,14 +1,14 @@
 export type Theme = 'light' | 'dark'
 
-export const THEME_STORAGE_KEY = 'theme'
+const THEME_STORAGE_KEY = 'theme'
 export const THEME_CHANGE_EVENT = 'themechange'
 
 export function getTheme(): Theme {
-  if (typeof document === 'undefined') return 'light'
-  return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
+  if (typeof document === 'undefined') return 'dark'
+  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
 }
 
-export function setTheme(theme: Theme) {
+function setTheme(theme: Theme) {
   if (typeof document === 'undefined') return
   document.documentElement.dataset.theme = theme
   try {
@@ -33,4 +33,4 @@ export function toggleTheme(): Theme {
  * Runs before paint via an inline script in the document head, so the
  * stored/preferred theme applies without a flash of the wrong palette.
  */
-export const themeInitScript = `(function(){try{var t=localStorage.getItem('${THEME_STORAGE_KEY}');if(t!=='dark'&&t!=='light'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='light'}})()`
+export const themeInitScript = `(function(){try{var t=localStorage.getItem('${THEME_STORAGE_KEY}');if(t!=='dark'&&t!=='light'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='dark'}})()`

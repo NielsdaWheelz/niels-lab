@@ -1,8 +1,17 @@
 export const entries = [
   {
+    title: 'Senior Software Engineer – Solid',
+    date: 'March 2026 – present',
+    category: 'experience' as const,
+    bullets: [
+      'Build infrastructure for always-on agents — persistent memory, machines, accounts, communications, and payments — so an agent can hold work that outlives a chat session.',
+      'Ship production backend services end to end: typed contracts at the boundaries, deterministic cores, migrations that roll back in one revision.',
+    ],
+  },
+  {
     title: 'Fractal Tech – Software Engineering Fellowship',
     subtitle: 'Full-time, six-day weeks, 13-hour days',
-    date: 'October 2025 – present',
+    date: 'October 2025 – December 2025',
     category: 'education' as const,
   },
   {

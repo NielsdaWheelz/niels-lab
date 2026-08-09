@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { CustomMDX } from '@/app/components/mdx'
-import { formatDate, getWritingPosts } from '@/app/writing/utils'
+import { getWritingPosts } from '@/lib/content'
 import { PageTitle } from '@/app/components/PageTitle'
 import { JsonLd } from '@/app/components/StructuredData'
 import {
@@ -9,6 +9,11 @@ import {
   getPersonSchemaId,
   getWebsiteSchemaId,
 } from '@/app/site'
+import styles from '@/app/posts.module.css'
+
+// The essays are a closed set: no slug outside generateStaticParams exists,
+// so the loader never reads the filesystem at request time.
+export const dynamicParams = false
 
 export async function generateStaticParams() {
   const posts = getWritingPosts()
@@ -71,18 +76,18 @@ export default async function WritingPost({
           mainEntityOfPage: postUrl,
         }}
       />
-      <section>
+      <article>
         <PageTitle>{post.metadata.title}</PageTitle>
-        <p className="article-summary">{post.metadata.summary}</p>
-        <p className="article-meta">
-          <time dateTime={post.metadata.publishedAt}>
-            {formatDate(post.metadata.publishedAt)}
+        <p className={styles.gloss}>{post.metadata.summary}</p>
+        <p className={styles.dateline}>
+          <time className="date" dateTime={post.metadata.publishedAt}>
+            {post.metadata.publishedAt}
           </time>
         </p>
-        <article className="prose article-body">
+        <div className={`prose ${styles.body}`}>
           <CustomMDX source={post.content} />
-        </article>
-      </section>
+        </div>
+      </article>
     </>
   )
 }
