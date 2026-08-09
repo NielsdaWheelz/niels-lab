@@ -74,7 +74,11 @@ export default function RootLayout({
           Skip to content
         </a>
         <Navbar />
-        <main id="main-content">{children}</main>
+        {/* tabIndex so the skip link moves real focus, not just the
+            sequential-focus start point (Safari/VoiceOver). */}
+        <main id="main-content" tabIndex={-1}>
+          {children}
+        </main>
         <Footer />
         <Analytics />
         <SpeedInsights />

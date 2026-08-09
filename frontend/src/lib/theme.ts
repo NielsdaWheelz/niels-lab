@@ -1,6 +1,6 @@
 export type Theme = 'light' | 'dark'
 
-export const THEME_STORAGE_KEY = 'theme'
+const THEME_STORAGE_KEY = 'theme'
 export const THEME_CHANGE_EVENT = 'themechange'
 
 export function getTheme(): Theme {
@@ -8,7 +8,7 @@ export function getTheme(): Theme {
   return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
 }
 
-export function setTheme(theme: Theme) {
+function setTheme(theme: Theme) {
   if (typeof document === 'undefined') return
   document.documentElement.dataset.theme = theme
   try {

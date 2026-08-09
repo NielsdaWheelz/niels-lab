@@ -11,7 +11,7 @@ const navItems = [
 
 export function Navbar() {
   return (
-    <nav className="site-nav" aria-label="Primary navigation">
+    <nav className="site-nav" aria-label="Primary">
       <Link href="/" className="nav-name">
         Niels-Erik Nandal
       </Link>

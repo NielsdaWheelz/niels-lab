@@ -3,6 +3,7 @@ import { Fragment } from 'react'
 import { PageTitle } from '@/app/components/PageTitle'
 import { JsonLd } from '@/app/components/StructuredData'
 import {
+  bio,
   createPageMetadata,
   getCanonicalUrl,
   getPersonSchemaId,
@@ -51,10 +52,7 @@ export default function CVPage() {
       />
       <article>
         <PageTitle>cv</PageTitle>
-        <p className={styles.bio}>
-          Niels-Erik Nandal is a senior software engineer at Solid in San
-          Francisco.
-        </p>
+        <p className={styles.bio}>{bio}</p>
         <p className={`chrome ${styles.contact}`}>
           <a href="mailto:niels.erik.nandal@gmail.com">
             niels.erik.nandal@gmail.com
@@ -76,11 +74,11 @@ export default function CVPage() {
                     <h3 className={styles.role}>{entry.title}</h3>
                     <span className="date">{entry.date}</span>
                   </div>
-                  {'subtitle' in entry && entry.subtitle ? (
+                  {'subtitle' in entry ? (
                     <p className={styles.subtitle}>{entry.subtitle}</p>
                   ) : null}
                   {'bullets' in entry && entry.bullets ? (
-                    <ul className="entries">
+                    <ul className="entries" role="list">
                       {entry.bullets.map((bullet) => (
                         <li key={bullet} className="entry">
                           {bullet}

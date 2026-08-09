@@ -13,8 +13,12 @@ const frontmatterRegex = /---\s*([\s\S]*?)\s*---/
 const publishedAtRegex = /^\d{4}-\d{2}-\d{2}$/
 
 const listsFile = 'src/content/lists.ts'
+const logFile = 'src/content/log.ts'
+const logKinds = new Set(['train', 'read', 'ship', 'write'])
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 // Lifting and meet numbers ship as prose only (spec §9): no evidence, ever.
+// A keyword tripwire, not a complete gate: it catches the obvious nouns,
+// not every phrasing of a lifting claim.
 const liftingRegex = /\b(squat|bench|deadlift|total|lbs?|kg)\b/i
 const linkTimeoutMs = 15000
 const userAgent = 'nielseriknandal.com content validator'
@@ -24,7 +28,7 @@ const contentSources = [
   {
     name: 'projects',
     directory: 'src/app/projects/posts',
-    requiredKeys: ['title', 'publishedAt', 'summary', 'image'],
+    requiredKeys: ['title', 'publishedAt', 'summary'],
   },
   {
     name: 'writing',
@@ -116,23 +120,6 @@ function validateUrl(value, fieldName, relativePath, errors) {
   }
 }
 
-function validateImagePath(value, relativePath, errors) {
-  if (!value.trim()) {
-    errors.push(`${relativePath}: image must be non-empty`)
-    return
-  }
-
-  if (!value.startsWith('/')) {
-    errors.push(`${relativePath}: image must be a root-relative public path`)
-    return
-  }
-
-  const imagePath = path.join(frontendRoot, 'public', value.slice(1))
-  if (!fs.existsSync(imagePath)) {
-    errors.push(`${relativePath}: image file is missing at public${value}`)
-  }
-}
-
 function validateMetadata(metadata, source, relativePath, errors) {
   for (const key of source.requiredKeys) {
     if (!Object.prototype.hasOwnProperty.call(metadata, key)) {
@@ -157,10 +144,6 @@ function validateMetadata(metadata, source, relativePath, errors) {
     errors.push(`${relativePath}: summary must be present and non-empty`)
   }
 
-  if (Object.prototype.hasOwnProperty.call(metadata, 'image')) {
-    validateImagePath(metadata.image, relativePath, errors)
-  }
-
   for (const fieldName of ['repoUrl', 'liveUrl']) {
     if (
       typeof metadata[fieldName] === 'string' &&
@@ -172,16 +155,6 @@ function validateMetadata(metadata, source, relativePath, errors) {
 }
 
 function getSourceFiles(source, errors) {
-  if (source.file) {
-    const absoluteFile = path.join(frontendRoot, source.file)
-    if (!fs.existsSync(absoluteFile)) {
-      errors.push(`${source.file}: content file is missing`)
-      return []
-    }
-
-    return [source.file]
-  }
-
   const absoluteDirectory = path.join(frontendRoot, source.directory)
   if (!fs.existsSync(absoluteDirectory)) {
     errors.push(`${source.directory}: content directory is missing`)
@@ -204,24 +177,30 @@ function getSourceFiles(source, errors) {
 // The corpus is typed TypeScript, so bun — the repo's runner, and this
 // script's parent process — reads the module and hands back plain JSON.
 // Nothing here parses source text.
-function loadLists(errors) {
-  const modulePath = JSON.stringify(path.join(frontendRoot, listsFile))
+function loadExport(relativeFile, exportName, errors) {
+  const modulePath = JSON.stringify(path.join(frontendRoot, relativeFile))
   const result = spawnSync(
     'bun',
     [
       '--eval',
-      `process.stdout.write(JSON.stringify((await import(${modulePath})).lists))`,
+      `process.stdout.write(JSON.stringify((await import(${modulePath})).${exportName} ?? null))`,
     ],
     { encoding: 'utf-8' },
   )
 
   if (result.status !== 0) {
     const reason = (result.stderr || result.error?.message || '').trim()
-    errors.push(`${listsFile}: could not be loaded (${reason})`)
+    errors.push(`${relativeFile}: could not be loaded (${reason})`)
     return []
   }
 
-  return JSON.parse(result.stdout)
+  const value = JSON.parse(result.stdout)
+  if (value === null) {
+    errors.push(`${relativeFile}: no "${exportName}" export`)
+    return []
+  }
+
+  return value
 }
 
 function routeExists(pathname) {
@@ -371,6 +350,50 @@ function validateLists(lists, errors, externalHrefs) {
   return lists.reduce((count, list) => count + list.entries.length, 0)
 }
 
+// The ledger's manual rows: mergeEvents sorts on date, isStale parses it,
+// and every href is a claim of proof — all gated here, like the lists.
+function validateLog(events, errors, externalHrefs) {
+  if (!Array.isArray(events)) {
+    errors.push(`${logFile}: log must be an array`)
+    return
+  }
+
+  for (const [index, event] of events.entries()) {
+    const where = `${logFile}: row ${index + 1}`
+
+    if (typeof event.date !== 'string' || !publishedAtRegex.test(event.date)) {
+      errors.push(`${where}: date must use YYYY-MM-DD`)
+    } else if (Number.isNaN(new Date(`${event.date}T00:00:00Z`).valueOf())) {
+      errors.push(`${where}: date is not a valid date`)
+    } else if (event.date > today) {
+      errors.push(`${where}: date is in the future`)
+    }
+
+    if (!logKinds.has(event.kind)) {
+      errors.push(`${where}: kind must be one of train, read, ship, write`)
+    }
+
+    if (typeof event.text !== 'string' || event.text.trim() === '') {
+      errors.push(`${where}: text must be present and non-empty`)
+    }
+
+    if (
+      event.failed !== undefined &&
+      typeof event.failed?.lesson !== 'string'
+    ) {
+      errors.push(`${where}: failed must carry a lesson`)
+    }
+
+    if (event.href !== undefined) {
+      if (!/^https?:\/\//.test(event.href)) {
+        errors.push(`${where}: href must be an absolute http(s) URL`)
+      } else {
+        externalHrefs.add(event.href)
+      }
+    }
+  }
+}
+
 // Dead proof is a build error; an unreachable network is not, so the site
 // still builds on a train.
 async function checkExternalHrefs(hrefs, errors, warnings) {
@@ -401,11 +424,9 @@ async function checkExternalHrefs(hrefs, errors, warnings) {
 
   for (const { href, status, reason } of results) {
     if (status === null) {
-      warnings.push(
-        `${listsFile}: ${href} unreachable (${reason}), not checked`,
-      )
+      warnings.push(`${href} unreachable (${reason}), not checked`)
     } else if (status >= 400 && status < 600) {
-      errors.push(`${listsFile}: evidence href ${href} responded ${status}`)
+      errors.push(`evidence href ${href} responded ${status}`)
     }
   }
 }
@@ -432,10 +453,15 @@ async function main() {
     }
   }
 
-  const lists = loadLists(errors)
+  const lists = loadExport(listsFile, 'lists', errors)
   const externalHrefs = new Set()
   const entryCount = validateLists(lists, errors, externalHrefs)
   totals.push(`lists:${lists.length}`, `entries:${entryCount}`)
+
+  const logEvents = loadExport(logFile, 'log', errors)
+  validateLog(logEvents, errors, externalHrefs)
+  totals.push(`log:${logEvents.length}`)
+
   await checkExternalHrefs(externalHrefs, errors, warnings)
 
   for (const warning of warnings) {

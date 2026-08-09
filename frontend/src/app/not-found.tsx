@@ -10,7 +10,7 @@ export default function NotFound() {
     <section>
       <h1 className="list-title">Things that are not where you left them</h1>
       <hr />
-      <ul className="entries">
+      <ul className="entries" role="list">
         <li className="entry">
           The puck, after the deke. The goaltender is looking for it too.
         </li>

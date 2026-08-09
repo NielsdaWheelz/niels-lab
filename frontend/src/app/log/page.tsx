@@ -29,7 +29,7 @@ export default async function LogPage() {
         <p className={`chrome ${styles.deload}`}>deload week.</p>
       ) : null}
 
-      <ol className={styles.rows}>
+      <ol className={styles.rows} role="list">
         {events.map((event) => {
           const text = event.failed ? <s>{event.text}</s> : event.text
 
@@ -42,7 +42,11 @@ export default async function LogPage() {
               <span>
                 {event.href ? <a href={event.href}>{text}</a> : text}
                 {event.failed ? (
-                  <span className={styles.lesson}> {event.failed.lesson}</span>
+                  <span className={styles.lesson}>
+                    {' — '}
+                    <span className="sr-only">failed: </span>
+                    {event.failed.lesson}
+                  </span>
                 ) : null}
               </span>
             </li>

@@ -66,9 +66,6 @@ export default async function Project({
     creator: { '@id': getPersonSchemaId() },
     isPartOf: { '@id': getWebsiteSchemaId() },
     mainEntityOfPage: projectUrl,
-    ...(project.metadata.image
-      ? { image: getCanonicalUrl(project.metadata.image) }
-      : {}),
     ...(project.metadata.repoUrl
       ? { codeRepository: project.metadata.repoUrl }
       : {}),

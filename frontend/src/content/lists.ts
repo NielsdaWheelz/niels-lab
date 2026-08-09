@@ -125,7 +125,7 @@ export const lists: PillowList[] = [
         added: '2026-08-09',
       },
       {
-        text: 'This site: typed data for a CMS, evidence links checked at build, one client component. The colophon confesses.',
+        text: 'This site: typed data for a CMS, evidence links checked at build, two client components. The colophon confesses.',
         evidence: {
           label: 'niels-lab, source',
           href: 'https://github.com/NielsdaWheelz/niels-lab',

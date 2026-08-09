@@ -314,41 +314,44 @@ blockquote {
   font-style: italic;
 }
 
-/* sugar-high tokens, restricted to the palette */
-.sh__line {
+/* sugar-high tokens, restricted to the palette. sugar-high 1.x colors every
+   token span inline with color: var(--sh-<type>), so the theme is expressed
+   as custom properties — class rules would lose to the inline style. The
+   var() references resolve at use time, so both themes are covered. */
+:root {
+  --sh-keyword: var(--murasaki);
+  --sh-string: var(--celadon);
+  --sh-class: var(--celadon);
+  --sh-jsxliterals: var(--celadon);
+  --sh-entity: var(--celadon);
+  --sh-comment: var(--faded);
+  --sh-sign: var(--faded);
+  --sh-identifier: var(--lamplight);
+  --sh-property: var(--lamplight);
+  --sh-break: var(--lamplight);
+  --sh-space: var(--lamplight);
+}
+
+/* Line wrappers stack only inside code blocks; inline code stays inline. */
+pre code .sh__line {
   display: block;
 }
 
-code .sh__token--keyword,
-code .sh__token--operator {
-  color: var(--murasaki);
-}
-
-code .sh__token--string,
-code .sh__token--number,
-code .sh__token--class,
-code .sh__token--jsxliterals,
-code .sh__token--entity {
-  color: var(--celadon);
-}
-
 code .sh__token--comment {
-  color: var(--faded);
   font-style: italic;
 }
 
-code .sh__token--punctuation,
-code .sh__token--sign {
-  color: var(--faded);
-}
-
-code .sh__token--identifier,
-code .sh__token--property,
-code .sh__token--function {
-  color: var(--lamplight);
-}
-
 /* ---------- shell: skip link, nav, footer ---------- */
+
+/* .sr-only — text for assistive technology only (e.g. the ledger's
+   "failed:" cue, evidence summary names). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
 
 .skip-link {
   position: absolute;

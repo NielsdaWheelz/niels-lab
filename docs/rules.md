@@ -24,7 +24,8 @@ standards; deviations need a written reason in the PR.
 ## Rendering
 
 - RSC-first. Client components only for irreducible interactivity; each one is listed in
-  the colophon. Current allowance: the theme toggle.
+  the colophon. Current allowance: the theme toggle and the lab's sampling playground
+  (kept per spec §3; spec §11's "theme toggle only" line predates that decision).
 - Zero-JS content parity: every load-bearing fact and sentence must exist in the initial
   HTML response. If `curl` can't see it, it doesn't exist.
 - Static-first; ISR (`revalidate`) for external data. No client-side fetching for content.

@@ -139,7 +139,9 @@ Dark is the canonical theme ("night writing"); light is a true inverse, both AA.
 - `writing/utils.ts` ≡ `projects/utils.ts` → one `src/lib/content.ts` (duplication extirpated).
 - `validate-content.mjs` — extend (lists schema, evidence URL liveness, date formats).
 - `cv/print.css` pattern — reuse.
-- `public/projects/*.svg` art — reuse in project pages (fits: they're ink-line drawings).
+- ~~`public/projects/*.svg` art — reuse in project pages~~ (amended during QA 2026-08-09: the
+  premise was wrong — the SVGs were cream/terracotta-palette cards, the banned tell itself;
+  extirpated with their frontmatter and validator branch).
 
 ## 9. Content design contracts
 
@@ -184,7 +186,9 @@ W2/W3/W4 touch disjoint files and run in parallel after W1. W6 lands as data int
 
 - `bun run check` green (format, lint, typecheck, build).
 - Zero references to killed components/deps; `git grep -iE 'geist|roughjs|terminal|caveat'` clean in `src/`.
-- Client JS ≤ ~30 KB beyond framework + analytics; theme toggle is the only interactive client component.
+- Client JS ≤ ~30 KB beyond framework + analytics; the theme toggle and the lab's sampling
+  playground (§3 keeps it) are the only client components (amended during QA 2026-08-09 —
+  the original "toggle only" line contradicted §3).
 - `curl` of every route contains all load-bearing text (zero-JS parity, AI-crawler ready).
 - All token pairs pass WCAG AA; both themes shipped; `prefers-reduced-motion` honored.
 - Slop-tell audit passes: no Inter/Geist, no uppercase-tracked labels, no numbered section

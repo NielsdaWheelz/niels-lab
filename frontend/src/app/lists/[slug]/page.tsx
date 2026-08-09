@@ -3,6 +3,10 @@ import { ListBody } from '@/app/components/ListBody'
 import { lastWritten, lists } from '@/content/lists'
 import { createPageMetadata } from '@/app/site'
 
+// The corpus is a closed set: no slug outside generateStaticParams exists,
+// so unknown list slugs 404 statically.
+export const dynamicParams = false
+
 export function generateStaticParams() {
   return lists.map((list) => ({ slug: list.slug }))
 }
@@ -19,7 +23,8 @@ export async function generateMetadata({
   return createPageMetadata({
     title: list.title,
     description:
-      list.note ?? 'A list from the Pillow Book of Niels-Erik Nandal.',
+      list.note ??
+      `${list.entries.length} entries, last written ${lastWritten(list)}. A list from the Pillow Book of Niels-Erik Nandal.`,
     path: `/lists/${list.slug}`,
   })
 }

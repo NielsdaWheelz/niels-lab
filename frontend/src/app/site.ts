@@ -65,8 +65,6 @@ export function getSiteUrl() {
   )
 }
 
-export const baseUrl = getSiteUrl()
-
 export function getCanonicalUrl(pathname = '/') {
   return new URL(pathname, `${getSiteUrl()}/`).toString()
 }
@@ -89,7 +87,7 @@ export function shouldIndexSite() {
   return getSiteUrl() === DEFAULT_SITE_URL
 }
 
-export function getOgImageUrl(title?: string, description?: string) {
+function getOgImageUrl(title?: string, description?: string) {
   const url = new URL('/og', getSiteUrl())
 
   if (title) {

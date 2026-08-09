@@ -2,7 +2,8 @@ import Link from 'next/link'
 import type { Evidence, PillowList } from '@/content/lists'
 import styles from './ListBody.module.css'
 
-// Evidence body: the primary source itself — its address as the link text.
+// Evidence body: the label is the link to the primary source (spec §4:
+// the summary is the celadon mark; opening yields label + link).
 function Source({ evidence }: { evidence: Evidence }) {
   if ('kind' in evidence) {
     return (
@@ -11,22 +12,26 @@ function Source({ evidence }: { evidence: Evidence }) {
     )
   }
   if (evidence.href.startsWith('/')) {
-    return <Link href={evidence.href}>{evidence.href}</Link>
+    return <Link href={evidence.href}>{evidence.label}</Link>
   }
-  return <a href={evidence.href}>{evidence.href}</a>
+  return <a href={evidence.href}>{evidence.label}</a>
 }
 
 export function ListBody({ list }: { list: PillowList }) {
   return (
     <>
       {list.note ? <p className={styles.note}>{list.note}</p> : null}
-      <ul className={`entries ${styles.body}`}>
+      <ul className={`entries ${styles.body}`} role="list">
         {list.entries.map((entry, index) => (
           <li className="entry" key={index}>
             {entry.text}
             {entry.evidence ? (
               <details className="evidence">
-                <summary>{entry.evidence.label}</summary>
+                {/* The visible summary is the › mark alone (CSS); the label
+                    names the disclosure for assistive technology. */}
+                <summary>
+                  <span className="sr-only">{entry.evidence.label}</span>
+                </summary>
                 <p className={`chrome ${styles.source}`}>
                   <Source evidence={entry.evidence} />
                 </p>

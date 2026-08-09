@@ -82,14 +82,6 @@ export default function ColophonPage() {
           ))}
         </dl>
 
-        <p>
-          Both faces are vendored in the repository under the SIL Open Font
-          License; the chips are painted with the live custom properties, so the
-          theme toggle repaints them. Motion is budgeted at one animation — a
-          250ms ink-reveal when a disclosure opens — and nothing else on the
-          site moves.
-        </p>
-
         <h2>The confession</h2>
         <p>
           Two client components run on this site: the theme toggle, and the

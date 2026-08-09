@@ -50,12 +50,9 @@ export async function GET() {
   const siteUrl = getSiteUrl()
   const ledger = await getLedger()
 
-  const projects = [...getProjects()].sort((a, b) =>
-    b.metadata.publishedAt.localeCompare(a.metadata.publishedAt),
-  )
-  const writingPosts = [...getWritingPosts()].sort((a, b) =>
-    b.metadata.publishedAt.localeCompare(a.metadata.publishedAt),
-  )
+  // The loader already sorts newest first (src/lib/content.ts).
+  const projects = getProjects()
+  const writingPosts = getWritingPosts()
 
   // Every entry and every proof, from the same typed data the pages render.
   const listsSection = lists
@@ -122,7 +119,7 @@ ${stripJsxLines(post.content)}`
     })
     .join('\n\n---\n\n')
 
-  const body = `# ${bookTitle} — Full Corpus
+  const body = `# ${bookTitle} — full corpus
 
 > ${siteDescription}
 

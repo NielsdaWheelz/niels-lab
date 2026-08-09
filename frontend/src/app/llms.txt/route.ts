@@ -7,12 +7,9 @@ export const dynamic = 'force-static'
 export async function GET() {
   const siteUrl = getSiteUrl()
 
-  const writingPosts = [...getWritingPosts()].sort((a, b) =>
-    b.metadata.publishedAt.localeCompare(a.metadata.publishedAt),
-  )
-  const projects = [...getProjects()].sort((a, b) =>
-    b.metadata.publishedAt.localeCompare(a.metadata.publishedAt),
-  )
+  // The loader already sorts newest first (src/lib/content.ts).
+  const writingPosts = getWritingPosts()
+  const projects = getProjects()
 
   // Generated from the typed corpus, so the map cannot drift from the pages.
   const listsSection = lists
@@ -39,10 +36,11 @@ export async function GET() {
 
   const pagesSection = [
     `- [Log](${siteUrl}/log): a dated ledger of training, reading, and shipping, newest first; the failures stay in.`,
-    `- [CV](${siteUrl}/cv): full career history, skills, and experience as a structured resume.`,
+    `- [CV](${siteUrl}/cv): the record — roles, projects, education, tools; prints on one page.`,
     `- [Now](${siteUrl}/now): a dated diary page — what the work, the reading, and the training are at the moment.`,
     `- [Colophon](${siteUrl}/colophon): how this site is designed and built.`,
     `- [Lab](${siteUrl}/lab): interactive experiments on model internals.`,
+    `- [How sampling works](${siteUrl}/lab/sampling): temperature, top-k, and top-p on a live token distribution.`,
     `- [RSS feed](${siteUrl}/rss): the lists, the log, and new writing.`,
     `- [llms-full.txt](${siteUrl}/llms-full.txt): the entire corpus (bio, every list entry, every log row, every project, every writing post, and the CV) as one plain-text document, meant to be read in full by a language model.`,
   ].join('\n')

@@ -7,7 +7,7 @@ import styles from '@/app/posts.module.css'
 export const metadata = createPageMetadata({
   title: 'Writing',
   description:
-    'Technical notes on machine learning, AI systems, and software engineering by Niels Erik Nandal.',
+    'Essays: neural networks explained from zero, in plain English. By Niels-Erik Nandal.',
   path: '/writing',
 })
 
@@ -15,7 +15,7 @@ export default function Page() {
   return (
     <section>
       <PageTitle>writing</PageTitle>
-      <ul className={styles.index}>
+      <ul className={styles.index} role="list">
         {getWritingPosts().map((post) => (
           <li key={post.slug} className={styles.row}>
             <div className={styles.head}>

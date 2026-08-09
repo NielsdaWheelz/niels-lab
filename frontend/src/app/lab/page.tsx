@@ -22,10 +22,12 @@ export default function Page() {
         </p>
       </div>
 
-      <ul className={`entries ${styles.list}`}>
+      <ul className={`entries ${styles.list}`} role="list">
         <li className="entry">
           <Link href="/lab/sampling">how sampling works</Link>{' '}
-          <span className="date">2026-07</span>
+          <time className="date" dateTime="2026-07">
+            2026-07
+          </time>
           <p className={styles.hook}>
             temperature, top-k, and top-p on a live token distribution — feel
             the dice reshape before the roll.

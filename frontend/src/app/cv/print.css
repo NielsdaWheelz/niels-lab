@@ -17,8 +17,11 @@
     margin: 1cm;
   }
 
-  /* Both themes print identically. */
+  /* Both themes print identically. :root:not([data-theme]) outranks the
+     no-JS prefers-color-scheme fallback in globals.css, which a bare :root
+     would lose to on specificity. */
   :root,
+  :root:not([data-theme]),
   :root[data-theme='dark'],
   :root[data-theme='light'] {
     color-scheme: light;

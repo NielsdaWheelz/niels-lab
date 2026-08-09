@@ -21,6 +21,18 @@
   gap: 0.25rem 1rem;
 }
 
+/* disclosure mark: same celadon › as evidence marks, turned when open */
+.row::before {
+  content: '\203a';
+  display: inline-block;
+  width: 1.5ch;
+  color: var(--celadon);
+}
+
+.list[open] > .row::before {
+  transform: rotate(90deg);
+}
+
 .row > h2 {
   margin-right: auto;
 }
@@ -28,4 +40,9 @@
 .rowMeta {
   color: var(--faded);
   white-space: nowrap;
+}
+
+/* each open list ends with the address of its own page */
+.permalink {
+  margin: 0.9rem 0 0;
 }

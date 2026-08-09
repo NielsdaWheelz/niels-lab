@@ -9,10 +9,9 @@
   margin-top: 1rem;
 }
 
-/* evidence body: the primary-source address; long URLs must wrap */
+/* evidence body: the labeled link to the primary source */
 .source {
   margin: 0.3rem 0 0.6rem;
-  overflow-wrap: anywhere;
 }
 
 .source img {

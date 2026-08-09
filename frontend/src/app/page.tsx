@@ -3,11 +3,8 @@ import Link from 'next/link'
 import { PageTitle } from '@/app/components/PageTitle'
 import { ListBody } from '@/app/components/ListBody'
 import { lastWritten, lists } from '@/content/lists'
-import { createPageMetadata, siteDescription } from '@/app/site'
+import { bio, bookTitle, createPageMetadata, siteDescription } from '@/app/site'
 import styles from './home.module.css'
-
-const bookTitle =
-  'The Pillow Book of Niels-Erik Nandal, written in San Francisco.'
 
 export const metadata: Metadata = {
   ...createPageMetadata({
@@ -28,21 +25,18 @@ export default function Page() {
           Lists, kept and dated. A claim links to its evidence or goes as plain
           observation.
         </p>
-        <p className={styles.subline}>
-          Niels-Erik Nandal is a senior software engineer at Solid in San
-          Francisco.
-        </p>
+        <p className={styles.subline}>{bio}</p>
       </header>
       <hr />
       <section aria-label="The lists">
-        {lists.map((list) => {
+        {lists.map((list, index) => {
           const last = lastWritten(list)
           return (
             <details
               key={list.slug}
               id={list.slug}
               className={styles.list}
-              open={list.slug === 'things-that-quicken-the-heart'}
+              open={index === 0}
             >
               <summary className={styles.row}>
                 <h2 className="list-title">{list.title}</h2>
@@ -52,16 +46,17 @@ export default function Page() {
                   <time className="date" dateTime={last}>
                     {last}
                   </time>
-                  {' · '}
-                  <Link
-                    href={`/lists/${list.slug}`}
-                    aria-label={`${list.title} — permalink`}
-                  >
-                    §
-                  </Link>
                 </span>
               </summary>
               <ListBody list={list} />
+              <p className={`chrome ${styles.permalink}`}>
+                <Link
+                  href={`/lists/${list.slug}`}
+                  aria-label={`${list.title} — permalink`}
+                >
+                  § permalink
+                </Link>
+              </p>
             </details>
           )
         })}

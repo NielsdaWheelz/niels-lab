@@ -1,6 +1,6 @@
 import { getWritingPosts } from '@/lib/content'
 import { lastWritten, lists } from '@/content/lists'
-import { log } from '@/content/log'
+import { getLedger } from '@/lib/ledger'
 import {
   bookTitle,
   getCanonicalUrl,
@@ -10,18 +10,18 @@ import {
 
 export const dynamic = 'force-static'
 
-function escapeXml(value: string) {
-  return value.replace(/[&<>"']/g, (character) => {
-    const entities: Record<string, string> = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&apos;',
-    }
+// The escape regex can only produce these five characters, so the lookup
+// never misses.
+const entities: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&apos;',
+}
 
-    return entities[character] ?? character
-  })
+function escapeXml(value: string) {
+  return value.replace(/[&<>"']/g, (character) => entities[character])
 }
 
 function rssDate(value: string) {
@@ -31,6 +31,9 @@ function rssDate(value: string) {
 type FeedItem = {
   title: string
   url: string
+  // Absent: the url is the permalink guid. Present: a stable non-permalink
+  // guid, so readers that dedupe on guid still see every row.
+  guid?: string
   description: string
   date: string
 }
@@ -54,19 +57,20 @@ export async function GET() {
     }
   })
 
-  // The log's item is its newest hand-written row: the description is data, so
-  // the feed says what actually landed instead of describing the page.
-  const newest = log.reduce((latest, event) =>
-    event.date >= latest.date ? event : latest,
-  )
-  const logItem: FeedItem = {
-    title: 'Log',
-    url: getCanonicalUrl('/log'),
-    description: newest.text,
-    date: newest.date,
-  }
+  // One item per ledger row, so the feed carries the log instead of
+  // describing the page; guids are stable per (date, text).
+  const logUrl = getCanonicalUrl('/log')
+  const logItems: FeedItem[] = (await getLedger()).map((event) => ({
+    title: `${event.date} · ${event.kind}`,
+    url: logUrl,
+    guid: `${logUrl}#${event.date} ${event.text}`,
+    description: event.failed
+      ? `${event.text} — failed: ${event.failed.lesson}`
+      : event.text,
+    date: event.date,
+  }))
 
-  const items = [...posts, ...listItems, logItem].sort((a, b) =>
+  const items = [...posts, ...listItems, ...logItems].sort((a, b) =>
     b.date.localeCompare(a.date),
   )
 
@@ -75,7 +79,7 @@ export async function GET() {
       (item) => `<item>
         <title>${escapeXml(item.title)}</title>
         <link>${escapeXml(item.url)}</link>
-        <guid isPermaLink="true">${escapeXml(item.url)}</guid>
+        <guid isPermaLink="${item.guid ? 'false' : 'true'}">${escapeXml(item.guid ?? item.url)}</guid>
         <description>${escapeXml(item.description)}</description>
         <dc:creator>${escapeXml(siteName)}</dc:creator>
         <pubDate>${rssDate(item.date)}</pubDate>
@@ -85,9 +89,8 @@ export async function GET() {
 
   const siteUrl = getCanonicalUrl('/')
   const feedUrl = getCanonicalUrl('/rss')
-  const lastBuildDate = items[0]
-    ? `<lastBuildDate>${rssDate(items[0].date)}</lastBuildDate>`
-    : ''
+  // posts + lists + log all exist by construction, so items is never empty.
+  const lastBuildDate = `<lastBuildDate>${rssDate(items[0].date)}</lastBuildDate>`
 
   const rssFeed = `<?xml version="1.0" encoding="UTF-8" ?>
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
