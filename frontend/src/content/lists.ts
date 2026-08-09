@@ -15,12 +15,13 @@ export type PillowList = {
   slug: string // kebab-case, stable, used in URL + anchors
   title: string // the merciless heading
   note?: string // optional one-line gloss under the heading
+  draft?: true // a draft list is invisible everywhere; delete the key to publish
   entries: Entry[] // ordered by the author, not by date
 }
 
 // Derived (never stored): count = entries.length; lastWritten = max(added).
 
-export const lists: PillowList[] = [
+const corpus: PillowList[] = [
   {
     slug: 'things-that-quicken-the-heart',
     title: 'Things that quicken the heart',
@@ -375,7 +376,46 @@ export const lists: PillowList[] = [
       { text: 'Hotel gyms with an actual barbell.', added: '2026-08-09' },
     ],
   },
+  // draft: titles only - the judgment lines and the title are Niels's to write.
+  {
+    slug: 'read',
+    title: 'read',
+    draft: true,
+    entries: [
+      { text: 'Hyperion — Dan Simmons', added: '2026-08-09' },
+      { text: 'The Fall of Hyperion — Dan Simmons', added: '2026-08-09' },
+      { text: 'The Last Wish — Andrzej Sapkowski', added: '2026-08-09' },
+      { text: 'Sword of Destiny — Andrzej Sapkowski', added: '2026-08-09' },
+      { text: 'The Martian — Andy Weir', added: '2026-08-09' },
+      { text: 'Project Hail Mary — Andy Weir', added: '2026-08-09' },
+      {
+        text: 'Stories of Your Life and Others — Ted Chiang',
+        added: '2026-08-09',
+      },
+      {
+        text: 'There Is No Antimemetics Division — qntm',
+        added: '2026-08-09',
+      },
+      {
+        text: 'When I Have Fears That I May Cease to Be — John Keats',
+        added: '2026-08-09',
+      },
+      {
+        text: 'the negative capability letter (to George and Tom Keats, December 1817) — John Keats',
+        added: '2026-08-09',
+      },
+      {
+        text: 'Letter #58, to Benjamin Bailey, 13 March 1818 ("The Human Seasons") — John Keats',
+        added: '2026-08-09',
+      },
+    ],
+  },
 ]
+
+// The one choke point for list drafts: the unfiltered corpus never leaves
+// this module, so every surface — home, /lists/[slug], sitemap, RSS,
+// llms.txt, llms-full.txt — reads only published lists.
+export const lists: PillowList[] = corpus.filter((list) => !list.draft)
 
 // YYYY-MM-DD compares lexicographically, so string max is date max.
 // Invariant: a PillowList has at least one entry.

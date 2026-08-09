@@ -1,6 +1,6 @@
 /// <reference types="bun" />
 import { describe, expect, test } from 'bun:test'
-import { parseFrontmatter } from './content'
+import { collectPosts, parseFrontmatter } from './content'
 
 // Shape of a real post: a title carrying its own colon, quoted values,
 // optional keys, and a body that must survive intact.
@@ -50,5 +50,26 @@ describe('parseFrontmatter', () => {
     expect(() => parseFrontmatter('---\ntitle\n---\n\nbody\n')).toThrow(
       /key: value/,
     )
+  })
+})
+
+describe('collectPosts', () => {
+  // The draft gate: `draft: true` makes a post invisible to every consumer.
+  // The draft here carries no publishedAt and no summary and an empty body,
+  // so this test also fails if the filter runs after the date sort.
+  test('drops drafts and sorts the survivors newest first', () => {
+    const posts = collectPosts([
+      {
+        slug: 'older',
+        raw: '---\ntitle: Older\npublishedAt: 2025-01-01\nsummary: s\n---\n\nbody\n',
+      },
+      { slug: 'draft', raw: '---\ntitle: Draft\ndraft: true\n---\n' },
+      {
+        slug: 'newer',
+        raw: '---\ntitle: Newer\npublishedAt: 2025-02-01\nsummary: s\n---\n\nbody\n',
+      },
+    ])
+
+    expect(posts.map((post) => post.slug)).toEqual(['newer', 'older'])
   })
 })

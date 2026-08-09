@@ -93,10 +93,6 @@ function parseFrontmatter(rawContent, relativePath, errors) {
     metadata[key] = stripOuterQuotes(rawValueParts.join(': ').trim())
   }
 
-  if (!content) {
-    errors.push(`${relativePath}: content body is empty`)
-  }
-
   return { metadata, content }
 }
 
@@ -120,15 +116,39 @@ function validateUrl(value, fieldName, relativePath, errors) {
   }
 }
 
-function validateMetadata(metadata, source, relativePath, errors) {
+function validateMetadata(metadata, content, source, relativePath, errors) {
+  if (typeof metadata.title !== 'string' || metadata.title.trim() === '') {
+    errors.push(`${relativePath}: title must be present and non-empty`)
+  }
+
+  for (const fieldName of ['repoUrl', 'liveUrl']) {
+    if (
+      typeof metadata[fieldName] === 'string' &&
+      metadata[fieldName].trim() !== ''
+    ) {
+      validateUrl(metadata[fieldName], fieldName, relativePath, errors)
+    }
+  }
+
+  // A draft needs only title + draft; its body may be empty and its
+  // publishedAt is checked only when present. Deleting the draft key is the
+  // act of publishing — everything below is what publishing requires.
+  if (metadata.draft !== undefined) {
+    if (metadata.draft !== 'true') {
+      errors.push(`${relativePath}: draft, when present, must be exactly true`)
+    }
+
+    if (metadata.publishedAt !== undefined) {
+      validatePublishedAt(metadata.publishedAt, relativePath, errors)
+    }
+
+    return
+  }
+
   for (const key of source.requiredKeys) {
     if (!Object.prototype.hasOwnProperty.call(metadata, key)) {
       errors.push(`${relativePath}: missing required frontmatter key "${key}"`)
     }
-  }
-
-  if (typeof metadata.title !== 'string' || metadata.title.trim() === '') {
-    errors.push(`${relativePath}: title must be present and non-empty`)
   }
 
   if (
@@ -144,13 +164,8 @@ function validateMetadata(metadata, source, relativePath, errors) {
     errors.push(`${relativePath}: summary must be present and non-empty`)
   }
 
-  for (const fieldName of ['repoUrl', 'liveUrl']) {
-    if (
-      typeof metadata[fieldName] === 'string' &&
-      metadata[fieldName].trim() !== ''
-    ) {
-      validateUrl(metadata[fieldName], fieldName, relativePath, errors)
-    }
+  if (!content) {
+    errors.push(`${relativePath}: content body is empty`)
   }
 }
 
@@ -219,9 +234,21 @@ function internalHrefResolves(href, listSlugs) {
     const [section, slug] = segments
 
     if (section === 'writing' || section === 'projects') {
-      return fs.existsSync(
-        path.join(frontendRoot, 'src/app', section, 'posts', `${slug}.mdx`),
+      const file = path.join(
+        frontendRoot,
+        'src/app',
+        section,
+        'posts',
+        `${slug}.mdx`,
       )
+
+      if (!fs.existsSync(file)) {
+        return false
+      }
+
+      // A draft has no page: evidence pointing at one is dead proof.
+      const match = frontmatterRegex.exec(fs.readFileSync(file, 'utf-8'))
+      return match !== null && !/^draft:/m.test(match[1])
     }
 
     if (section === 'lists') {
@@ -449,7 +476,13 @@ async function main() {
         continue
       }
 
-      validateMetadata(parsed.metadata, source, relativePath, errors)
+      validateMetadata(
+        parsed.metadata,
+        parsed.content,
+        source,
+        relativePath,
+        errors,
+      )
     }
   }
 
