@@ -83,10 +83,6 @@ const stack = [
     note: 'writing lives as MDX in /writing and renders server-side — no client bundle for prose.',
   },
   {
-    name: 'rough.js',
-    note: 'the hand-drawn canvas accents: the 404 map, the CV timeline, the homepage system diagram.',
-  },
-  {
     name: 'sugar-high',
     note: "syntax highlighting, retokenized into the site's own warm palette.",
   },
@@ -103,9 +99,8 @@ const stack = [
 const ingredients = [
   'graph-paper ruling: two layered linear-gradients on <html>, 32px apart, tinted with --color-ruling',
   'a custom dot cursor: an inline SVG data URI, terracotta over text, teal over links',
-  'a ctrl+k terminal for poking at the site from the keyboard instead of the mouse',
   'dark mode as "midnight blueprint" — one data-theme attribute flips every token on this page, no second stylesheet',
-  'hand-drawn SVG and canvas annotations: the circled "receipts" on the homepage, the torn-page 404 scene, the CV timeline dots',
+  'hand-drawn SVG annotations: the circled "receipts" on the homepage, the CV timeline dots',
 ]
 
 export default function ColophonPage() {
@@ -167,7 +162,7 @@ export default function ColophonPage() {
       <section className={styles.section} aria-labelledby="type-heading">
         <header className="section-header">
           <p className="section-index">02 / type specimens</p>
-          <h2 id="type-heading">Three faces, three jobs.</h2>
+          <h2 id="type-heading">One face, one job.</h2>
         </header>
 
         <div className={styles.specimen}>
@@ -177,27 +172,6 @@ export default function ColophonPage() {
           </p>
           <p className={styles.specimenNote}>
             Headlines, page titles, the occasional italic aside.
-          </p>
-        </div>
-
-        <div className={styles.specimen}>
-          <p className={styles.specimenLabel}>Geist Mono — the workhorse</p>
-          <p className={styles.specimenMono}>
-            $ bun run dev · NAV · 03:14:07 · 2/2 checks passed
-          </p>
-          <p className={styles.specimenNote}>
-            Navigation, timestamps, labels, and every code block on the site.
-          </p>
-        </div>
-
-        <div className={styles.specimen}>
-          <p className={styles.specimenLabel}>Caveat — the marginalia</p>
-          <p className={styles.specimenHand}>
-            a note scribbled in the margin, because rigor still needs room to
-            breathe
-          </p>
-          <p className={styles.specimenNote}>
-            Asides and annotations — the handwriting layer over the grid.
           </p>
         </div>
       </section>

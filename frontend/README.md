@@ -15,8 +15,6 @@ Frontend app for `niels-lab`.
 
 Vercel Root Directory must be `frontend`.
 
-Set `NEXT_PUBLIC_NIELS_GPT_API_BASE` in Vercel and local `.env.local` if you want terminal chat enabled.
-
 Set `NEXT_PUBLIC_SITE_URL` if you want to override the canonical site URL outside production.
 
 Enable Vercel system environment variables if you want preview and production host detection without hardcoding hosts in the app.

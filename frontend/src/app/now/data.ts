@@ -72,11 +72,6 @@ export const nowSections: NowSection[] = [
         detail: 'Landed recently, so this page reads fine at 1am too.',
       },
       {
-        title: 'ctrl+k terminal',
-        detail:
-          'A keyboard launcher for getting around the site without reaching for the mouse.',
-      },
-      {
         title: '/lab',
         detail:
           'Interactive model-internals experiments, starting with a token-sampling playground — temperature, top-k, and top-p you can actually feel.',

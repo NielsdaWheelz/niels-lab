@@ -2,8 +2,6 @@ import Link from 'next/link'
 import { ProjectsList } from '@/app/components/projects'
 import { getWritingPosts, formatDate } from '@/app/writing/utils'
 import { githubUrl, linkedinUrl } from '@/app/site'
-import { SystemMap } from '@/app/components/SystemMap'
-import { TerminalLauncher } from '@/app/components/TerminalLauncher'
 
 export default function Page() {
   const writingPosts = getWritingPosts()
@@ -46,7 +44,6 @@ export default function Page() {
             >
               inspect selected work <span aria-hidden="true">↓</span>
             </Link>
-            <TerminalLauncher />
           </div>
           <p className="hero-availability">
             <span aria-hidden="true" />
@@ -57,7 +54,15 @@ export default function Page() {
             <Link href="/lab">go poke a token sampler in the lab</Link>
           </p>
         </div>
-        <SystemMap />
+        <aside aria-label="Product engineering loop">
+          <ul>
+            <li>fuzzy problem — find the real constraint</li>
+            <li>human signal — make steering possible</li>
+            <li>deterministic core — contracts before magic</li>
+            <li>observable AI — traces, tests, evidence</li>
+          </ul>
+          <p>product loop: ship → inspect → learn</p>
+        </aside>
       </section>
 
       <dl className="proof-strip" aria-label="Current engineering profile">

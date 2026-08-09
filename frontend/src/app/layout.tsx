@@ -1,8 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { GeistMono } from 'geist/font/mono'
-import { GeistSans } from 'geist/font/sans'
-import { Newsreader, Caveat } from 'next/font/google'
+import { Newsreader } from 'next/font/google'
+import { quattro } from '@/fonts'
 import { themeInitScript } from '@/lib/theme'
 import { Navbar } from '@/app/components/nav'
 import Footer from '@/app/components/footer'
@@ -16,23 +15,13 @@ import {
   siteName,
 } from '@/app/site'
 import { StructuredData } from '@/app/components/StructuredData'
-import {
-  TerminalWrapper,
-  ContentData,
-} from '@/app/components/Terminal/TerminalWrapper'
-import { getProjects } from '@/app/projects/utils'
-import { getWritingPosts } from '@/app/writing/utils'
 
+// opsz axis kept so `font-optical-sizing: auto` has a real axis to drive.
 const newsreader = Newsreader({
   subsets: ['latin'],
   style: ['normal', 'italic'],
+  axes: ['opsz'],
   variable: '--font-serif',
-  display: 'swap',
-})
-
-const caveat = Caveat({
-  subsets: ['latin'],
-  variable: '--font-hand',
   display: 'swap',
 })
 
@@ -64,43 +53,15 @@ export const metadata: Metadata = {
   },
 }
 
-function getTerminalData(): ContentData {
-  const writingPosts = getWritingPosts().map((p) => ({
-    slug: p.slug,
-    metadata: p.metadata as Record<string, string>,
-    content: `${p.metadata.summary}\n\nRead the full note at /writing/${p.slug}`,
-  }))
-
-  const projects = getProjects().map((p) => ({
-    slug: p.slug,
-    metadata: p.metadata as Record<string, string>,
-    content: `${p.metadata.summary}\n\nInspect the full case study at /projects/${p.slug}`,
-  }))
-
-  const cv = {
-    metadata: {
-      title: 'CV',
-      publishedAt: '2025-12-01',
-      summary: 'Professional experience and background',
-    },
-    content:
-      'Software engineer working across AI systems, deterministic backends, and product interfaces.\n\nRead the full background at /cv',
-  }
-
-  return { writingPosts, projects, cv }
-}
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const terminalData = getTerminalData()
-
   return (
     <html
       lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable} ${newsreader.variable} ${caveat.variable}`}
+      className={`${newsreader.variable} ${quattro.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -114,7 +75,6 @@ export default function RootLayout({
         <Navbar />
         <main id="main-content">{children}</main>
         <Footer />
-        <TerminalWrapper data={terminalData} />
         <Analytics />
         <SpeedInsights />
       </body>
