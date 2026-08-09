@@ -1,4 +1,5 @@
 import {
+  bio,
   getCanonicalUrl,
   getPersonSchemaId,
   getWebsiteSchemaId,
@@ -31,8 +32,21 @@ export function StructuredData() {
     '@id': personId,
     name: siteName,
     url: siteUrl,
-    jobTitle: 'AI Systems Engineer',
-    description: siteDescription,
+    jobTitle: 'Senior Software Engineer',
+    worksFor: {
+      '@type': 'Organization',
+      name: 'Solid',
+      url: 'https://solid.tech',
+    },
+    // Byte-identical to the visible bio; the string lives once, in site.ts.
+    description: bio,
+    knowsAbout: [
+      'Backend systems',
+      'Language models',
+      'Python',
+      'TypeScript',
+      'PostgreSQL',
+    ],
     sameAs: socialProfileUrls,
   }
 

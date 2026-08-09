@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { getProjects } from '@/app/projects/utils'
-import { getWritingPosts } from '@/app/writing/utils'
+import { getProjects, getWritingPosts } from '@/lib/content'
+import { lastWritten, lists } from '@/content/lists'
 import { getSiteUrl } from '@/app/site'
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -14,8 +14,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${siteUrl}/projects/${project.slug}`,
   }))
 
+  const listPages = lists.map((list) => ({
+    url: `${siteUrl}/lists/${list.slug}`,
+    lastModified: lastWritten(list),
+  }))
+
   const routes = [
     '',
+    '/log',
     '/projects',
     '/writing',
     '/cv',
@@ -27,5 +33,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${siteUrl}${route}`,
   }))
 
-  return [...routes, ...projects, ...writing]
+  return [...routes, ...listPages, ...projects, ...writing]
 }

@@ -1,13 +1,15 @@
-import { getWritingPosts } from '@/app/writing/utils'
-import { getProjects } from '@/app/projects/utils'
+import { getProjects, getWritingPosts } from '@/lib/content'
+import { lastWritten, lists } from '@/content/lists'
+import { getLedger } from '@/lib/ledger'
 import { entries, skills } from '@/app/cv/data'
 import {
+  bioExtended,
+  bookTitle,
   getSiteUrl,
   githubUrl,
   huggingFaceUrl,
   linkedinUrl,
   siteDescription,
-  siteName,
   xUrl,
 } from '@/app/site'
 
@@ -46,6 +48,7 @@ function renderCv() {
 
 export async function GET() {
   const siteUrl = getSiteUrl()
+  const ledger = await getLedger()
 
   const projects = [...getProjects()].sort((a, b) =>
     b.metadata.publishedAt.localeCompare(a.metadata.publishedAt),
@@ -53,6 +56,43 @@ export async function GET() {
   const writingPosts = [...getWritingPosts()].sort((a, b) =>
     b.metadata.publishedAt.localeCompare(a.metadata.publishedAt),
   )
+
+  // Every entry and every proof, from the same typed data the pages render.
+  const listsSection = lists
+    .map((list) => {
+      const entryLines = list.entries
+        .map((entry) => {
+          if (!entry.evidence) {
+            return `- ${entry.text}`
+          }
+
+          const proof =
+            'href' in entry.evidence ? entry.evidence.href : entry.evidence.src
+          // A machine reading this file has no base URL: every proof is absolute.
+          const target = proof.startsWith('/') ? `${siteUrl}${proof}` : proof
+
+          return `- ${entry.text}\n  - Evidence: ${entry.evidence.label} — ${target}`
+        })
+        .join('\n')
+
+      return `### ${list.title}
+
+**URL:** ${siteUrl}/lists/${list.slug}
+**Entries:** ${list.entries.length}
+**Last written:** ${lastWritten(list)}${list.note ? `\n**Note:** ${list.note}` : ''}
+
+${entryLines}`
+    })
+    .join('\n\n---\n\n')
+
+  const logSection = ledger
+    .map((event) => {
+      const lesson = event.failed ? ` — failed: ${event.failed.lesson}` : ''
+      const source = event.href ? ` — ${event.href}` : ''
+
+      return `- ${event.date} (${event.kind}) ${event.text}${lesson}${source}`
+    })
+    .join('\n')
 
   const projectsSection = projects
     .map((project) => {
@@ -82,22 +122,26 @@ ${stripJsxLines(post.content)}`
     })
     .join('\n\n---\n\n')
 
-  const body = `# ${siteName} — Full Corpus
+  const body = `# ${bookTitle} — Full Corpus
 
 > ${siteDescription}
 
-This document contains the entire readable corpus of ${siteUrl} — bio,
-every project, every writing post, and the CV — concatenated as one
-plain-text file for language models. For a short index instead, see
-[llms.txt](${siteUrl}/llms.txt).
+This document contains the entire readable corpus of ${siteUrl} — bio, every
+list entry with its evidence, every log row, every project, every writing post,
+and the CV — concatenated as one plain-text file for language models. For a
+short index instead, see [llms.txt](${siteUrl}/llms.txt).
 
 ## About
 
-Niels Erik Nandal is an AI systems engineer. He builds deterministic backends,
-legible interfaces, and readable software, and this site is the record of
-that work: production projects with real architecture and evidence behind
-them, technical writing about what building them taught him, and a
-structured CV covering his education, experience, and skills.
+${bioExtended}
+
+## Lists
+
+${listsSection}
+
+## Log
+
+${logSection}
 
 ## Projects
 

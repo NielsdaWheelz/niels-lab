@@ -1,230 +1,133 @@
+import Link from 'next/link'
 import { PageTitle } from '@/app/components/PageTitle'
 import { createPageMetadata } from '@/app/site'
-import { ColorSwatch } from './ColorSwatch'
 import styles from './colophon.module.css'
 
 export const metadata = createPageMetadata({
   title: 'Colophon',
   description:
-    "The design tokens, type specimens, stack, and provenance behind this site's sketchbook — the notebook inspecting itself.",
+    'How this site is set: the six tokens, the two faces, the client-JS confession, and the Homunculus plan.',
   path: '/colophon',
 })
 
-const paletteTokens = [
+// The whole palette (globals.css). Chips are painted with the live custom
+// property, never a frozen value, so the theme toggle repaints them.
+const tokens = [
+  { name: '--ink', role: 'the page ground', chip: styles.ink },
+  { name: '--lamplight', role: 'body text', chip: styles.lamplight },
+  { name: '--murasaki', role: 'headings and links', chip: styles.murasaki },
   {
-    varName: '--color-bg',
-    role: 'the page — cream paper by day, midnight blueprint by night',
-    light: '#fbf4e2',
-    dark: '#10151c',
+    name: '--celadon',
+    role: 'evidence marks, dates, counts',
+    chip: styles.celadon,
   },
-  {
-    varName: '--color-bg-alt',
-    role: 'raised panel — cards, code blocks, callouts',
-    light: '#f4ebd3',
-    dark: '#171e27',
-  },
-  {
-    varName: '--color-text',
-    role: 'ink — body copy',
-    light: '#2e2a23',
-    dark: '#e6dfcc',
-  },
-  {
-    varName: '--color-text-muted',
-    role: 'faded ink — captions, meta, secondary copy',
-    light: '#6f675a',
-    dark: '#97917f',
-  },
-  {
-    varName: '--color-terracotta',
-    role: 'primary accent — links, CTAs, the stamp',
-    light: '#d4552a',
-    dark: '#ef8250',
-  },
-  {
-    varName: '--color-sage',
-    role: 'secondary accent — the deep teal, hovers, marginalia',
-    light: '#17697a',
-    dark: '#5cb8c9',
-  },
-  {
-    varName: '--color-gold',
-    role: 'tertiary accent — the ochre, used sparingly',
-    light: '#c0932f',
-    dark: '#d9b35e',
-  },
-  {
-    varName: '--color-border',
-    role: 'paper edge — dividers, card outlines',
-    light: '#e4d9bf',
-    dark: '#29323e',
-  },
-] as const
-
-const stack = [
-  {
-    name: 'Next.js 16',
-    note: 'App Router, React Server Components — the whole site runs on it.',
-  },
-  {
-    name: 'React 19',
-    note: 'actions and refs-as-props mean fewer wrappers between intent and pixels.',
-  },
-  {
-    name: 'TypeScript, strict',
-    note: '"readable is a feature" applies to the source too, not just the interface.',
-  },
-  {
-    name: 'Bun',
-    note: 'package manager and script runner for install, dev, and build.',
-  },
-  {
-    name: 'next-mdx-remote',
-    note: 'writing lives as MDX in /writing and renders server-side — no client bundle for prose.',
-  },
-  {
-    name: 'sugar-high',
-    note: "syntax highlighting, retokenized into the site's own warm palette.",
-  },
-  {
-    name: 'hand-rolled CSS',
-    note: 'one globals.css plus a CSS module per component — no Tailwind, no UI kit.',
-  },
-  {
-    name: 'Vercel',
-    note: 'build, deploy, analytics, and speed insights.',
-  },
-] as const
-
-const ingredients = [
-  'graph-paper ruling: two layered linear-gradients on <html>, 32px apart, tinted with --color-ruling',
-  'a custom dot cursor: an inline SVG data URI, terracotta over text, teal over links',
-  'dark mode as "midnight blueprint" — one data-theme attribute flips every token on this page, no second stylesheet',
-  'hand-drawn SVG annotations: the circled "receipts" on the homepage, the CV timeline dots',
+  { name: '--rule', role: 'hairlines', chip: styles.rule },
+  { name: '--faded', role: 'secondary text', chip: styles.faded },
 ]
 
 export default function ColophonPage() {
   return (
-    <section className={styles.page}>
+    <article>
       <PageTitle>colophon</PageTitle>
-      <p className="page-intro">
-        A colophon used to be the printer&rsquo;s mark at the back of a book —
-        who set the type, on what press, in which face. This is that page,
-        except the book is a website and it can show its work instead of just
-        describing it.
-      </p>
-      <p className={styles.invite}>
-        Everything below is rendered with the same custom properties, fonts, and
-        libraries that draw this very sentence. Toggle the theme in the nav —
-        the swatches, and the whole page around them, will follow.
-      </p>
 
-      <section className={styles.section} aria-labelledby="palette-heading">
-        <header className="section-header">
-          <p className="section-index">01 / palette, live</p>
-          <h2 id="palette-heading">Eight variables, two moods.</h2>
-          <p>
-            Every chip below is painted with the actual custom property, not a
-            frozen hex — flip the theme and watch them repaint. Click one to
-            copy its variable name.
-          </p>
-        </header>
-
-        <div className={styles.swatchGrid}>
-          {paletteTokens.map((token) => (
-            <ColorSwatch key={token.varName} {...token} />
-          ))}
-        </div>
-
-        <p className={`margin-note ${styles.marginAside}`}>
-          yes — I know you might be reading these values in devtools right now.
-          that&rsquo;s the point.
+      <div className="prose">
+        <h2>What this is</h2>
+        <p>
+          A zuihitsu — &quot;following the brush&quot; — after Sei Shōnagon, who
+          kept lists in a drawer of her writing desk around the year 1000 and
+          was embarrassed when they circulated. Hers were merciless and exact:
+          elegant things, hateful things, things that quicken the heart. This
+          site borrows the form with one amendment a Heian court lady never
+          needed: every checkable claim is wired to primary evidence, and what
+          cannot be checked is written as plain observation.
         </p>
 
-        <div className={styles.atmosphereGrid}>
-          <div className={styles.atmosphereCard}>
-            <div className={styles.rulingDemo} aria-hidden="true" />
-            <p>
-              <code>--color-ruling</code> — the graph-paper grid, a teal at
-              roughly 5% opacity so it reads as texture, not noise.
-            </p>
+        <h2>How it is made</h2>
+        <p>
+          Next.js, App Router, React Server Components; pages are static first
+          and assembled on the server. The lists are not a database and not
+          markdown — they are typed TypeScript data, reviewed like code, and the
+          type checker is the CMS. The CSS is written by hand: one file of
+          tokens, a module per component, no framework. Two faces do all the
+          work: Newsreader for everything you read, iA Writer Quattro for dates,
+          counts, and chrome. The tokens are named for what they are — ink for
+          the ground, lamplight for the text, murasaki for headings and links,
+          celadon for evidence and dates. Dark is the canonical theme; this is
+          night writing. Light is its true inverse, not an afterthought.
+        </p>
+
+        <dl className={styles.rows}>
+          <div className={styles.row}>
+            <dt className="chrome">Newsreader</dt>
+            <dd className={styles.reading}>Things that quicken the heart</dd>
           </div>
-          <div className={styles.atmosphereCard}>
-            <div className={styles.shadowDemo} aria-hidden="true" />
-            <p>
-              <code>--color-shadow</code> — the one shadow color on the site,
-              reused everywhere something needs to lift off the paper.
-            </p>
+          <div className={styles.row}>
+            <dt className="chrome">iA Writer Quattro</dt>
+            <dd className="date">2026-08-09 · 250ms · 68ch</dd>
           </div>
-        </div>
-      </section>
+        </dl>
 
-      <section className={styles.section} aria-labelledby="type-heading">
-        <header className="section-header">
-          <p className="section-index">02 / type specimens</p>
-          <h2 id="type-heading">One face, one job.</h2>
-        </header>
-
-        <div className={styles.specimen}>
-          <p className={styles.specimenLabel}>Newsreader — display serif</p>
-          <p className={styles.specimenSerif}>
-            Build the magic, keep the receipts.
-          </p>
-          <p className={styles.specimenNote}>
-            Headlines, page titles, the occasional italic aside.
-          </p>
-        </div>
-      </section>
-
-      <section className={styles.section} aria-labelledby="stack-heading">
-        <header className="section-header">
-          <p className="section-index">03 / stack</p>
-          <h2 id="stack-heading">What it&rsquo;s actually made of.</h2>
-        </header>
-        <dl className={styles.stackList}>
-          {stack.map((item) => (
-            <div className={styles.stackItem} key={item.name}>
-              <dt>{item.name}</dt>
-              <dd>{item.note}</dd>
+        <dl className={styles.rows}>
+          {tokens.map((token) => (
+            <div className={styles.row} key={token.name}>
+              <dt className="chrome">
+                <span
+                  className={`${styles.chip} ${token.chip}`}
+                  aria-hidden="true"
+                />
+                {token.name}
+              </dt>
+              <dd className={styles.role}>{token.role}</dd>
             </div>
           ))}
         </dl>
-      </section>
 
-      <section className={styles.section} aria-labelledby="ingredients-heading">
-        <header className="section-header">
-          <p className="section-index">04 / ingredients</p>
-          <h2 id="ingredients-heading">The small decisions that add up.</h2>
-        </header>
-        <ul className={styles.ingredientsList}>
-          {ingredients.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-      </section>
+        <p>
+          Both faces are vendored in the repository under the SIL Open Font
+          License; the chips are painted with the live custom properties, so the
+          theme toggle repaints them. Motion is budgeted at one animation — a
+          250ms ink-reveal when a disclosure opens — and nothing else on the
+          site moves.
+        </p>
 
-      <section className={styles.section} aria-labelledby="provenance-heading">
-        <header className="section-header">
-          <p className="section-index">05 / provenance</p>
-          <h2 id="provenance-heading">Who built this, honestly.</h2>
-        </header>
+        <h2>The confession</h2>
         <p>
-          This site is designed and built by Niels, in collaboration with Claude
-          — Anthropic&rsquo;s model, working as a pair-programmer with strong
-          opinions about CSS. That is not a caveat tucked at the bottom of the
-          page; it is the point. The same &ldquo;build the magic, keep the
-          receipts&rdquo; ethic that runs through the rest of this site applies
-          to how the site itself got made.
+          Two client components run on this site: the theme toggle, and the
+          sampling playground in <Link href="/lab">the lab</Link>, which rolls
+          its dice in your browser or not at all. Everything else is markup sent
+          finished from the server. Evidence disclosures are details elements;
+          they open without JavaScript, in reader mode, and under curl. If a
+          sentence does not exist in the initial HTML, it does not exist.
         </p>
-        <p>The git history keeps the receipts, commit by commit:</p>
-        <pre>
-          <code>Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code>
-        </pre>
+
+        <h2>Evidence</h2>
         <p>
-          No ghostwriting, no pretending otherwise. If a line of CSS turned out
-          clever, it is worth knowing whose idea it was.
+          Entries that make a checkable claim carry a small celadon mark. Open
+          it and you get a label and a link to the primary source — a
+          repository, a checkpoint, a live system, a page of working notes.
+          Entries without proof ship unmarked; there are no placeholders, and a
+          dead evidence link fails the build. The lifting numbers are the
+          deliberate exception: they appear as written observation only, the way
+          a diary would have them.
         </p>
-      </section>
-    </section>
+
+        <h2>Homunculus, forthcoming</h2>
+        <p>
+          Version two of this site will contain the Homunculus: a small language
+          model trained on my own writing, answering questions as the site
+          rather than about it. Pessoa kept heteronyms; I intend to keep one
+          made of matrices. It is not built, and this paragraph is currently its
+          entire implementation.
+        </p>
+
+        <h2>Provenance</h2>
+        <p>
+          Designed and written by Niels-Erik Nandal, built in collaboration with
+          Claude, Anthropic&apos;s model, working as a pair programmer. The git
+          history records who did what, commit by commit; nothing here pretends
+          otherwise.
+        </p>
+      </div>
+    </article>
   )
 }

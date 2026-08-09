@@ -1,0 +1,21 @@
+/* the list's one-line gloss, between heading and entries */
+.note {
+  margin: 1rem 0 0;
+  color: var(--faded);
+  font-style: italic;
+}
+
+.body {
+  margin-top: 1rem;
+}
+
+/* evidence body: the primary-source address; long URLs must wrap */
+.source {
+  margin: 0.3rem 0 0.6rem;
+  overflow-wrap: anywhere;
+}
+
+.source img {
+  display: block;
+  margin-top: 0.35rem;
+}

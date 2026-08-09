@@ -8,6 +8,7 @@ import Footer from '@/app/components/footer'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import {
+  bookTitle,
   createPageMetadata,
   getSiteUrl,
   shouldIndexSite,
@@ -28,7 +29,7 @@ const newsreader = Newsreader({
 const siteUrl = getSiteUrl()
 const shouldIndex = shouldIndexSite()
 const rootMetadata = createPageMetadata({
-  title: `${siteName} — AI Systems Engineer`,
+  title: bookTitle,
   description: siteDescription,
   path: '/',
 })
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
   ...rootMetadata,
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${siteName} — AI Systems Engineer`,
+    default: bookTitle,
     template: `%s — ${siteName}`,
   },
   robots: {

@@ -4,9 +4,11 @@ export default function Footer() {
   return (
     <footer className="site-footer">
       <p>
-        Niels-Erik Nandal · <Link href="/cv">cv</Link> ·{' '}
-        <a href="mailto:niels.erik.nandal@gmail.com">email</a> ·{' '}
-        <Link href="/colophon">colophon</Link>
+        For the record, <Link href="/cv">the CV</Link>. For correspondence,{' '}
+        <a href="mailto:niels.erik.nandal@gmail.com">
+          niels.erik.nandal@gmail.com
+        </a>
+        . For the making of it, <Link href="/colophon">the colophon</Link>.
       </p>
     </footer>
   )

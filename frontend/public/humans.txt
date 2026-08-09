@@ -1,11 +1,11 @@
 /* TEAM */
-Niels Erik Nandal, AI Systems Engineer
+Niels-Erik Nandal, Senior Software Engineer
 
 /* SITE STACK */
-Next.js 16, React 19, Bun, MDX, rough.js, handcrafted CSS
+Next.js 16, React 19, Bun, MDX, handcrafted CSS
 
-/* FEATURES */
-This site has a real terminal. Try it: ctrl+k
+/* TYPE */
+Newsreader for reading, iA Writer Quattro for dates and chrome
 
-/* HANDCRAFTED */
-With warm cream paper and wobbly ink lines.
+/* THE BOOK */
+A zuihitsu of dated lists. Every checkable claim links to its evidence.

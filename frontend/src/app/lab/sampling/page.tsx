@@ -13,26 +13,29 @@ export const metadata = createPageMetadata({
 
 export default function Page() {
   return (
-    <article className={styles.page}>
-      <p className={styles.kicker}>lab / 001 · interactive</p>
+    <article>
       <PageTitle>how sampling works</PageTitle>
 
-      <p className={styles.lead}>
-        A language model doesn’t pick a word — it produces a{' '}
-        <em>distribution</em> over every word, then rolls dice against it. The
-        knobs you set at inference time (temperature, top-k, top-p) reshape
-        those dice before the roll. Below is a hand-authored toy distribution
-        for one prompt. Drag the sliders and watch the whole shape breathe.
-      </p>
+      <div className="prose">
+        <p>
+          A language model doesn’t pick a word — it produces a{' '}
+          <em>distribution</em> over every word, then rolls dice against it. The
+          knobs you set at inference time (temperature, top-k, top-p) reshape
+          those dice before the roll. Below is a hand-authored toy distribution
+          for one prompt. Drag the sliders and watch the whole shape breathe.
+        </p>
+      </div>
 
       <SamplingPlayground />
 
-      <p className="margin-note">
-        toy logits, real math — the softmax and the cuts are exactly what your
-        favorite model runs.
-      </p>
+      <aside className={styles.note}>
+        <p>
+          toy logits, real math — the softmax and the cuts are exactly what your
+          favorite model runs.
+        </p>
+      </aside>
 
-      <section className={styles.explainer}>
+      <section className="prose">
         <h2>What you’re actually looking at</h2>
         <p>
           The final layer of a transformer emits one raw score — a{' '}
@@ -85,10 +88,12 @@ export default function Page() {
           the tail floods with mass.
         </p>
 
-        <p className="margin-note">
-          temperature only rescales — the <em>ordering</em> of tokens never
-          changes, no matter how hot it gets.
-        </p>
+        <aside className={styles.note}>
+          <p>
+            temperature only rescales — the <em>ordering</em> of tokens never
+            changes, no matter how hot it gets.
+          </p>
+        </aside>
 
         <h2>Top-k and top-p: cutting the tail</h2>
         <p>
@@ -159,8 +164,9 @@ export default function Page() {
         </p>
       </section>
 
-      <p className={styles.backLink}>
-        <Link href="/lab">← back to the lab</Link>
+      <hr />
+      <p className={styles.back}>
+        <Link href="/lab">back to the lab</Link>
       </p>
     </article>
   )

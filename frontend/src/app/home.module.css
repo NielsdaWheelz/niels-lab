@@ -1,0 +1,31 @@
+/* the book's index: title line, sublines, table of lists */
+
+.subline {
+  margin: 0;
+  color: var(--faded);
+}
+
+.subline + .subline {
+  margin-top: 0.35rem;
+}
+
+.list + .list {
+  margin-top: 1.4rem;
+}
+
+/* summary row: title left, chrome right; wraps on narrow screens */
+.row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+}
+
+.row > h2 {
+  margin-right: auto;
+}
+
+.rowMeta {
+  color: var(--faded);
+  white-space: nowrap;
+}

@@ -34,9 +34,19 @@ function normalizeSiteUrl(value: string | undefined, assumeHttps = false) {
   }
 }
 
-export const siteName = 'Niels Erik Nandal'
+export const siteName = 'Niels-Erik Nandal'
+export const bookTitle =
+  'The Pillow Book of Niels-Erik Nandal, written in San Francisco.'
 export const siteDescription =
-  'AI systems engineer building ambitious products with deterministic backends, legible interfaces, and readable software.'
+  'Senior software engineer at Solid in San Francisco. A book of lists — training, reading, shipped systems — with the evidence attached.'
+
+// Canonical bio. Ships byte-identical in JSON-LD, llms.txt, and the visible
+// about text on the home page (docs/rules.md, "Machine surfaces").
+export const bio =
+  'Niels-Erik Nandal is a senior software engineer at Solid in San Francisco.'
+// The long form opens with the canonical sentence, so the two cannot drift.
+export const bioExtended = `${bio} He came to software through molecular biology, behavioural-economics research, and low-level professional hockey, and learned to program in three months of six-day weeks. He lifts, reads long books, and keeps this site as a book of lists in which every checkable claim links to its evidence.`
+
 export const githubUrl = 'https://github.com/NielsdaWheelz'
 export const linkedinUrl = 'https://www.linkedin.com/in/nielseriknandal/'
 export const xUrl = 'https://x.com/the_powertool'
