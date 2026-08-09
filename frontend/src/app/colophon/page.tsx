@@ -82,6 +82,16 @@ export default function ColophonPage() {
           ))}
         </dl>
 
+        <p>
+          iA Writer Quattro is vendored in the repository under the SIL Open
+          Font License, alongside the Newsreader files the OG card is set in;
+          the reading face itself is fetched once at build time and self-hosted.
+          The chips above are painted with the live custom properties, so the
+          theme toggle repaints them. Motion is budgeted at one animation — a
+          250ms ink-reveal when a disclosure opens — and nothing else on the
+          site moves.
+        </p>
+
         <h2>The confession</h2>
         <p>
           Two client components run on this site: the theme toggle, and the

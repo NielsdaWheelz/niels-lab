@@ -11,7 +11,7 @@ export const entries = [
   {
     title: 'Fractal Tech – Software Engineering Fellowship',
     subtitle: 'Full-time, six-day weeks, 13-hour days',
-    date: 'October 2025 – March 2026',
+    date: 'October 2025 – December 2025',
     category: 'education' as const,
   },
   {

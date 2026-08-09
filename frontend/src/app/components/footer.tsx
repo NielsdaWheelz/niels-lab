@@ -8,7 +8,7 @@ export default function Footer() {
         <a href="mailto:niels.erik.nandal@gmail.com">
           niels.erik.nandal@gmail.com
         </a>
-        .
+        . For the making of it, <Link href="/colophon">the colophon</Link>.
       </p>
     </footer>
   )
