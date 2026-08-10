@@ -6,7 +6,7 @@ import styles from './log.module.css'
 export const revalidate = 86400
 
 const description =
-  'A dated ledger of training, reading, and shipping. The failures stay in.'
+  'A dated ledger of lifts, pages, and shipped work; failed entries stay, struck through, with the lesson attached.'
 
 export const metadata = createPageMetadata({
   title: 'Log',
@@ -26,7 +26,10 @@ export default async function LogPage() {
       </p>
 
       {isStale(events, today) ? (
-        <p className={`chrome ${styles.deload}`}>deload week.</p>
+        <p className={`chrome ${styles.deload}`}>
+          Nothing logged in the last fortnight: no row written by hand, no push
+          to a public main.
+        </p>
       ) : null}
 
       <ol className={styles.rows} role="list">

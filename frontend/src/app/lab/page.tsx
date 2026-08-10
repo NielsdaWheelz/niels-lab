@@ -6,7 +6,7 @@ import styles from './lab.module.css'
 export const metadata = createPageMetadata({
   title: 'Lab',
   description:
-    'Mechanisms from inside a language model, rebuilt small enough to turn over by hand.',
+    'Interactive pages that demonstrate language-model mechanisms, starting with token sampling.',
   path: '/lab',
 })
 
@@ -17,8 +17,9 @@ export default function Page() {
 
       <div className="prose">
         <p>
-          Mechanisms from inside a language model, rebuilt small enough to turn
-          over by hand. Each one runs in your browser and calls nothing home.
+          Mechanisms from inside a language model, rebuilt small enough to
+          operate by hand. Each one runs in your browser and makes no network
+          requests.
         </p>
       </div>
 
@@ -29,8 +30,8 @@ export default function Page() {
             2026-07
           </time>
           <p className={styles.hook}>
-            temperature, top-k, and top-p on a live token distribution — feel
-            the dice reshape before the roll.
+            one toy distribution, three knobs, and the discarded mass kept
+            visible.
           </p>
         </li>
       </ul>

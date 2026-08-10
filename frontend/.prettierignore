@@ -1,2 +1,7 @@
 .next
 node_modules
+# the author's essay bodies are byte-sacred; prettier would rewrite them
+src/app/writing/posts/fractal-week-one.mdx
+src/app/writing/posts/fractal-week-two.mdx
+src/app/writing/posts/fractal-week-three.mdx
+src/app/writing/posts/fractal-week-four.mdx

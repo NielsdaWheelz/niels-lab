@@ -1,0 +1,72 @@
+---
+title: 'ariel'
+publishedAt: '2026-08-09'
+summary: 'A single-user Discord agent whose only action surface is a Python program run in a gVisor sandbox.'
+repoUrl: 'https://github.com/NielsdaWheelz/ariel'
+---
+
+ariel is a personal AI agent runtime, Discord-primary and single-user: a
+FastAPI backend, a Discord bot, Postgres persistence, and one agent loop
+that serves both my messages and its own proactive wakes. Its capabilities
+are Gmail, Calendar, Drive, Maps, weather, web search, and web extraction,
+with approval gates on side effects. The doctrine is
+[written down](https://github.com/NielsdaWheelz/ariel/blob/107e0d242da5c01df629f4af6f0bd42b77e2a81d/docs/ai-first.md):
+AI owns judgment; deterministic code owns the service rails, and never
+performs product judgment by heuristic.
+
+The first decision is the action surface. The model does not emit JSON
+tool calls; it writes a Python program, and the runtime
+[executes it in a gVisor sandbox](https://github.com/NielsdaWheelz/ariel/blob/107e0d242da5c01df629f4af6f0bd42b77e2a81d/src/ariel/sandbox_runtime.py)
+— one persistent rootless `runsc` container, a fresh guest process per
+program, capabilities exposed as typed syscalls over line-delimited JSON,
+hard caps at 64 syscalls, 64KB of source, 5 seconds of CPU, 256MB of
+memory, 30 seconds wall clock. The
+[commit that landed it](https://github.com/NielsdaWheelz/ariel/commit/b026bfa659e551d344171bfe1ffec6b1172983cf)
+deleted the flat JSON tool-call list, and a terminal subsystem had already
+been cut before that. Two predecessor designs, both deleted.
+
+The second decision was subtraction:
+[sessions were abolished](https://github.com/NielsdaWheelz/ariel/commit/c4fb12916ff319feb09d1736cd96ed18ae5582b3).
+The repo had built chat-style sessions with auto-rotation, thresholds, and
+reason codes; the
+[forward-only migration](https://github.com/NielsdaWheelz/ariel/blob/107e0d242da5c01df629f4af6f0bd42b77e2a81d/alembic/versions/20260526_0070_drop_sessions.py)
+deletes all of it, and turns and events become globally scoped. The commit
+message argues that sessions were a judgment, not just data — and judgments
+belong to the model.
+
+The third was forced by a bill. The
+[cutover spec](https://github.com/NielsdaWheelz/ariel/blob/107e0d242da5c01df629f4af6f0bd42b77e2a81d/docs/openrouter-cost-cutover.md)
+quantifies four days of uncached Claude calls from the production events
+table: $17.28 across 5.67M input tokens in 76 calls, zero cached. The same spec ships four coupled changes
+at once:
+[MAIN to Kimi K2.6](https://github.com/NielsdaWheelz/ariel/commit/864dd0e4340b0f0ee130dbd9868a05d46f303c23),
+[OpenRouter prompt caching on](https://github.com/NielsdaWheelz/ariel/commit/52de14deb71de6442de52b665ea7cd0925d7084a),
+the recent-events budget cut from 100K to 20K tokens, and a bounded
+grounding-retry loop. Model identity is a
+[code constant](https://github.com/NielsdaWheelz/ariel/blob/107e0d242da5c01df629f4af6f0bd42b77e2a81d/src/ariel/models.py),
+not deployment config.
+
+Side effects run a fail-closed
+[taint policy](https://github.com/NielsdaWheelz/ariel/blob/107e0d242da5c01df629f4af6f0bd42b77e2a81d/src/ariel/policy_engine.py):
+the model's own taint assertions are advisory; runtime provenance decides; a
+tainted irreversible write or external send is denied outright, and the
+ambiguous cases escalate to approval.
+
+Numbers: 286 commits, 2026-02-27 to 2026-05-27;
+[71 migrations](https://github.com/NielsdaWheelz/ariel/tree/107e0d242da5c01df629f4af6f0bd42b77e2a81d/alembic/versions)
+in twelve weeks; 969 test functions in 78 files, test lines outweighing
+source 45,481 to 39,724 by wc -l; 143 commits carry Claude co-author
+trailers.
+
+What is wrong with it. The README still documents the `/v1/sessions`
+endpoints that were removed the day before the last commit. A
+[three-bug stack](https://github.com/NielsdaWheelz/ariel/commit/4de92a4ab1f036c57f7529c5fdfca3c71289cca8)
+silently dropped every proactive Gmail wake from the day Google was
+connected until 2026-05-26 — the push pipeline shipped without a liveness
+check. The migration ledger is a record of churn: proactive tables built and
+dropped.
+The gVisor tests skip wherever `runsc` is not installed, and that is the one
+layer that must not go untested.
+
+It serves one user, one guild, one box on a tailnet. The user is satisfied
+and biased.

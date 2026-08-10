@@ -1,0 +1,67 @@
+---
+title: 'agency'
+publishedAt: '2026-08-09'
+summary: 'A Go daemon that gives each coding-agent session its own worktree: released, reworked without a release, then rewritten in private.'
+repoUrl: 'https://github.com/NielsdaWheelz/agency'
+---
+
+agency is a Go CLI and daemon that runs AI coding agents in parallel on one
+machine: each session gets an
+[isolated git worktree](https://github.com/NielsdaWheelz/agency/blob/ecc0ee9898731a44e4bbe29b7752afccbbb09d7a/docs/git-worktrees.md),
+a Claude Code or Codex runner
+[launched in tmux](https://github.com/NielsdaWheelz/agency/blob/ecc0ee9898731a44e4bbe29b7752afccbbb09d7a/README.md),
+[automatic checkpoints](https://github.com/NielsdaWheelz/agency/commit/5b8a5a88d5bc7bba25f20805f1b285ca2637a40f),
+and a path to land the diff as a GitHub PR, installed from a
+[Homebrew tap](https://github.com/NielsdaWheelz/homebrew-tap/blob/24e16474916c52b3e42abcb30b68830c73220702/agency.rb).
+Several agents on one repo collide unless each owns its worktree, and
+parallel sessions are wasted unless something reports which one is waiting
+for input; agency automates the isolation and the supervision.
+
+The [first commit](https://github.com/NielsdaWheelz/agency/commit/efe409f49fd9be9083c3872f2474190eca511b4d)
+is 2025-12-12. A
+[constitution landed as PR #1](https://github.com/NielsdaWheelz/agency/commit/3c0e5b3d7b477e7f804de3ee41f9a918d553f012)
+before any code; I
+[rewrote it from scratch](https://github.com/NielsdaWheelz/agency/commit/9f3507eb94721de1b8f2b7f43586c67064af26df)
+three weeks later, still before implementation. v1 shipped: fifteen releases,
+v0.1.0-beta through v1.2.9 by 2026-01-22,
+[built CGO-free](https://github.com/NielsdaWheelz/agency/blob/ecc0ee9898731a44e4bbe29b7752afccbbb09d7a/.goreleaser.yaml)
+for darwin and linux.
+
+Then the rework. v1 ran git and tmux directly from CLI commands over JSON
+state; from February every mutation moved behind a
+[daemon](https://github.com/NielsdaWheelz/agency/commit/bbf2b5c70c7523655b76ee6cdc1cd33cc4131b18)
+owning invocations, checkpoints,
+[durable PR merges](https://github.com/NielsdaWheelz/agency/commit/17bdd759171694bda99e86e526058bbffe24f39e),
+and an append-only event log, with the CLI reduced to a client. The runner
+contract shrank to
+[one file](https://github.com/NielsdaWheelz/agency/blob/ecc0ee9898731a44e4bbe29b7752afccbbb09d7a/internal/runnerstatus/runnerstatus.go),
+`runner_status.json`, with four canonical states; unknown provider events
+degrade to diagnostics, not invented states. The alternative, parsing
+provider output streams for meaning, is what it replaced. Each
+redesign was a hard cutover:
+[target-first CLI syntax](https://github.com/NielsdaWheelz/agency/commit/73e7fadad96ce282008308f4808d90cd1b2768e6),
+[config schema v3](https://github.com/NielsdaWheelz/agency/commit/d3e6af0d7db6c60c125a920a57fbac2edfdf3ce6),
+[execution profiles](https://github.com/NielsdaWheelz/agency/commit/eecb1dcde64785efc6de9f3fc57d0f2a42987e01)
+— old surfaces deleted, never aliased. The cost is a fact: I never released
+any of the rework, so published v1.2.9 and main diverged permanently.
+Installing today delivers a pre-daemon CLI the current README no longer
+documents, and the README's own install commands are broken twice — a
+[cask I never published](https://github.com/NielsdaWheelz/agency/commit/2d84883a40f2debc2c52400d325542e0169f4b6e),
+and a Linux archive for a release that does not exist.
+
+Numbers, by wc -l and git log at HEAD: 453 commits, 2025-12-12 to
+2026-05-24; 87,467 lines of Go, 49% of them in test files, 1,069 test
+functions; 63 commits carry Claude co-author trailers — a tool for running
+coding agents, built with coding agents.
+
+Thirty-seven days after agency's last commit I started agency-two, a private
+from-scratch rewrite. It keeps the supervision and inverts the rest: SQLite
+instead of JSON state, a supervisor/runner split with a versioned wire
+protocol so running agents survive supervisor upgrades, prompt-state
+detection from the rendered tmux pane with transcript parsing forbidden as a
+correctness source. Merge, commit, push, and PR automation are all cut as
+explicit non-goals. The headline feature of v1 did not survive my own
+review.
+
+The [issues register](https://github.com/NielsdaWheelz/agency/blob/ecc0ee9898731a44e4bbe29b7752afccbbb09d7a/docs/issues.md)
+at HEAD lists three open items, and its "Done" section reads "(none yet)."

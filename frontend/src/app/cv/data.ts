@@ -4,8 +4,8 @@ export const entries = [
     date: 'March 2026 – present',
     category: 'experience' as const,
     bullets: [
-      'Build infrastructure for always-on agents — persistent memory, machines, accounts, communications, and payments — so an agent can hold work that outlives a chat session.',
-      'Ship production backend services end to end: typed contracts at the boundaries, deterministic cores, migrations that roll back in one revision.',
+      'Build infrastructure that lets an agent hold work beyond a single chat session: persistent memory, machines, accounts, communications, payments.',
+      'Ship production backend services: typed contracts at the boundaries, deterministic cores, migrations that roll back in one revision.',
     ],
   },
   {
@@ -16,13 +16,13 @@ export const entries = [
   },
   {
     title: 'Nexus',
-    date: 'November 2025',
+    date: 'November 2025 – present',
     category: 'project' as const,
     bullets: [
-      'Designed and implemented a reading-first knowledge management system: ingesting PDFs/EPUBs/HTML into deterministic canonical text, chunking, and embedding content into Postgres/pgvector for semantic search.',
-      'Built a persistent anchoring model where highlights and annotations are stored as byte-offset ranges into canonical text, then remapped on re-ingestion, so annotations survive document updates without breaking.',
-      'Architected the service as a modern web stack (FastAPI + SQLAlchemy/Alembic, Redis/Celery workers, Next.js frontend with generated TypeScript API client), with per-user ACL enforced on all search and document access.',
-      'Implemented LLM-augmented conversations (thread and message models) as the foundation for a RAG-style "chat with your documents and authors" feature.',
+      'Run a production reading, notes, and AI workspace at nexus.nielseriknandal.com: EPUB, PDF, web, YouTube, and podcast ingestion, with an Android shell and a Manifest V3 capture extension.',
+      'Rebuilt the ten-day FastAPI prototype from an empty repository into the production system — a Next.js BFF over FastAPI, SSE authenticated by 60-second single-use JWTs, background work on a Postgres job queue in place of Celery and Redis.',
+      'Anchor highlights as Unicode codepoint ranges into canonical text; when client and server canonicalization disagree, the reader refuses to highlight rather than store a bad anchor.',
+      'Shipped 1,571 commits and 211 Alembic migrations between December 2025 and August 2026, directing Claude agents that carry co-author trailers on 562 of them.',
     ],
   },
   {
@@ -30,9 +30,10 @@ export const entries = [
     date: 'November 2025',
     category: 'project' as const,
     bullets: [
-      'Built a multi-agent LLM system wrapped around a fully deterministic factory-scheduling simulator—LLM agents handle interpretation/reporting, while the core EDD scheduler and metrics engine remain pure, auditable computation.',
-      'Designed a 10-stage orchestration pipeline with strict validation (Pydantic schemas, ID-coverage guarantees, no-hallucination rules) and safe fallbacks, exposing full pipeline traces via a debug API and React UI.',
-      'Developed comprehensive tests covering determinism, purity, contract enforcement, agent behavior (LLM-mocked), and end-to-end pipeline invariants.',
+      'Built LLM agents that turn free-text factory descriptions into typed configs for a deterministic EDD job-shop scheduler.',
+      'Validated model output in one function: OpenAI JSON mode parsed into Pydantic schemas.',
+      'Scored every parse against machine and job IDs regex-extracted from the source text.',
+      'Wrote 419 backend tests; the suite mocks the model boundary and needs no API key.',
     ],
   },
   {
@@ -40,9 +41,9 @@ export const entries = [
     date: 'October – November 2025',
     category: 'experience' as const,
     bullets: [
-      'Refactored production Dagster pipelines from ad-hoc Supabase/SQL scripts into a clean SQLModel-based architecture—typed DAOs for all I/O, pure transformation layers, and an orchestrator—eliminating pandas, reducing regressions, and making the workflow deterministic and testable.',
-      'Rebuilt the database layer by replacing manual Supabase schema management with a full Alembic/SQLAlchemy migration system—baseline revisions, whitelists, schema diff tooling, and autogenerate gating—giving the team reproducible, version-controlled schema changes for the first time.',
-      'Replaced brittle mock-based tests with an ephemeral Postgres test harness (Alembic-stamped), adding granular tests for migration filters and schema scope—ending silent ORM/DB drift and giving the pipeline real integration coverage.',
+      'Refactored production Dagster pipelines from ad-hoc Supabase/SQL scripts into typed SQLModel DAOs, pure transformation layers, and an orchestrator, removing pandas outright.',
+      'Replaced manual schema management with an Alembic/SQLAlchemy migration system — baseline revisions, whitelists, schema-diff tooling, autogenerate gating.',
+      'Replaced mock-based tests with an ephemeral Alembic-stamped Postgres harness, ending silent ORM/DB drift.',
     ],
   },
   {
@@ -50,7 +51,7 @@ export const entries = [
     date: 'December 2018 – June 2020',
     category: 'experience' as const,
     bullets: [
-      'Translated cognitive-neuroscience research into shipped software products—defining specifications, shaping experiments, and working with engineers to deliver browser, mobile, AR, and VR applications.',
+      'Translated cognitive-neuroscience research into shipped browser, mobile, AR, and VR applications: specifications, experiment design, and delivery with the engineers.',
     ],
   },
   {
@@ -58,8 +59,8 @@ export const entries = [
     date: 'October 2015 – March 2016, July 2018 – December 2018',
     category: 'experience' as const,
     bullets: [
-      'Developed detection algorithms across multiple signal channels (physiology, text/speech, facial/gestural cues), transforming raw behavioral data into feature sets, metrics, and visualizations used to model emotional and cognitive states.',
-      'Prototyped applied systems including a VR stress-regulation game and a Bluetooth breathing/HR monitor integrated into research workflows.',
+      'Built detection algorithms over physiological, text and speech, and facial and gestural signals, turning raw behavioral data into features, metrics, and visualizations of emotional and cognitive state.',
+      'Prototyped a VR stress-regulation game and a Bluetooth breathing and heart-rate monitor used in research workflows.',
     ],
   },
   {
@@ -68,8 +69,8 @@ export const entries = [
     date: 'July 2015 – March 2016',
     category: 'experience' as const,
     bullets: [
-      'Designed and ran behavioural experiments on multi-alternative choice (attraction, compromise, dominance effects), analyzing how contextual options shape decision formation.',
-      'Developed a habituation experiment in collaboration with Dr. Colin Camerer, focusing on how repeated exposure alters valuation and choice behaviour.',
+      'Designed and ran behavioral experiments on multi-alternative choice: attraction, compromise, and dominance effects.',
+      'Designed a habituation experiment with Dr. Colin Camerer on how repeated exposure alters valuation and choice.',
     ],
   },
   {
@@ -92,15 +93,7 @@ export const skills = {
     'Celery',
     'Express',
   ],
-  'AI/ML': [
-    'PyTorch',
-    'scikit-learn',
-    'Pandas',
-    'NumPy',
-    'RAG',
-    'LangGraph',
-    'Agent Orchestration',
-  ],
+  'AI/ML': ['PyTorch', 'scikit-learn', 'Pandas', 'NumPy', 'RAG', 'LangGraph'],
   Frontend: ['React', 'Next.js', 'TanStack Query', 'Tailwind', 'Vite'],
   Tools: ['Docker', 'Git', 'JSON', 'Linux', 'Bash', 'Make'],
 }

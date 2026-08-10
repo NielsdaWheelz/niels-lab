@@ -1,0 +1,69 @@
+---
+title: 'the Solid take-home'
+publishedAt: '2026-08-09'
+summary: 'Remote bash execution built to a resilience spec: Postgres as the only clock, failure as a client-side verdict.'
+repoUrl: 'https://github.com/NielsdaWheelz/solid-takehome'
+---
+
+solid-takehome is my solution to Solid's backend interview take-home: a
+distributed remote-bash-execution system in TypeScript with Effect — API
+servers, a CLI client, an executor daemon, Postgres. The repo is public,
+and I work at Solid now. It records no score.
+
+The [assignment](https://github.com/NielsdaWheelz/solid-takehome/blob/bd647204fdf37b66c1807c5e6e18b062f06dcb17/docs/assignment.md)
+is preserved verbatim in-repo, and it is a resilience spec: commands to 1KB,
+output to 1MB; survive latency, packet loss, and network, database, or
+server outages up to 60 seconds; the client exits `failed` within 120
+seconds; no conceptual races — "we may add 100ms sleep statements anywhere."
+I committed a
+[constitution of fourteen invariants](https://github.com/NielsdaWheelz/solid-takehome/commit/0c86e863a9af97875a0a614fbc34c51174c54a10)
+in the first PR, before implementation, and worked a
+[10-PR roadmap](https://github.com/NielsdaWheelz/solid-takehome/blob/bd647204fdf37b66c1807c5e6e18b062f06dcb17/docs/pr_roadmap.md)
+with per-PR specs.
+
+The load-bearing decision: Postgres is the only clock. Every lease and
+session expiry compares against `NOW()`; no machine clock is consulted; the
+[schema](https://github.com/NielsdaWheelz/solid-takehome/blob/bd647204fdf37b66c1807c5e6e18b062f06dcb17/migrations/0001_schema_v0.sql)
+gives sessions no status column, because connectivity is a predicate over
+timestamps; servers hold no state that correctness depends on. The
+alternative, in-memory server state, dies with the server. Timestamps do
+not.
+
+Signaling splits along the same line. LISTEN/NOTIFY wakes workers as a
+[best-effort hint](https://github.com/NielsdaWheelz/solid-takehome/blob/bd647204fdf37b66c1807c5e6e18b062f06dcb17/src/services/pubsub/WakeupPubSub.ts);
+dropped notifications are tolerated because a tick-based catch-up fetch
+guarantees progress. Correctness comes from `FOR UPDATE SKIP LOCKED`
+[claim transactions](https://github.com/NielsdaWheelz/solid-takehome/blob/bd647204fdf37b66c1807c5e6e18b062f06dcb17/src/services/db/WorkRepo.ts)
+and clients replaying output from a cursor. Output is an append-only log
+with a per-attempt monotonic sequence number, so duplicates and reconnects
+are harmless by construction. The alternatives were per-chunk NOTIFY, or
+pure polling.
+
+`failed` is a client-side verdict only. The
+[120-second detector](https://github.com/NielsdaWheelz/solid-takehome/blob/bd647204fdf37b66c1807c5e6e18b062f06dcb17/src/runners/cli-client.ts)
+lives in the CLI and resets only on genuine progress, and the database never
+records `failed` for a command a client gave up on. I built the alternative
+first, a server-side timeout column, and
+[removed it](https://github.com/NielsdaWheelz/solid-takehome/commit/eb8afc9af70296506e7eda381151f78d10c0f800)
+as out-of-spec, migration and all.
+
+Numbers: 29 commits, 2025-12-29 to 2026-01-04, 22 of them merged PRs; 113
+test cases across 15 files, each vitest worker in its
+[own throwaway Postgres schema](https://github.com/NielsdaWheelz/solid-takehome/blob/bd647204fdf37b66c1807c5e6e18b062f06dcb17/src/tests/vitest-setup.ts);
+[5 runtime dependencies](https://github.com/NielsdaWheelz/solid-takehome/blob/bd647204fdf37b66c1807c5e6e18b062f06dcb17/package.json);
+5 tables in 100 lines of SQL;
+[7 chaos scripts](https://github.com/NielsdaWheelz/solid-takehome/tree/bd647204fdf37b66c1807c5e6e18b062f06dcb17/scripts/chaos)
+covering partition, packet loss, latency, DB outage, server restart, and
+executor kill; zero setInterval calls in src.
+
+What is wrong with it. The repo's own
+[coverage matrix](https://github.com/NielsdaWheelz/solid-takehome/blob/bd647204fdf37b66c1807c5e6e18b062f06dcb17/docs/test_coverage.md)
+marks 24 requirements "needs test," including the 1KB and 1MB limits. The
+constitution still forbids the client NOTIFY channel that
+[PR #20 shipped](https://github.com/NielsdaWheelz/solid-takehome/commit/612e7e37e735fabc45da572a12e9191b45757211).
+Chaos testing is manual scripts against live VMs, and there is no CI. The
+[final commit](https://github.com/NielsdaWheelz/solid-takehome/commit/bd647204fdf37b66c1807c5e6e18b062f06dcb17),
+four days after the rest, removes pubsub timeouts that had been silencing
+streams — my own bug outlived the deadline.
+
+The design held under iptables. The documentation did not keep up with it.
