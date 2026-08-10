@@ -22,21 +22,18 @@ export default function NowPage() {
 
       <div className="prose">
         <p>
-          Days at Solid, where we build infrastructure for agents that do not
-          sleep — persistent memory, machines, accounts, payments. I have been a
-          senior engineer there since March. The work is the good kind of
+          Days at Solid, building infrastructure for always-on agents. I have
+          been a senior engineer there since March. The work is the good kind of
           unglamorous: the parts that must hold when nobody is watching.
         </p>
         <p>
           Braudel&apos;s <em>Mediterranean</em> in the mornings, forty pages at
-          a sitting; the sea is still winning. <em>War and Peace</em> sits at
-          eye level for the reread I have been promising it for ten years.
+          a sitting; most of the book is still ahead.
         </p>
         <p>
           The meet total stands at 1,055 — squat 415, bench 275, deadlift 365.
           Training is ordinary on purpose: heavy triples, long warmups, the same
-          empty-bar start every session. Soccer most evenings, where I defend,
-          which is out of fashion.
+          empty-bar start every session. Soccer most evenings, where I defend.
         </p>
         <p>
           In August this site became a book of lists. The{' '}

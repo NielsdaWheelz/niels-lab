@@ -1,0 +1,58 @@
+---
+title: 'web-search-tool'
+publishedAt: '2026-08-09'
+summary: 'Brave Search behind frozen dataclasses: bounded retries, distrusted URLs, one afternoon of work.'
+repoUrl: 'https://github.com/NielsdaWheelz/web-search-tool'
+---
+
+web-search-tool is an afternoon-sized Python package: the Brave Search API
+behind
+[normalized dataclasses](https://github.com/NielsdaWheelz/web-search-tool/blob/20adb934cdfb6e7a3a9bbffa990e5553541cba2c/src/web_search_tool/types.py)
+for requests, results, and errors. One provider, no persistence, no caching,
+no key management — the
+[README scopes all of that out](https://github.com/NielsdaWheelz/web-search-tool/blob/20adb934cdfb6e7a3a9bbffa990e5553541cba2c/README.md)
+explicitly. [Nexus consumes it](https://github.com/NielsdaWheelz/nexus-web/blob/4fc8401fec9e8ba218d156a0664943303af57285/python/pyproject.toml)
+as a git-pinned dependency, and so does
+[ariel](https://github.com/NielsdaWheelz/ariel/blob/107e0d242da5c01df629f4af6f0bd42b77e2a81d/pyproject.toml).
+It exists because search results entering an application should arrive
+already bounded, ordered, and safe, and that normalization did not belong
+inside the application.
+
+Three decisions, all defensive.
+
+The provider does not own an HTTP client. Its
+[constructor takes](https://github.com/NielsdaWheelz/web-search-tool/blob/20adb934cdfb6e7a3a9bbffa990e5553541cba2c/src/web_search_tool/brave.py)
+an `httpx.AsyncClient`, so the host application controls pooling and
+lifecycle and no hidden connection pool appears inside a worker. The
+simpler alternative, constructing a client internally, is exactly how
+hidden pools happen.
+
+Retries are bounded and clamped: two attempts total; retry only on 429, 5xx,
+and network failures, never on auth errors; and `Retry-After` is clamped to
+2.0 seconds, so a hostile or misconfigured server cannot stall the caller.
+Honoring `Retry-After` verbatim was the alternative, and the clamp has its
+own test.
+
+Result URLs are not trusted. Anything non-HTTP(S) or carrying embedded
+credentials is dropped; schemes and hosts are lowercased, default ports
+stripped, fragments removed; the configurable base_url gets the same
+treatment. Brave's "mixed" ranking survives by replaying its index list with
+bounds checks instead of concatenating web and news results, and each
+result gets a stable `result_ref`, a SHA-256 prefix of the normalized URL,
+for deterministic dedup.
+
+Numbers: two commits, both on 2026-04-27, about two hours apart; 537 lines
+of source by wc -l;
+[14 test functions](https://github.com/NielsdaWheelz/web-search-tool/blob/20adb934cdfb6e7a3a9bbffa990e5553541cba2c/tests/test_brave.py)
+over a respx-mocked API;
+[one runtime dependency](https://github.com/NielsdaWheelz/web-search-tool/blob/20adb934cdfb6e7a3a9bbffa990e5553541cba2c/pyproject.toml).
+[CI](https://github.com/NielsdaWheelz/web-search-tool/blob/20adb934cdfb6e7a3a9bbffa990e5553541cba2c/.github/workflows/ci.yml)
+runs ruff, pyright, pytest, a build, and pip-audit on every push.
+
+What is wrong with it. It was never released: no tags, so the publish
+workflow has never run. The README's install line currently resolves to a
+different author's package that owns the PyPI name. The
+`WebSearchProvider` Protocol promises swappable backends, and only Brave
+exists. `freshness_days` silently buckets a 3-day request into Brave's 7-day
+window, undocumented. Eight Dependabot branches sit unmerged; development
+stopped the day it started.

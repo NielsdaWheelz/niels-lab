@@ -1,0 +1,73 @@
+---
+title: 'llm-calling'
+publishedAt: '2026-08-09'
+summary: 'Five providers called without their SDKs; every provider fact pinned in a catalog with a source and a date.'
+repoUrl: 'https://github.com/NielsdaWheelz/llm-calling'
+---
+
+llm-calling, packaged as `provider_runtime`, is an async Python runtime
+for LLM calls: five providers (OpenAI, Anthropic, Gemini, Moonshot,
+OpenRouter) over raw httpx, plus a second lane that runs local Codex and
+Claude agent sessions. It was
+[extracted from Nexus](https://github.com/NielsdaWheelz/llm-calling/commit/f39ab01e16dff62fae33ff511b330c8f7fe502d4),
+which [pins it](https://github.com/NielsdaWheelz/nexus-web/blob/4fc8401fec9e8ba218d156a0664943303af57285/python/pyproject.toml)
+at an exact git revision.
+
+The problem it answers: provider facts drift and get remembered wrong —
+token limits, reasoning wire values, cache mechanisms, pricing. Here
+they are a checked-in
+[catalog](https://github.com/NielsdaWheelz/llm-calling/blob/345444b0950df7482ea9b77abbde6cda75d551dc/src/provider_runtime/catalog.py):
+every row carries a source URL and a verification date, pricing is integer
+USD micros per million tokens, and any row change bumps a revision stamped
+into every plan. Terminal costing reads the plan's frozen accounting, never
+the live catalog. The alternatives were floats and runtime fetching, which
+is how the drift gets in.
+
+No provider SDKs. The
+[transport](https://github.com/NielsdaWheelz/llm-calling/blob/345444b0950df7482ea9b77abbde6cda75d551dc/src/provider_runtime/transport.py)
+owns auth headers, HTTP, timeouts, and raw SSE framing; by its own comment
+it "parses nothing, classifies nothing." Per-provider codecs encode,
+decode, and classify errors, and
+[httpx is the only runtime dependency](https://github.com/NielsdaWheelz/llm-calling/blob/345444b0950df7482ea9b77abbde6cda75d551dc/pyproject.toml).
+The [README](https://github.com/NielsdaWheelz/llm-calling/blob/345444b0950df7482ea9b77abbde6cda75d551dc/README.md)
+declines the standard wrapper features in writing: no fallback, no routing,
+no sampling knobs, no response cache, no JSON repair. There was a router
+once; a [hard cutover deleted it](https://github.com/NielsdaWheelz/llm-calling/commit/20dfb37d73725aeb34585814c7edc99fed793693),
+along with DeepSeek support.
+
+Certification is a paid live test that leaves evidence. The OpenRouter Kimi
+row ships as OperatorUncertified, representable but unplannable, until a
+live probe observes the pinned upstream and a non-zero billed cache read,
+writing an
+[evidence artifact](https://github.com/NielsdaWheelz/llm-calling/tree/345444b0950df7482ea9b77abbde6cda75d551dc/tests/live/evidence)
+whose revision gets pinned into the row. The alternative is trusting
+provider docs.
+
+The [agent lane](https://github.com/NielsdaWheelz/llm-calling/commit/ebbe2929e98884698798ca8782c39b8056b1a00c)
+is deliberately narrow: two routes, Codex and Claude SDKs, local
+pre-enrolled accounts only. Agent children get a
+[fixed hardcoded PATH](https://github.com/NielsdaWheelz/llm-calling/blob/345444b0950df7482ea9b77abbde6cda75d551dc/src/provider_runtime/agent_runtime/auth.py);
+PATH, HOME, and the config-dir variables are runtime-owned and
+caller-unsettable; both routes reject API-key credentials, and the
+[live matrix](https://github.com/NielsdaWheelz/llm-calling/blob/345444b0950df7482ea9b77abbde6cda75d551dc/tests/live/test_agent_matrix.py)
+certifies the refusal.
+
+Numbers: 50 commits, 2026-04-27 to 2026-08-05, containing three hard
+cutovers — a rename, a
+[full rewrite against a written spec](https://github.com/NielsdaWheelz/llm-calling/commit/11c4083fab8b979276aa0c5cf78ddab456adba6c),
+and the agent lane. 560 test functions in 38 files; test lines outweigh
+source, 21,055 to 19,439 by wc -l.
+[CI](https://github.com/NielsdaWheelz/llm-calling/blob/345444b0950df7482ea9b77abbde6cda75d551dc/.github/workflows/ci.yml)
+builds the wheel and installs it into four clean venvs to prove the SDK
+extras are optional.
+
+What is wrong with it. It has never been released: version 0.1.0, zero
+tags, a publish workflow that has never fired. Consumers pin git SHAs
+instead.
+The OpenRouter row remains uncertified, and an unmerged branch already
+repairs endpoint drift in its pin. One catalog row's introductory pricing
+expires 2026-08-31 by its own comment. Two total rewrites mean git blame
+reaches one to three commits deep on most files.
+
+A catalog of facts with dates on them. When the dates go stale, so does the
+package — that is the contract.

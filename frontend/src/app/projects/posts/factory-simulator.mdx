@@ -1,115 +1,61 @@
 ---
-title: 'Factory Simulator'
+title: 'factory simulator'
 publishedAt: '2025-12-03'
-summary: 'Multi-agent LLM orchestration with deterministic factory scheduling simulation'
+summary: 'Free-text factory descriptions, parsed by LLM agents, scheduled and scored by a deterministic core.'
 repoUrl: 'https://github.com/NielsdaWheelz/factory-simulator'
 ---
 
-Multi-agent LLM orchestration paired with deterministic factory scheduling simulation. Built for SupplyCo.
+Factory Simulator turns a paragraph of prose about a factory into a schedule.
+LLM agents parse the description into a typed config, a deterministic
+[EDD job-shop simulator](https://github.com/NielsdaWheelz/factory-simulator/blob/46c3eef18829c7751e2b82cc332f74eb93ee79ff/backend/sim.py)
+runs one to three scenarios over it, and a briefing explains the metrics. The
+[use case](https://github.com/NielsdaWheelz/factory-simulator/blob/46c3eef18829c7751e2b82cc332f74eb93ee79ff/README.md)
+is the planner's morning question: what will go wrong today, and which jobs
+are at risk.
 
-## what it does
+It began as a fixed ten-stage pipeline. On 2025-12-03 I
+[replaced it](https://github.com/NielsdaWheelz/factory-simulator/commit/bc96eaa8bda9c10b05cd3f8577b82b06395f0532)
+with a plan-then-execute agent: the model emits a typed plan, and a
+deterministic engine executes that plan against a
+[tool registry](https://github.com/NielsdaWheelz/factory-simulator/blob/46c3eef18829c7751e2b82cc332f74eb93ee79ff/backend/agent_tools.py)
+under max-step and LLM-call budgets, returning a partial answer when a budget
+runs out. The alternative was adopting LangGraph; the in-repo
+[demo script](https://github.com/NielsdaWheelz/factory-simulator/blob/46c3eef18829c7751e2b82cc332f74eb93ee79ff/DEMO.md)
+instead maps each hand-rolled piece to its LangGraph equivalent. The
+orchestrator shrank to a 31-line wrapper.
 
-**Input**: Free-form factory description + today's situation/priorities (text)
+Two guards make the parsing checkable. Before any LLM call,
+[regex extraction](https://github.com/NielsdaWheelz/factory-simulator/blob/46c3eef18829c7751e2b82cc332f74eb93ee79ff/backend/onboarding.py)
+pulls the machine and job IDs the text states explicitly; the model's parse
+is then measured against that ground truth, so a dropped or invented machine
+is a number, not a suspicion. And every LLM response passes through
+[one choke point](https://github.com/NielsdaWheelz/factory-simulator/blob/46c3eef18829c7751e2b82cc332f74eb93ee79ff/backend/llm.py):
+OpenAI JSON mode into a Pydantic schema. `openai` is imported inside that
+function, so the test suite monkeypatches the boundary and runs without an
+API key or the package installed.
 
-**Output**: JSON response containing:
+Evaluation is a
+[13-case adversarial corpus](https://github.com/NielsdaWheelz/factory-simulator/blob/46c3eef18829c7751e2b82cc332f74eb93ee79ff/backend/eval/adversarial_cases.yaml)
+of clean, messy, and hostile factory texts, checked against
+[structural invariants](https://github.com/NielsdaWheelz/factory-simulator/blob/46c3eef18829c7751e2b82cc332f74eb93ee79ff/backend/eval/invariants.py)
+rather than golden outputs: valid machine references, minimum durations,
+non-empty jobs. The React frontend renders the agent's plan, its data flow,
+and the LLM call log beside the answer.
 
-- Parsed factory config (machines, jobs, routing)
-- 1–3 scenario variations (baseline, rush order, machine slowdown)
-- Performance metrics per scenario (makespan, lateness, bottlenecks, utilization)
-- Operational briefing (markdown summary with risks and recommendations)
-- Optional debug payload (10-stage pipeline execution trace)
+Numbers, from git log and AST counts at HEAD: 93 commits from 2025-11-19 to
+2025-12-06; 419 test functions across
+[20 backend files](https://github.com/NielsdaWheelz/factory-simulator/tree/46c3eef18829c7751e2b82cc332f74eb93ee79ff/backend/tests);
+zero frontend tests.
 
-## use case
+What is wrong with it is mostly what the rewrite left behind. The README documents
+the pre-rewrite system: it describes `POST /api/simulate`, and the
+[server](https://github.com/NielsdaWheelz/factory-simulator/blob/46c3eef18829c7751e2b82cc332f74eb93ee79ff/backend/server.py)
+exposes only `POST /api/agent`. The CLI imports a function the rewrite
+deleted, so `python -m backend.main` raises ImportError. The backend has no
+dependency manifest, and there is no CI. Determinism holds only for the
+scheduler core — the LLM calls set no temperature and no seed. The fallback
+policy contradicts itself: a demo-factory tool coexists with a system prompt
+that forbids silently using it.
 
-Factory planners need to answer: "What will go wrong today? Which jobs are at risk? What can I do about it?" This system simulates alternative futures and explains risks in operational language, without manual what-if analysis.
-
-## architecture
-
-### two integrated pipelines
-
-**Onboarding Pipeline (O0–O4)**: Factory description → FactoryConfig
-
-- O0: Explicit ID extraction (regex)
-- O1: Coarse structure enumeration (LLM)
-- O2: Fine extraction - jobs → steps (LLM)
-- O3: Validate & normalize
-- O4: Coverage assessment
-
-**Decision Pipeline (D1–D5)**: Factory + situation → metrics + briefing
-
-- D1: Intent classification (LLM)
-- D2: Futures expansion (LLM)
-- D3: Simulation (deterministic EDD scheduler)
-- D4: Metrics computation
-- D5: Briefing generation (LLM)
-
-## core design principles
-
-1. **LLM at the edges, deterministic core** – Agents interpret input and generate output; simulation/metrics/scheduling are pure computation
-2. **Strict validation, no hallucination** – All LLM outputs validated against Pydantic schemas
-3. **100% coverage enforced** – Onboarding ensures all mentioned IDs appear in final factory; otherwise falls back to toy factory
-4. **Full reproducibility** – Same input → deterministic output, no randomness
-
-## stack
-
-- Python 3.10+, FastAPI, Pydantic
-- OpenAI API (JSON mode)
-- React 18+, TypeScript, Vite
-- ~9,000 LOC of tests across 24 test files
-
----
-
-## README
-
-```markdown
-# Factory Day Simulator
-
-Multi-agent LLM orchestration paired with deterministic factory
-scheduling simulation.
-
-## Quick Start
-
-# Python dependencies
-
-pip install -U openai pydantic pytest fastapi uvicorn
-
-# Frontend
-
-cd frontend && npm install
-
-# Environment
-
-export OPENAI_API_KEY="sk-..."
-
-## Running
-
-# API server
-
-uvicorn backend.server:app --reload
-
-# → http://localhost:8000
-
-# Frontend
-
-cd frontend && npm run dev
-
-# → http://localhost:5173
-
-# CLI
-
-python -m backend.main "we have a rush order for J2"
-
-## Testing
-
-python -m pytest -v
-
-## API
-
-POST /api/simulate
-{
-"factory_description": "3 machines (M1, M2, M3), 3 jobs",
-"situation_text": "rush order for J2 today"
-}
-
-Returns: factory, specs, metrics, briefing, meta, debug
-```
+The core still cannot invent a schedule. Everything around it drifted in
+three weeks.

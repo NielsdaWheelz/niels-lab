@@ -1,241 +1,69 @@
 ---
-title: 'Nexus'
+title: 'nexus'
 publishedAt: '2026-07-20'
-summary: 'Production reading, notes, and AI workspace built around stable evidence, durable chat, and one shared resource graph'
+summary: 'A reading, notes, and AI workspace where highlights, notes, and chat citations resolve to the same addressable text.'
 liveUrl: 'https://nexus.nielseriknandal.com'
 repoUrl: 'https://github.com/NielsdaWheelz/nexus-web'
 ---
 
-Nexus is a reading, notes, and AI platform for people who want to do more than
-collect links. It turns books, papers, articles, videos, podcasts, highlights,
-notes, and conversations into resources that can be searched, connected, and
-cited without losing the path back to the source.
+Nexus is where I read. It ingests EPUBs, PDFs, web articles, YouTube videos,
+and podcast episodes, renders them in a pane-based reader, and answers
+questions about them with an LLM whose citations resolve back to the passage.
+It runs at [nexus.nielseriknandal.com](https://nexus.nielseriknandal.com),
+ships an [Android shell](https://github.com/NielsdaWheelz/nexus-web/releases/tag/android-v0.2.13)
+through GitHub releases, and captures pages with a
+[Manifest V3 extension](https://github.com/NielsdaWheelz/nexus-web/blob/4fc8401fec9e8ba218d156a0664943303af57285/apps/extension/manifest.json).
+It exists because my reading was scattered: highlights in one app, notes in
+another, chat context brittle and unshareable.
 
-The product is live on the web, ships through a first-party Android shell, and
-includes a browser extension for capture. It is built first for a single power
-user: someone who reads across formats, thinks in connected notes, and expects
-AI answers to remain inspectable.
+I built it twice. The first repo, [nexus](https://github.com/NielsdaWheelz/nexus),
+ran from 2025-11-25 to 2025-12-05: FastAPI, Celery and Redis, Clerk auth,
+byte-offset highlights, pgvector search. Its
+[README](https://github.com/NielsdaWheelz/nexus/blob/f2876950a709a22ae6bac1eea6e69fb4233b055d/README.md)
+promised highlights that survive re-ingestion; the
+[remap task](https://github.com/NielsdaWheelz/nexus/blob/f2876950a709a22ae6bac1eea6e69fb4233b055d/backend/app/tasks/remap.py)
+was a stub I never wrote. Chat was never started. The repo ends in a two-day
+burst of spec commits, and six days later
+[nexus-web began](https://github.com/NielsdaWheelz/nexus-web/commit/c7f901370575a8b6220051d06b73b4fdf38c3ddc)
+from an empty README. No code crossed over; auth, job queue, and anchor
+semantics all changed.
 
-## the user problem
+Three reversals define the second system. The founding
+[constitution](https://github.com/NielsdaWheelz/nexus-web/commit/b11d164f4060c9f7be5838e6dba6ac784c2af842)
+mandated browsers calling FastAPI directly; eleven days later a
+[Next.js BFF](https://github.com/NielsdaWheelz/nexus-web/commit/468da77c8edae0e48cf8b364c19c43567cac0574)
+stood in front of it, leaving one direct browser path — SSE, authenticated by
+[60-second single-use JWTs](https://github.com/NielsdaWheelz/nexus-web/blob/4fc8401fec9e8ba218d156a0664943303af57285/python/nexus/services/stream_tokens.py)
+with a replay-prevention table. Background work started on Celery and Redis,
+as v1 had; in March I [cut both](https://github.com/NielsdaWheelz/nexus-web/commit/47a88de6f4b64809e1f8b34a0a03a83b0fd338a0)
+for a Postgres job queue, removing an infrastructure dependency outright. And
+v1's byte offsets became
+[Unicode codepoint ranges](https://github.com/NielsdaWheelz/nexus-web/blob/4fc8401fec9e8ba218d156a0664943303af57285/apps/web/src/lib/reader/textOffsets.ts)
+over canonical text: when the client's canonicalization disagrees with the
+server's, the reader
+[disables highlighting](https://github.com/NielsdaWheelz/nexus-web/blob/4fc8401fec9e8ba218d156a0664943303af57285/apps/web/src/lib/highlights/selectionToOffsets.ts)
+rather than write a bad anchor. PDFs get a separate
+[page-geometry anchor](https://github.com/NielsdaWheelz/nexus-web/blob/4fc8401fec9e8ba218d156a0664943303af57285/python/nexus/schemas/highlights.py).
 
-Most knowledge tools break one body of work into unrelated systems:
+Chat is not a request. Sending a message creates a
+[durable run](https://github.com/NielsdaWheelz/nexus-web/commit/a5d1a6c154fdf02573bed547f4a805710cb8328a)
+the worker executes while the browser tails SSE and reconciles from stored
+state. A citation is an edge in one flat
+[resource_edges table](https://github.com/NielsdaWheelz/nexus-web/commit/ee250de731043211f6c90fd5a9d953b209f55b70)
+that replaced the per-feature link stores.
 
-- the reader knows where the text is, but the chat does not;
-- the chat can summarize, but its evidence becomes a dead excerpt;
-- notes can link to pages, but not reliably to a passage, highlight, person, or
-  generated answer;
-- each file format invents a different coordinate system;
-- search, navigation, and AI retrieval quietly disagree about what an object is.
+By git log on 2026-08-09: 1,571 commits since December 2025, 211 Alembic
+migrations, and 562 commits carrying Claude co-author trailers — I direct the
+build; agents write a large share of it.
 
-Nexus treats those as one problem. Every surface should be able to identify the
-same resource, resolve it under the same permissions, and open it at the best
-available location. A citation is not decoration attached to prose. It is a
-durable connection from an answer to an addressable piece of evidence.
+What is wrong with it. I committed a copyrighted Hyperion EPUB to the root
+of a public repo, and it is still tracked. There is no LICENSE file. History records production
+incidents, including a
+[middleware crash](https://github.com/NielsdaWheelz/nexus-web/commit/edd4c4bae50c9e4f12cde2433f6444a71efb57e2)
+over a missing CSP env var. The
+[architecture doc](https://github.com/NielsdaWheelz/nexus-web/blob/4fc8401fec9e8ba218d156a0664943303af57285/docs/architecture.md)
+scopes the product to a single user; billing code exists, with no evidence
+of a second user. I deleted the constitution whose constraints the system
+reversed; it survives only in history.
 
-## origin and my role
-
-Nexus began as a week-three group project at Fractal with **Nyan and Jahnik**.
-That project established the original reading, annotation, and semantic-search
-direction.
-
-After the group project ended, I continued the work independently and rebuilt it
-as the current `nexus-web` product. The 2026 system described here is that later
-codebase. I own its product direction, architecture, implementation,
-infrastructure, deployment, and ongoing operation.
-
-The evolution matters: this is not the original course-project checklist with a
-few more features. The storage model, auth boundary, ingest pipeline, reader,
-workspace, search system, chat runtime, citation model, notes model, mobile
-shell, extension, deployment topology, and testing strategy were built out into
-one production system.
-
-## what is shipped
-
-### one library for heterogeneous media
-
-Nexus accepts EPUBs, PDFs, web articles, YouTube videos, podcast episodes, and
-browser-captured pages or files. Ingestion turns them into a common media model,
-while preserving format-specific artifacts needed for faithful reading.
-
-Long-running extraction, transcription, indexing, metadata, and AI work runs as
-durable background jobs. A source can become ready for reading before its search
-index is ready; those are deliberately separate state machines rather than one
-misleading progress flag.
-
-### a reader with stable evidence coordinates
-
-Reflowable formats use Unicode-codepoint offsets into canonical fragment text,
-not DOM nodes or screen pixels. PDFs use page-space geometry plus text-span
-matches. Typography and viewport changes can therefore reflow the page without
-moving the logical target.
-
-Highlights, quotes, citations, contents, and connections meet in a single
-Document Map. Clicking a citation in chat activates the source resource and, when
-the target is more precise than the document, focuses the relevant passage or
-location inside the reader.
-
-### notes that participate in the same system
-
-The notes surface is a block-based ProseMirror outliner. A note can embed or
-reference another Nexus object, attach to a highlight, expose backlinks, and be
-found by the same hybrid search used for media. Note bodies enter the same
-content-block, chunk, span, and embedding pipeline as imported material; there
-is no second, weaker notes index.
-
-### durable, branchable AI conversation
-
-Chat is retrieval-grounded, streamed, and branchable. Sending a message creates
-a durable `ChatRun`; the HTTP request does not sit open while an LLM works. A
-worker assembles context, calls models and tools, appends events, and persists
-the result. The browser tails those events over SSE and reconciles from durable
-state after reconnects or interruptions.
-
-Conversations are message trees with a per-viewer active path. Users can fork an
-earlier answer without allowing sibling branches to leak into the new prompt.
-Assistant responses expose citations and a trust trail assembled from the
-prompt plan, tool calls, selected retrievals, and resource edges that actually
-produced the answer.
-
-### a workspace rather than a sequence of pages
-
-The web client is a tabbed, multi-pane workspace. Panes retain their own history,
-can publish secondary tools such as the Document Map or conversation context,
-and restore per user and device. The URL projects the active pane; it does not
-destroy the rest of the workspace every time navigation occurs.
-
-The surrounding product includes shared libraries, a contributor/authorship
-graph, unified search and command palette, podcast subscriptions and playback,
-an ordered Lectern for things to read or listen to, and the Oracle: an agentic
-reading surface over a curated public-domain corpus stored as an ordinary Nexus
-library.
-
-## architecture
-
-The default production request path is intentionally conventional:
-
-```text
-Browser / Android WebView
-          |
-          v
-Next.js frontend + same-origin BFF (Vercel)
-          |
-          v
-FastAPI services (Hetzner)
-          |
-          v
-PostgreSQL + pgvector
-          ^
-          |
-Postgres-backed worker -----> R2 object storage
-```
-
-The browser holds no auth tokens and does not call FastAPI directly for product
-data. Next.js attaches the authenticated session and an internal service secret.
-SSE is the narrow exception: the browser connects directly to the API with a
-short-lived, single-use stream token. Supabase provides authentication only;
-application data lives in Postgres and files live in R2.
-
-Business logic sits in explicit Python services behind thin FastAPI routes. The
-Next.js API layer is a proxy, not a second backend. PostgreSQL is the source of
-truth for product state, durable jobs, chat events, graph edges, and the active
-retrieval index.
-
-## the system spine: resources, edges, and evidence
-
-The architectural center is a closed `ResourceRef` vocabulary. Media, pages,
-note blocks, highlights, passages, chunks, conversations, messages, contributors,
-Oracle readings, external snapshots, and other addressable objects all use the
-same reference grammar.
-
-`resource_edges` is the single directed connection table. User-authored links,
-note-body references, highlight notes, system relationships, and generated
-citations differ by typed `kind` and `origin`, but they do not create parallel
-link systems.
-
-A generated citation is one of those edges:
-
-```text
-assistant message --[citation N]--> evidence span / content chunk / resource
-```
-
-The ordinal shown as `[N]` lives on the edge. The reader jump is reconstructed
-from the target resource's own locator. Chat, Oracle, and library intelligence
-therefore share the same citation contract instead of each inventing a bespoke
-source payload.
-
-Search follows the same convergence. One typed search service backs the search
-page, command palette, object-reference autocomplete, and the chat `app_search`
-tool. Retrieval is always hybrid: a pgvector cosine-search arm and a PostgreSQL
-full-text arm are combined, reranked, permission-filtered, and resolved through
-the same resource layer.
-
-## the hardest decisions
-
-### 1. addressing meaning rather than pixels
-
-The hard part of highlights is not drawing a colored rectangle. It is preserving
-the meaning of a selection while HTML reflows, an EPUB changes type size, or a
-PDF mixes text and geometry. Nexus uses format-appropriate coordinates but one
-activation contract. For reflowable text, the frontend canonicalizer must match
-the backend's canonical text exactly; if it does not, highlighting is disabled
-instead of writing an anchor the system cannot defend.
-
-### 2. separating durable work from streaming transport
-
-An LLM request can outlive a browser tab, a network connection, or an API
-process. Making `ChatRun` the durable unit lets the worker continue independently
-while SSE remains a replaceable observation channel. The same separation is used
-for ingestion and Oracle generation: product work belongs to persisted state and
-workers, not to the lifetime of an HTTP response.
-
-### 3. making citations part of the object model
-
-It was tempting to keep citations as arrays of snippets attached to each AI
-feature. That would have been easy locally and expensive everywhere else.
-Modeling them as graph edges means access checks, navigation, backlinks,
-resource activation, and deletion semantics can be shared. It also makes the
-answer's evidence inspectable after the stream is over.
-
-### 4. deleting duplicate truths
-
-Much of the architecture work was subtraction: one Postgres product database,
-one resource vocabulary, one graph, one search service, one chat-run path, one
-notes index, one citation contract, and named owners for each ingest capability.
-The codebase treats alternate stores and compatibility paths as liabilities to
-remove, not safety blankets to preserve indefinitely.
-
-## evidence, not roadmap
-
-As of July 2026, the current repository contains:
-
-- **1,083 commits** in the independently developed `nexus-web` history;
-- **182 hand-written Alembic migrations**;
-- **610 checked-in test files** across backend, frontend, browser, Android, and
-  end-to-end surfaces;
-- a Next.js frontend and BFF, FastAPI API, Postgres-backed worker, first-party
-  Android app, and Manifest V3 capture extension;
-- production deploy tooling for Vercel, Hetzner, PostgreSQL migrations,
-  Cloudflare R2, and hosted authentication.
-
-The CI boundary is deliberately broader than unit tests. It includes static and
-type checks, backend tests against real Postgres, browser component tests in
-Chromium, migration up/down coverage, Android verification, sharded Playwright
-journeys, deterministic real-media ingest/search/chat acceptance, and separate
-live-provider gates for the external AI and media services.
-
-Those numbers are not the product claim. They are evidence that the visible
-reader, notes, search, and chat surfaces sit on maintained contracts rather than
-a demo-only happy path.
-
-## current status
-
-Nexus is live at [nexus.nielseriknandal.com](https://nexus.nielseriknandal.com)
-and the current code is public in
-[NielsdaWheelz/nexus-web](https://github.com/NielsdaWheelz/nexus-web). It is an
-actively developed, production-deployed personal platform, not a finished
-mass-market SaaS product.
-
-The central bet is now real: a passage can be read, highlighted, linked from a
-note, retrieved by search, cited by an AI answer, inspected through its trust
-trail, and reopened in context because every layer agrees on what that evidence
-is. That is the system I wanted to prove I could build.
+The reading is no longer scattered. The operating is.

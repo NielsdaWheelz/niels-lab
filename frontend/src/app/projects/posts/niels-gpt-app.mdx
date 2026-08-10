@@ -1,0 +1,60 @@
+---
+title: 'niels-gpt-app: inference, token by token'
+publishedAt: '2026-08-09'
+summary: 'A chat interface that streams, beside each token, the probabilities and attention that produced it.'
+repoUrl: 'https://github.com/NielsdaWheelz/niels-gpt-app'
+---
+
+niels-gpt-app is a chat interface over my from-scratch model that shows, for
+every generated token, why that token. I had trained the model; I wanted to
+watch it choose, not just read its output.
+
+A FastAPI backend
+[downloads the v1 checkpoint](https://github.com/NielsdaWheelz/niels-gpt-app/blob/54fb3a2b8bc4360055ea0e8f931fb1b234eb206a/api/app/checkpoint.py)
+from Hugging Face at startup and streams `POST /chat/stream` as server-sent
+events. Each generated token arrives as two events: the token, and a
+[trace](https://github.com/NielsdaWheelz/niels-gpt-app/blob/54fb3a2b8bc4360055ea0e8f931fb1b234eb206a/api/app/main.py)
+carrying the top-k candidate probabilities, the entropy of the next-token
+distribution, and one attention row for a layer the client selects. A
+[second endpoint](https://github.com/NielsdaWheelz/niels-gpt-app/blob/54fb3a2b8bc4360055ea0e8f931fb1b234eb206a/api/app/generation.py)
+returns the full t-by-t attention matrix for one layer and head. The Next.js
+frontend renders all of it: an
+[inspector](https://github.com/NielsdaWheelz/niels-gpt-app/blob/54fb3a2b8bc4360055ea0e8f931fb1b234eb206a/web/src/components/InspectorPane.tsx)
+with per-token replay, top-k bubbles, an entropy indicator, a heatmap modal,
+and an ASCII/UTF-8 toggle, because byte-level tokens are not always
+printable. An
+[in-repo explainer](https://github.com/NielsdaWheelz/niels-gpt-app/blob/54fb3a2b8bc4360055ea0e8f931fb1b234eb206a/docs/viz-explained.md)
+documents how to read the display.
+
+Two decisions carry the app. Streaming is SSE over POST with a
+[hand-rolled fetch parser](https://github.com/NielsdaWheelz/niels-gpt-app/blob/54fb3a2b8bc4360055ea0e8f931fb1b234eb206a/web/src/lib/sse.ts),
+because the browser EventSource API cannot POST; the alternatives were
+WebSockets or putting the prompt in a GET query. And the trace exists only
+because the model code keeps attention as an explicit softmax in every path
+instead of calling a fused kernel — the fused alternative is faster and
+returns no probability matrix to show.
+
+The guardrails are small and concrete: a 16KB prompt cap returning 413, a
+[token bucket](https://github.com/NielsdaWheelz/niels-gpt-app/blob/54fb3a2b8bc4360055ea0e8f931fb1b234eb206a/api/app/rate_limit.py)
+at 10 requests per minute with burst 3 per IP returning 429, and a bounds
+check on the requested trace layer returning 422.
+
+Numbers: 8 commits, 2025-12-16 to 2025-12-19; the
+[API](https://github.com/NielsdaWheelz/niels-gpt-app/commit/d5fbc72c1f8e9a3b627fb4f8c0c97f8beb0f4832)
+and the
+[web UI](https://github.com/NielsdaWheelz/niels-gpt-app/commit/f5e7e6de2e2978389ee8d762b1871eab6d01c903)
+both landed on the first day. The API has 14 test functions across 3 files,
+including the
+[SSE protocol](https://github.com/NielsdaWheelz/niels-gpt-app/blob/54fb3a2b8bc4360055ea0e8f931fb1b234eb206a/api/tests/test_sse_protocol.py);
+the web app has zero tests, and its README's stated verification is
+`npm run build`.
+
+What is wrong with it. Both documented deploy URLs returned 404 on
+2026-08-09 — the Render API and the Vercel frontend are dead, so the charter
+goal of hosting this on my site is currently false. The API pins the model
+code to a git URL that now redirects to
+[niels-gpt-2](/projects/niels-gpt-2), whose interfaces are incompatible, so
+a fresh install builds against the wrong code. The README calls the model
+"256-token context, 4-layer," which matches neither v1's defaults nor v2's.
+
+The model is small. Watching it choose is the entire point.

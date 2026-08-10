@@ -1,0 +1,61 @@
+---
+title: 'dev-server'
+publishedAt: '2026-08-09'
+summary: 'One command converges a Hetzner devbox or a workstation, with per-account routing for AI CLIs.'
+repoUrl: 'https://github.com/NielsdaWheelz/dev-server'
+---
+
+dev-server is the bash and Ansible that build my machines.
+[`./devbox converge`](https://github.com/NielsdaWheelz/dev-server/blob/359ab3671c24131d77d7f98d70c6a472ce09f9c6/devbox)
+creates or reuses a Hetzner VPS, waits for Tailscale, locks down public SSH,
+runs Ansible, and runs a doctor; `./workstation converge` does macOS and
+Arch. The [README](https://github.com/NielsdaWheelz/dev-server/blob/359ab3671c24131d77d7f98d70c6a472ce09f9c6/README.md)
+scopes it in one line: "fast, malleable coding machines, not a compliance
+framework." Two problems made it exist: a fresh cloud VM is exposed during
+bootstrap, and running work and personal subscriptions of the same AI CLI on
+one machine mixes credential state unless something separates it.
+
+For the first:
+[cloud-init](https://github.com/NielsdaWheelz/dev-server/blob/359ab3671c24131d77d7f98d70c6a472ce09f9c6/cloud-init-devbox.template.yaml)
+opens SSH only from my current /32, enrolls Tailscale, deletes the auth key
+from disk, and enables UFW on first boot; converge then deletes the
+bootstrap firewall rule and verifies the closure — it attempts an SSH to the
+public IP and dies if the connection succeeds. The alternatives were leaving
+port 22 open or maintaining a bastion.
+
+For the second: one
+[router script](https://github.com/NielsdaWheelz/dev-server/blob/359ab3671c24131d77d7f98d70c6a472ce09f9c6/assets/routers/ai-router),
+symlinked under each tool-and-account name, derives the tool and account
+from its own argv[0], glob-matches the target path against work-directory
+patterns, and execs the real binary with `CODEX_HOME` or
+`CLAUDE_CONFIG_DIR` pointed at that account's state. Separate per-tool
+router scripts existed; the
+[refactor deleted them](https://github.com/NielsdaWheelz/dev-server/commit/744e29e6b48584c46ce64b0ca448f1fdf635a436).
+
+The third decision is a refusal. Converge installs desired state and does
+not clean unrelated drift; doctor runs positive checks and does not audit
+for absence; destroying and recreating the server is manual on purpose.
+Full configuration management was the alternative; the README's guardrails
+section names it as a non-goal.
+
+The doctor is the only verification, and it checks resolved state rather
+than files: for OpenCode it runs
+[`opencode debug config`](https://github.com/NielsdaWheelz/dev-server/blob/359ab3671c24131d77d7f98d70c6a472ce09f9c6/lib/ai-tools.sh)
+and asserts the resolved model, limits, and permissions with jq, against a
+[managed guardrail layer](https://github.com/NielsdaWheelz/dev-server/blob/359ab3671c24131d77d7f98d70c6a472ce09f9c6/assets/opencode/managed.json)
+that disables session sharing, binds the server to localhost, denies reads
+and edits of env files and secrets, and makes every bash command ask.
+
+Numbers, by wc -l over tracked files: 22 commits, 2026-05-13 to 2026-08-04;
+4,854 lines, of which 1,691 is a vendored p10k.zsh; zero tests, zero CI.
+
+What is wrong with it. Nothing verifies the scripts but the scripts. My SSH
+key, username, and personal project-dir globs are hardcoded — nobody else
+can run this without editing source, which is the stated scope but still a
+fact. Firewall idempotency substring-matches hcloud's error text and breaks
+silently if the wording changes. Claude installs by piping an unpinned
+remote script to bash. I wrote a 662-line walkthrough and later deleted
+it; the README is now the only document.
+
+One user, three kinds of machine, one command each. The scope is the
+feature.

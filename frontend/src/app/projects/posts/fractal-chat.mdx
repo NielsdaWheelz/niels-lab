@@ -1,245 +1,62 @@
 ---
-title: 'Fractal Chat'
+title: 'fractal chat'
 publishedAt: '2025-10-05'
-summary: 'Chat-first reader that ingests URLs/PDFs/EPUBs and stays grounded'
+summary: 'A group-built document reader with grounded chat: URLs, PDFs, and EPUBs into pgvector; the model chooses when to search.'
 repoUrl: 'https://github.com/NielsdaWheelz/fractal-chat'
 ---
 
-## A reading companion for infinite text
+Fractal Chat is a document reader with grounded chat, built in 19 days at
+Fractal by four of us. It ingests URLs, PDFs, and EPUBs into
+Postgres, chunks and embeds them, and chats with a model that retrieves from
+the uploaded documents; a URL can be one page or a
+[breadth-first crawl](https://github.com/NielsdaWheelz/fractal-chat/blob/a3ef588c5c4ebf14ccbae960389185202edacd3a/app/server/crawler.server.ts)
+capped at 50 same-host pages. Annotations, group sharing, and a Stripe-gated
+document limit sit on top. By git shortlog: 368 commits split across me (177), Jahnik (104),
+Nyan Prakash (45), and kudzuweb (42), with Mauria doing styling.
 
-_A chat-first reader built to ingest messy documents._
+Three decisions I would defend.
 
----
+pgvector inside Postgres instead of an external vector database.
+[Chunks](https://github.com/NielsdaWheelz/fractal-chat/blob/a3ef588c5c4ebf14ccbae960389185202edacd3a/app/server/document.server.ts)
+are split at 500 characters with 50 overlap, embedded with
+text-embedding-3-small at 512 dimensions, and cosine-searched
+[in SQL](https://github.com/NielsdaWheelz/fractal-chat/blob/a3ef588c5c4ebf14ccbae960389185202edacd3a/app/server/search.server.ts)
+with the `<=>` operator. One database holds everything.
 
-## System Architecture
+Retrieval as a tool, not a pipeline. The model gets a
+[searchDocuments tool](https://github.com/NielsdaWheelz/fractal-chat/blob/a3ef588c5c4ebf14ccbae960389185202edacd3a/app/routes/api.chat.ts)
+whose scope enum covers the current document, mentioned documents, or
+everything, and decides when to call it. No retrieval happens unless the
+model asks.
 
-### Document ingestion
+Dual PDF extraction.
+[pdf-parse runs first](https://github.com/NielsdaWheelz/fractal-chat/blob/a3ef588c5c4ebf14ccbae960389185202edacd3a/app/server/pdf-extractor.server.ts);
+when it throws or returns empty text, a pdfjs-dist fallback takes the file.
+Both imports are lazy, so neither library loads until a PDF arrives.
 
-Three inputs:
+Annotations anchor as
+[character offsets](https://github.com/NielsdaWheelz/fractal-chat/blob/a3ef588c5c4ebf14ccbae960389185202edacd3a/app/db/schema.ts):
+start and end integers plus the quoted text and its prefix and suffix. One
+recursive
+[permission resolver](https://github.com/NielsdaWheelz/fractal-chat/blob/a3ef588c5c4ebf14ccbae960389185202edacd3a/app/server/permissions.server.helper.ts)
+answers every access question, walking direct grants, creator, visibility,
+parent traversal, and group membership to return admin, write, read, or
+none.
 
-**1) URLs** - Mozilla [Readability](https://github.com/mozilla/readability) strips junk and keeps the article.
+Numbers, by wc -l over tracked files: 19,126 lines of TypeScript and TSX
+across 164 files; 18 Drizzle migrations, two pairs of them sharing sequence
+numbers 0012 and 0016; a
+[10-document free tier](https://github.com/NielsdaWheelz/fractal-chat/blob/a3ef588c5c4ebf14ccbae960389185202edacd3a/app/server/billing.server.ts).
 
-```typescript
-const article = await extractMainFromUrl(normalizedUrl)
-// { title, content, textContent, byline, publishedTime, meta }
-```
+What is wrong with it. There are no automated tests — no framework in
+package.json, no CI. The deployment is dead: fractal-chat.vercel.app
+returned 404 on 2026-08-09. The prefix and suffix fields were stored to
+allow re-anchoring annotations after edits, and no one ever wrote the
+re-anchoring code. Permissions were still being patched on the last day of code
+work, 2025-10-17, and the
+[Stripe integration](https://github.com/NielsdaWheelz/fractal-chat/commit/94b0a3eb540a72dcddb093ed0a386444efaa6e20)
+says in its own commit message, "added stripe integration using ai, don't
+yell at me."
 
-Single pages aren't enough, so there's a breadth-first crawler:
-
-```typescript
-const pages = await crawlSite(normalizedUrl, {
-  maxPages: 50,
-  sameHostOnly: true,
-  delayMs: 500,
-})
-```
-
-Aggregate pages or keep them separate; archives and docs need both.
-
-**2) PDFs** - Dual extractor because PDFs are hostile:
-
-```typescript
-const parsed = await extractPdfText(buffer)
-if (!textResult?.text?.trim()) {
-  return runFallbackExtraction(buffer, primaryError)
-}
-```
-
-**3) EPUBs** - EPUB is structured HTML. Pull chapters, glue them, keep metadata.
-
-```typescript
-const book = await EPub.createAsync(tmpPath)
-const htmlChapters = await Promise.all(
-  book.flow.map((ch) => book.getChapterRawAsync(ch.id)),
-)
-```
-
-### Metadata resolution
-
-Site metadata is sloppy. The pipeline combines rules and LLM inference:
-
-```typescript
-const { object } = await generateObject({
-  model: openai('gpt-5-nano'),
-  schema: metadataSchema,
-  prompt: contextualPrompt,
-})
-```
-
-Schema-constrained output prevents malformed or unexpected fields; grounding and citation checks handle factual reliability separately.
-
-### Chunking and embeddings
-
-Text gets split with LangChain's recursive splitter to keep concepts intact:
-
-```typescript
-const splitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 500,
-  chunkOverlap: 50,
-})
-```
-
-Embeddings: OpenAI `text-embedding-3-small` at 512 dims to balance cost and recall.
-
-```typescript
-const { embeddings } = await embedMany({
-  model: openai.textEmbeddingModel('text-embedding-3-small'),
-  values: chunkTexts,
-  providerOptions: { openai: { dimensions: 512 } },
-})
-```
-
-Stored in Postgres with `pgvector` so cosine search runs in the database:
-
-```sql
-SELECT *, 1 - (embedding <=> $1::vector) as similarity
-FROM document_chunks
-ORDER BY similarity DESC
-LIMIT $2
-```
-
-No external vector DB; fewer moving parts.
-
----
-
-## Annotation System
-
-### Character-offset anchoring
-
-Anchors stick to text, not the DOM:
-
-```typescript
-const annotation = {
-  start: 1420,
-  end: 1580,
-  quote: '...',
-  prefix: '...',
-  suffix: '...',
-}
-```
-
-If HTML shifts, offsets still line up unless the words change. Prefix/suffix support fuzzy re-anchoring after minor edits.
-
-### Permission inheritance
-
-Annotations inherit document visibility. Groups add another layer: share a doc with a group, everyone can read; public annotations from members are visible to the group; owner keeps admin rights.
-
-```typescript
-export async function computeAccessLevel(
-  userId: string,
-  resourceType: ResourceType,
-  resourceId: string,
-): Promise<PermissionLevel> {
-  // direct permissions
-  // creator checks
-  // visibility flags
-  // parent traversal
-  // group memberships
-}
-```
-
-It's query-heavy, but correctness beats premature caching.
-
----
-
-## AI Interface
-
-### Document-grounded chat
-
-Chats are bound to a document; the system prompt names it and its author and reminds the model it has a search tool. Less drift, better answers.
-
-```typescript
-systemPrompt += `\n\nContext: You are discussing the document "${document.title}"`
-if (authorNames) systemPrompt += ` by ${authorNames}`
-systemPrompt += `. You have access to a searchDocuments tool.`
-```
-
-### Retrieval as a tool
-
-Semantic search is exposed to the model so it can pull evidence when needed:
-
-```typescript
-tools: {
-  searchDocuments: tool({
-    description: `Search documents for matching chunks of text.`,
-    inputSchema: z.object({
-      query: z.string(),
-      topK: z.number(),
-      searchScope: z.enum(['current', 'mentioned', 'all']),
-    }),
-    execute: async ({ query, topK, searchScope }) => {
-      return await embedAndSearch(userId, query, topK, docIds);
-    },
-  }),
-}
-```
-
-RAG as agentic tool use instead of a fixed pipeline.
-
-### Mentions for cross-document context
-
-Mention syntax pulls other docs or authors into scope:
-
-```
-What did @[Meditations](document:abc123) say?
-How does this compare to @[Marcus Aurelius](author:xyz789)?
-```
-
-Regex parse, expand search scope, synthesize across sources.
-
----
-
-## UI/UX
-
-Cyberpunk skin with a job: signal hierarchy and interactivity.
-
-```css
-.cyber-border::before {
-  background: linear-gradient(
-    45deg,
-    var(--color-cyber-cyan),
-    var(--color-cyber-pink),
-    var(--color-cyber-purple)
-  );
-}
-.scanlines::before {
-  background: repeating-linear-gradient(
-    0deg,
-    transparent 0px,
-    transparent 2px,
-    rgba(0, 0, 0, 0.1) 2px,
-    rgba(0, 0, 0, 0.1) 4px
-  );
-}
-```
-
-Annotation popovers get layered shadows to feel tactile:
-
-```typescript
-boxShadow: '0 0 30px rgba(0,0,0,0.4), \
-            0 0 60px rgba(0,0,0,0.2), \
-            inset 0 1px 0 rgba(255,255,255,0.1)'
-```
-
-Looks serve clarity, not vibes.
-
----
-
-## Technical Choices
-
-- React Router 7: SSR with focused client islands; loader/action keeps data flow honest.
-- Drizzle ORM: Type-safe SQL without Prisma magic; vector queries stay visible.
-- Better-Auth: Auth as a library; no external service tax.
-- Vercel AI SDK: Streaming and tool calls solved; reinventing adds no value.
-- Stripe: Billing is solved; don't cosplay a payments company.
-- Supabase Storage: S3-compatible PDF storage; Postgres handles pgvector.
-
----
-
-## Lessons
-
-1. Metadata beats content in difficulty. Sites are inconsistent; expect cleanup.
-2. Permissions grow teeth fast. Hierarchies and overrides are inevitable.
-3. PDFs fight back. Test against pathological files or users will do it for you.
-4. LLMs work best as tools with constraints, not as oracles.
-5. Visual coherence reduces cognitive load; good UI teaches itself.
+The next reader I built, [Nexus](/projects/nexus), started from what this
+one got wrong.

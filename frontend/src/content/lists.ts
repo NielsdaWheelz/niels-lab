@@ -54,7 +54,7 @@ const corpus: PillowList[] = [
         text: 'Two generation paths, one fast, one naive, printing identical tokens. The speedup is now legal.',
         evidence: {
           label: 'niels-gpt: kv-cache prefill/decode against naive generation',
-          href: '/projects/niels-gpt',
+          href: '/projects/niels-gpt-2',
         },
         added: '2026-08-09',
       },
@@ -73,12 +73,12 @@ const corpus: PillowList[] = [
         text: 'A small language model, by hand, in two days — tokenizer, cache, pretraining, chat. It hedges where I hedge.',
         evidence: {
           label: 'niels-gpt, working notes',
-          href: '/projects/niels-gpt',
+          href: '/projects/niels-gpt-1',
         },
         added: '2026-08-09',
       },
       {
-        text: 'A reading system where a highlight is a byte offset into canonical text, so citations survive the document changing beneath them.',
+        text: 'A reading system where a highlight is a codepoint range into canonical text. When client and server disagree, it refuses to highlight.',
         evidence: {
           label: 'Nexus, source',
           href: 'https://github.com/NielsdaWheelz/nexus-web',
@@ -126,6 +126,14 @@ const corpus: PillowList[] = [
         added: '2026-08-09',
       },
       {
+        text: 'A budget app: tax brackets and payroll as typed Effect code, the cash flow drawn as a Sankey diagram. It has no tests.',
+        evidence: {
+          label: 'budget-app, domain layer',
+          href: 'https://github.com/NielsdaWheelz/budget-app/blob/f252bd4995f90995868c947d74422a7d8461760b/src/domain/budget.ts',
+        },
+        added: '2026-08-09',
+      },
+      {
         text: 'This site: typed data for a CMS, evidence links checked at build, two client components. The colophon confesses.',
         evidence: {
           label: 'niels-lab, source',
@@ -151,7 +159,7 @@ const corpus: PillowList[] = [
         text: 'A token cache with no record of which tokenizer wrote it. Every downstream loss curve is a rumor.',
         evidence: {
           label: 'niels-gpt caches hard-fail on tokenizer SHA mismatch',
-          href: 'https://huggingface.co/nnandal/niels-gpt',
+          href: 'https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/train/pretrain.py',
         },
         added: '2026-08-09',
       },
@@ -166,7 +174,8 @@ const corpus: PillowList[] = [
       {
         text: 'Annotations pinned to line numbers. One re-ingestion later, every highlight decorates the wrong sentence.',
         evidence: {
-          label: 'Nexus stores byte-offset ranges, remapped on re-ingestion',
+          label:
+            'Nexus anchors highlights to codepoint ranges in canonical text',
           href: '/projects/nexus',
         },
         added: '2026-08-09',
@@ -220,17 +229,13 @@ const corpus: PillowList[] = [
       {
         text: 'Weight tying: the matrix that reads is the matrix that speaks.',
         evidence: {
-          label: 'niels-gpt checkpoint',
-          href: 'https://huggingface.co/nnandal/niels-gpt',
+          label: 'niels-gpt model code, weight tying',
+          href: 'https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/niels_gpt/model/gpt.py',
         },
         added: '2026-08-09',
       },
       {
         text: 'A citation that still resolves after the document was edited underneath it.',
-        evidence: {
-          label: 'Nexus, live',
-          href: 'https://nexus.nielseriknandal.com',
-        },
         added: '2026-08-09',
       },
     ],
@@ -250,7 +255,8 @@ const corpus: PillowList[] = [
       {
         text: 'The distance between a claim and its proof. Ideally one link, to a trace.',
         evidence: {
-          label: 'Factory Simulator ships a full pipeline trace per run',
+          label:
+            "Factory Simulator returns the agent's plan and LLM-call trace with each run",
           href: 'https://github.com/NielsdaWheelz/factory-simulator',
         },
         added: '2026-08-09',
@@ -264,7 +270,7 @@ const corpus: PillowList[] = [
         added: '2026-08-09',
       },
       {
-        text: "An agent's opportunity to improvise. Pydantic contract in, Pydantic contract out, nothing invented in between.",
+        text: "An agent's opportunity to improvise. Pydantic contract in, Pydantic contract out, every invention measured.",
         evidence: {
           label: 'Factory Simulator contracts',
           href: '/projects/factory-simulator',
@@ -307,10 +313,6 @@ const corpus: PillowList[] = [
       },
       {
         text: 'A model card that admits what the model cannot do.',
-        evidence: {
-          label: 'one attempt',
-          href: 'https://huggingface.co/nnandal/niels-gpt',
-        },
         added: '2026-08-09',
       },
       {

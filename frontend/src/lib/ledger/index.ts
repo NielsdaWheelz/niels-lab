@@ -25,7 +25,7 @@ export function mergeEvents(batches: LedgerEvent[][]): LedgerEvent[] {
   return merged.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
 }
 
-// Quiet for a fortnight is a deload, and the page says so instead of
+// Quiet for a fortnight means the page reports the absence instead of
 // pretending the ledger is current. An empty ledger is quiet by definition.
 export function isStale(events: LedgerEvent[], today: string): boolean {
   const latest = events.reduce(

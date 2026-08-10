@@ -1,0 +1,59 @@
+---
+title: 'hockey-stats'
+publishedAt: '2026-08-09'
+summary: 'A two-process NHL analytics system: TypeScript writes the facts, Python fits the models, Postgres is their only meeting point.'
+repoUrl: 'https://github.com/NielsdaWheelz/hockey-stats'
+---
+
+hockey-stats is an NHL analytics system that runs on one machine: ingestion,
+canonical facts, expected-goals model families, venue correction, goalie
+metrics, and a
+[rink shot map](https://github.com/NielsdaWheelz/hockey-stats/blob/1d45312ed4a2d797150e377c87ecdba231b5ebfc/apps/web/src/viz/attempt-rink-map.tsx)
+in React and d3. The itch was to build the entire pipeline myself against
+the two public peers, Evolving Hockey and HockeyViz, whose published methods
+are [cataloged in-repo](https://github.com/NielsdaWheelz/hockey-stats/blob/1d45312ed4a2d797150e377c87ecdba231b5ebfc/docs/design/modeling-philosophy-and-peer-comparison.md)
+as a D01–D74 evidence file.
+
+The split is the architecture. A TypeScript/Effect application owns Postgres
+and every canonical write; a Python batch owns the models; the two meet
+[only through designated tables](https://github.com/NielsdaWheelz/hockey-stats/blob/1d45312ed4a2d797150e377c87ecdba231b5ebfc/README.md).
+The batch is a separate OS process the maintainer launches, never the app.
+One language for everything, or an RPC seam between services, were the
+alternatives; the choice is recorded in the
+[decision ledger](https://github.com/NielsdaWheelz/hockey-stats/blob/1d45312ed4a2d797150e377c87ecdba231b5ebfc/docs/design/decisions.md)
+the repo keeps for every durable choice.
+
+Two more decisions define the statistics. The production posterior engine is
+validated against
+[NumPyro NUTS reference posteriors](https://github.com/NielsdaWheelz/hockey-stats/blob/1d45312ed4a2d797150e377c87ecdba231b5ebfc/py/pyproject.toml),
+while importing jax or numpyro from production code is a testable defect —
+the reference dependencies live in their own exactly-pinned group. The
+alternatives were running MCMC in production, or trusting the approximation
+unchecked. And [CI runs fully offline](https://github.com/NielsdaWheelz/hockey-stats/blob/1d45312ed4a2d797150e377c87ecdba231b5ebfc/.github/workflows/ci.yml):
+every test tier serves the NHL HTTP boundary from a committed fixture
+corpus, so CI never contacts a live NHL host. Live endpoints in CI, or
+function-level mocks, were the alternatives.
+
+Numbers, by git log and grep (raw wc -l, blanks and docstrings included):
+406 commits in five and a half weeks, 2026-06-23 to 2026-08-01; 57 versioned
+Postgres migrations; 2,637 Python test functions across 238 files, plus
+Playwright journeys over the real API and web stack.
+
+What is wrong with it, the project
+[documents itself](https://github.com/NielsdaWheelz/hockey-stats/blob/1d45312ed4a2d797150e377c87ecdba231b5ebfc/docs/services/_status.md):
+four open P0 defects, including origin-recovery validation that leaks the
+held-out target into the predictors, which blocks all-attempt model
+selection, and calibration endpoints served as uncertainty bands on the
+goalie card when they are no such thing — a live statistical defect the
+status file names. The Direct228 offence-map vertical, the subject of most of the final
+month's commits, never shipped: at HEAD it is
+[blocked on a CHOLMOD ABI mismatch](https://github.com/NielsdaWheelz/hockey-stats/commit/1d45312ed4a2d797150e377c87ecdba231b5ebfc),
+and zero Direct model rows exist. Skater valuation and the goalie isolates
+are written but dormant: no campaign, no selection, no cutover. The status
+doc states that known gaps
+prohibit any parity claim against the peers, so I make none.
+
+What I trust most in the repo is the
+[register of what is not done](https://github.com/NielsdaWheelz/hockey-stats/blob/1d45312ed4a2d797150e377c87ecdba231b5ebfc/docs/implementation/remaining-work.md).
+The models are behind the bookkeeping, and the bookkeeping says exactly how
+far.

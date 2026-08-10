@@ -1,0 +1,60 @@
+---
+title: 'niels-gpt-1: a language model in two days'
+publishedAt: '2026-08-09'
+summary: 'Two days from first commit to published checkpoint: 256 tokens of vocabulary, six hours of training, one laptop.'
+repoUrl: 'https://github.com/NielsdaWheelz/niels-gpt-1'
+---
+
+niels-gpt-1 is a byte-level GPT, written and trained from scratch on a
+MacBook Air. It came out of
+[makemore](https://github.com/NielsdaWheelz/makemore/blob/fb72b74d63d29a75cc084d876990d4904642fba1/README.md),
+two November days of Karpathy's zero-to-hero exercises: character-level
+name models and a hand-written autograd class.
+
+The
+[charter](https://github.com/NielsdaWheelz/niels-gpt-1/blob/257190b3c136f70a26c5ae43dd732bd634582269/docs/charter.md)
+fixes the goal and the box — "i write the transformer code, i train the
+weights, and i can explain every part"; one M4 laptop on MPS; a training run
+under six hours; a byte-level tokenizer. Two days separate the first commit,
+2025-12-14, from the
+[published checkpoint](https://huggingface.co/nnandal/niels-gpt), whose
+`best.pt` is dated 2025-12-16.
+
+The tokenizer was the hard call. Subwords from day one were the alternative;
+the charter pins
+[bytes](https://github.com/NielsdaWheelz/niels-gpt-1/blob/257190b3c136f70a26c5ae43dd732bd634582269/niels_gpt/tokenizer.py)
+— vocab 256, every byte a token. A tokenizer I did not build would have been
+the one part I could not explain. The cost is context: T=384
+tokens is 384 bytes, roughly a hundred words of memory.
+
+The rest is deliberately legible.
+[RoPE implemented by hand](https://github.com/NielsdaWheelz/niels-gpt-1/commit/356d4d7757956509a98ebf524d98c7f315cd9f82),
+with its own PR and tests. A decoder-only transformer with LayerNorm, GELU
+MLP, and weight tying, at
+[V=256, T=384, C=384, six layers, four heads](https://github.com/NielsdaWheelz/niels-gpt-1/blob/257190b3c136f70a26c5ae43dd732bd634582269/niels_gpt/config.py).
+Pretraining mixes wikitext-103, my Roam notes, and a hand-written primer at
+0.72, 0.18, and 0.10. A
+[chat CLI](https://github.com/NielsdaWheelz/niels-gpt-1/blob/257190b3c136f70a26c5ae43dd732bd634582269/niels_gpt/chat_cli.py)
+with temperature and top-k sampling and stop sequences. Attention stays a
+manual softmax, and a
+[traced forward path](https://github.com/NielsdaWheelz/niels-gpt-1/commit/629aa061becac3e19fef7fd6b212e17f0395f2e3)
+returns the probability rows
+[niels-gpt-app](/projects/niels-gpt-app) displays.
+
+Numbers, by wc -l and grep over tracked files: 5,720 lines of Python across
+43 files; 107 test functions in
+[16 files](https://github.com/NielsdaWheelz/niels-gpt-1/tree/257190b3c136f70a26c5ae43dd732bd634582269/tests);
+the dependencies are torch and datasets.
+
+What is wrong with it. No loss curve, no eval number, and no sample
+transcript is committed anywhere, so I can cite the machinery and not the
+model. The README's caveats contradict the config in one place — "context is
+512 tokens" against a T=384 default. Best-checkpoint selection keys on
+wikitext loss alone. And the repo is a frozen snapshot: the original repo
+was renamed and rewritten in place as niels-gpt-2, the two share their first
+29 commits, and v1's
+[final commit](https://github.com/NielsdaWheelz/niels-gpt-1/commit/257190b3c136f70a26c5ae43dd732bd634582269)
+is a README todo recording the link debt the split created.
+
+The byte-level constraint was the point.
+[niels-gpt-2](/projects/niels-gpt-2) removes it.

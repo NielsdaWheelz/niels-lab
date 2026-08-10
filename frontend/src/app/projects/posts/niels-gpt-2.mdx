@@ -1,0 +1,69 @@
+---
+title: 'niels-gpt-2: subwords, SFT, and a KV cache'
+publishedAt: '2026-08-09'
+summary: 'The rewrite of my from-scratch model: subword tokenizer, supervised fine-tuning, hand-written KV-cache inference, and a benchmark sweep that picks the config.'
+repoUrl: 'https://github.com/NielsdaWheelz/niels-gpt-2'
+---
+
+niels-gpt-2 is the rewrite of [niels-gpt-1](/projects/niels-gpt-1), done in
+the renamed original repo. The
+[v2 roadmap](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/docs/v2/pr2_roadmap.md)
+is titled "best possible on m4/16gb," and everything below is that sentence
+executed.
+
+The driving reversal is the tokenizer: bytes went, replaced by
+[SentencePiece unigram](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/scripts/train_tokenizer.py)
+at vocab 16,000 with byte fallback, so the 512-token window no longer reads
+single bytes. Chat structure needs sentinel tokens, and standard markers can
+occur in scraped text; mine carry
+[UUID suffixes](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/niels_gpt/special_tokens.py),
+the [loader fails](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/niels_gpt/tokenizer.py)
+unless each sentinel encodes to exactly one id, and every ingested text is
+scanned for collisions.
+
+Data changed with the tokenizer. Pretraining is FineWeb-Edu-primary, mixed
+[0.70, 0.20, 0.10](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/niels_gpt/settings.py)
+with wikitext and my Roam notes; an SFT stage over Dolly, OASST1
+[rebuilt from its conversation trees](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/tests/test_oasst1_reconstruction.py),
+and a hand-written primer masks the loss to
+[assistant spans](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/niels_gpt/format/sft.py).
+Token caches are sharded uint16 bins whose
+[metadata records the tokenizer's SHA-256](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/niels_gpt/cache/build_cache.py);
+[training refuses](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/train/pretrain.py)
+a mismatched cache rather than train on tokens from a different tokenizer. The
+alternative, trusting the cache directory to stay in sync, fails silently —
+the worst way to fail.
+
+The backbone swapped LayerNorm and GELU for RMSNorm and SwiGLU in
+[one documented commit](https://github.com/NielsdaWheelz/niels-gpt-2/commit/09f895348ec99742cc6b1bc37adfceb32fa4f5ee).
+Inference gained a hand-written
+[KV cache](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/niels_gpt/infer/kv_cache.py),
+prefill plus decode_step, instead of a serving library;
+[equivalence tests](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/tests/test_kv_cache.py)
+hold it to the uncached path — greedy equivalence, logits parity, MPS
+parity.
+And hyperparameters come from measurement: a
+[benchmark sweep](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/tools/bench_sweep.py)
+isolates each candidate config in a subprocess, detects OOMs and timeouts,
+binary-searches the largest microbatch, and ranks configs by estimated
+tokens per eight hours. The alternative was copying another project's
+hyperparameters and hoping they fit a 16GB laptop.
+
+Numbers, from git log and grep at HEAD: 55 commits, 2025-12-14 to
+2026-01-12; 246 test functions in 46 files; 29 committed
+`resolved_settings.json` run records; the
+[dependencies](https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/pyproject.toml)
+are torch, datasets, sentencepiece, and pydantic. CUDA support with
+device-aware AMP
+[landed 2026-01-12](https://github.com/NielsdaWheelz/niels-gpt-2/commit/98e110aa1b11b520c632a4cc08f6f8a9a2bed42d).
+
+What is wrong with it. The rewrite kept v1's flaw: the repo commits nothing
+that measures the model, not a loss curve, a perplexity, or a sample
+output. The
+[published checkpoint](https://huggingface.co/nnandal/niels-gpt) predates
+the backbone rewrite; it is the v1-era model, and no v2 checkpoint or
+tokenizer artifact is public. The README still says "tokens here are just
+utf-8 bytes." The Gutenberg loader is a stub. The default `tokenizer_type`
+reads "bpe" while everything trained is unigram.
+
+The guardrails all hold. What they guard, I never measured.

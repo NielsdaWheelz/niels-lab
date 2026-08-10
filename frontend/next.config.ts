@@ -6,6 +6,17 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     '/og': ['./src/fonts/Newsreader-*.ttf'],
   },
+  // niels-gpt was one post; it split into niels-gpt-1, niels-gpt-2, and
+  // niels-gpt-app. The old URL lands on the main repo's writeup.
+  async redirects() {
+    return [
+      {
+        source: '/projects/niels-gpt',
+        destination: '/projects/niels-gpt-2',
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {
