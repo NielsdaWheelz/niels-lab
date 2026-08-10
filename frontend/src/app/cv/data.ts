@@ -16,13 +16,13 @@ export const entries = [
   },
   {
     title: 'Nexus',
-    date: 'November 2025',
+    date: 'November 2025 – present',
     category: 'project' as const,
     bullets: [
-      'Built a reading system that ingests PDFs, EPUBs, and HTML into deterministic canonical text, chunked and embedded into Postgres/pgvector for semantic search.',
-      'Anchored highlights and annotations as byte-offset ranges into canonical text.',
-      'Enforced per-user access control on every search and document read.',
-      'Served it from FastAPI, SQLAlchemy, and Alembic with Celery workers, fronted by Next.js with a TypeScript API client generated from the OpenAPI schema.',
+      'Run a production reading, notes, and AI workspace at nexus.nielseriknandal.com: EPUB, PDF, web, YouTube, and podcast ingestion, with an Android shell and a Manifest V3 capture extension.',
+      'Rebuilt the ten-day FastAPI prototype from an empty repository into the production system — a Next.js BFF over FastAPI, SSE authenticated by 60-second single-use JWTs, background work on a Postgres job queue in place of Celery and Redis.',
+      'Anchor highlights as Unicode codepoint ranges into canonical text; when client and server canonicalization disagree, the reader refuses to highlight rather than store a bad anchor.',
+      'Shipped 1,571 commits and 211 Alembic migrations between December 2025 and August 2026, directing Claude agents that carry co-author trailers on 562 of them.',
     ],
   },
   {
