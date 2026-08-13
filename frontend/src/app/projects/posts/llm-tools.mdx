@@ -1,0 +1,81 @@
+---
+title: 'llm-tools'
+publishedAt: '2026-08-13'
+summary: 'A provider-neutral typed tool kernel: four portable tools, closed capability profiles, and one replay boundary.'
+repoUrl: 'https://github.com/NielsdaWheelz/llm-tools'
+---
+
+llm-tools is a provider-neutral typed tool kernel for applications that need to
+give a model a small, explicit tool surface. The
+[README](https://github.com/NielsdaWheelz/llm-tools/blob/667e5121268189d6fe1202c244d5ce64e8b096d1/README.md)
+defines four portable tools — `web.search`, `web.read`, `tool.search`, and
+`tool.read` — and keeps provider wire protocols, authorization, orchestration,
+and persistence outside the package.
+
+The package is deliberately assembled in layers. An owner declares a typed
+`ToolSpec` and binds it to an implementation; immutable families compose into a
+catalogue; a closed capability profile grants authority; and a frozen plan
+chooses exactly one exposure: native tools, progressive discovery, or a host
+table. The
+[catalogue and profile code](https://github.com/NielsdaWheelz/llm-tools/blob/667e5121268189d6fe1202c244d5ce64e8b096d1/src/llm_tools/catalog.py)
+rejects duplicate ids, prefix mismatches, unbound publication, and grants that
+are not in the catalogue. There is no ambient registry to discover by accident.
+
+The boundary that makes this useful is
+[`ToolExecutor`](https://github.com/NielsdaWheelz/llm-tools/blob/667e5121268189d6fe1202c244d5ce64e8b096d1/src/llm_tools/execution.py).
+Every bounded call gets a canonical input digest before typed decoding. A
+position recorder owns occupation, budget reservation, dispatch state, terminal
+result, and settlement, so a terminal replay returns the same result without a
+second charge. `BilledOnce` calls stay uncertain after an unknown post-dispatch
+outcome and require explicit host recovery; `ReDispatchable` calls may only be
+re-admitted after the host proves that the abandoned dispatch was fenced.
+The library supplies the seam, not the durable store.
+
+The schema path is similarly singular. Python declarations compile through one
+[strict normalizer](https://github.com/NielsdaWheelz/llm-tools/blob/667e5121268189d6fe1202c244d5ce64e8b096d1/src/llm_tools/schema.py)
+into semantic and presentation projections: objects close by default, every
+property is required, nullable values are explicit JSON `null`, references are
+inlined or rejected, and unsupported schema shapes fail closed. Contract,
+documentation, binding-policy, profile, and plan revisions are kept separate,
+so a description edit does not invalidate authority or durable replay.
+
+`web.search` carries the useful part of the earlier Brave adapter into the
+portable kernel: normalized ranked results, provenance, a two-attempt ceiling,
+and bounded retries owned by the library. The model-facing input is only a
+query and nullable freshness value; locale, result count, and the effective
+limits remain host policy. Its
+[binding](https://github.com/NielsdaWheelz/llm-tools/blob/667e5121268189d6fe1202c244d5ce64e8b096d1/src/llm_tools/web/brave.py)
+requires an explicitly supplied credential, or the host can bind the declared
+tool as unavailable without preventing process boot.
+
+`web.read` is a separate, non-persisting public-Web read. Before every request
+and redirect it normalizes the URL, resolves and admits the destination,
+connects to a pinned peer, and checks that peer again. Aggregate ceilings cover
+redirects, retries, wire bytes, decoded bytes, extracted text, and elapsed time.
+It sends no credentials, cookies, subresources, scripts, or browser state, and
+returns bounded text plus a source, snapshot, and locator in an
+[evidence receipt](https://github.com/NielsdaWheelz/llm-tools/blob/667e5121268189d6fe1202c244d5ce64e8b096d1/src/llm_tools/evidence.py).
+The reader mitigates network-boundary abuse; an application still owns the
+information-flow policy for disclosing private data.
+
+The discovery pair is intentionally authority-blind. `tool.search` and
+`tool.read` inspect only the intersection of profile grants and a plan's frozen
+targets. Reading an unknown, ungranted, or non-target id produces the same
+`ToolUnavailable` boundary failure, and successful reads can be published on a
+later request without expanding authority. The
+[discovery tests](https://github.com/NielsdaWheelz/llm-tools/blob/667e5121268189d6fe1202c244d5ce64e8b096d1/tests/kernel/test_discovery.py)
+prove that target cap and next-request publication behavior.
+
+The merged cutover is intentionally not a general agent platform. It adds no
+provider SDK, MCP transport, model selection, workflow engine, crawler, browser
+automation, plugin registry, compatibility import, or automatic fallback. The
+[cutover contract](https://github.com/NielsdaWheelz/llm-tools/blob/667e5121268189d6fe1202c244d5ce64e8b096d1/docs/cutovers/llm-tools-library-hard-cutover.md)
+keeps provider lowering in `provider-runtime`, authorization and durable state
+in each host, and portable tool identity in lower-case dotted ids.
+
+The package is an alpha Python 3.12 library with `httpx`, `pydantic`, and
+`rfc8785` as runtime dependencies. Its proof is split by seam: kernel contract,
+execution and prompt tests, discovery tests, Web conformance tests, and an
+isolated package test that checks the public facade. The
+[upstream merge](https://github.com/NielsdaWheelz/llm-tools/commit/667e5121268189d6fe1202c244d5ce64e8b096d1)
+is the immutable source for this entry.
