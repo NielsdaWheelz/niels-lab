@@ -174,17 +174,16 @@ W2/W3/W4/W5 run in parallel after W1. W4's table lands only after the client app
 | Index keeps its `<details>` table | Hour-alive needs an openable list on `/`; the v1 structure already provides it — least churn, no new pattern. |
 | Threshold cut | Client, 2026-09-05. Recorded; not relitigated. |
 
-## 13. Open questions (blocking "go")
+## 13. Questions
 
-1. **Leaf warmth and the rubric.** The demos used a warm leaf (`#FAF8F3`) and a vermilion
-   rubric ink; `docs/rules.md` bans cream/terracotta palettes as a first-order slop tell,
-   and the v1 QA already extirpated a cream/terracotta artifact once. Options:
-   **(a)** keep the existing cool leaf `#F5F3F7` and no fourth ink — zero rule deviation
-   (recommended); **(b)** amend `rules.md` in writing to admit a warm leaf and a vermilion
-   rubric under an enumerated whitelist (pilcrow, folio, current-page mark — nothing else).
-2. **The hour table.** I will propose the six epigraph pairings (corpus lines, verbatim,
-   referenced by index) and six open-list assignments for your approval before W4 lands.
-   Curation of existing lines only — approve the mechanism now, the table at its gate.
-3. **Wit.** v1's law is one delight (the 404). The study's beauty judge found the whole
-   field humorless. Add one dry chrome aside per room (each line drafted for your
-   signature), or keep the single-delight law? Either is coherent; choose.
+1. **Leaf warmth and the rubric — RESOLVED (client, 2026-09-05):** the cool leaf
+   `#F5F3F7`, no fourth ink, zero deviation from `rules.md`. The warm leaf and vermilion
+   rubric of the study's demos do not ship.
+2. **The hour table — RESOLVED (client, 2026-09-05):** mechanism approved. The six
+   epigraph pairings (corpus lines, verbatim, referenced by index) and six open-list
+   assignments still come to the client for sign-off before W4 lands — that gate stands.
+3. **Wit — OPEN, blocking "go".** v1's law is one delight (the 404). The study's beauty
+   judge found the whole field humorless. Options under discussion: keep the law; a
+   one-aside-per-room budget; or wit confined to surfaces where chrome must already speak
+   (error, emptiness, staleness) — no new surface ever created to carry a line. All chrome
+   lines are drafted for the client's signature under the register rules.
