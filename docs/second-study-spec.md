@@ -1,6 +1,6 @@
 # The Second Study — presentation spec
 
-Status: **v1.0 draft — awaiting client answers to §13; implementation on an explicit "go"**.
+Status: **v1.1 — all §13 questions resolved 2026-09-05; awaiting an explicit "go"**.
 Branch: `agent/second-study`. No code changes yet. Standards: `docs/rules.md`, `docs/testing-standards.md`.
 Decision context: The Second Study brief, five walkable plates, and the Page-and-Wall
 comparison (Claude artifacts, 2026-09); client picks recorded 2026-09-05.
@@ -76,6 +76,13 @@ entrance; the site's force comes from scale, margins, the hour, and the corpus i
 6. **Colophon** — documents: canon ratios, hour tables, ink-age constants
    (`AGE_STEPS`, `FAILURE_FACTOR`), theme flip, and the unchanged client-component
    allowance (theme toggle, lab playground).
+7. **The wit law** — wit lives only where chrome must already speak; the site never
+   creates a surface to carry a line. The enumerated surfaces (exhaustive until amended
+   in writing): the 404 (exists), the ledger's stale state ("deload week", exists), the
+   print CV footer, the colophon sign-off, the llms.txt tail. Each line is a true
+   sentence in the register (sentence case, no exclamation, precision is the humor),
+   drafted in W5 and shipped only with the client's signature. Neutral filler is the
+   fallback for any line the client declines.
 
 ## 6. Schemas
 
@@ -140,7 +147,7 @@ from two flat tones and geometry, no gradients.
 | W2 | Index + list leaves + margin apparatus | `app/page.tsx`, `app/lists/`, gloss component + module css | W1 |
 | W3 | Ledger material law | `lib/ledger/inkAge.ts` (+test), `app/log/` | W1 |
 | W4 | Hour system | `lib/hour.ts` (+test), `content/hours.ts`, `/` integration | W1, §13 Q2 |
-| W5 | Inner restyle sweep + colophon draft | `writing/`, `projects/`, `cv/`, `now/`, `lab/`, `not-found.tsx`, `colophon/` | W1 |
+| W5 | Inner restyle sweep + colophon draft + §5.7 chrome lines (for signature) | `writing/`, `projects/`, `cv/`, `now/`, `lab/`, `not-found.tsx`, `colophon/` | W1 |
 | W6 | Lint + machine surfaces | `scripts/validate-content.mjs`, `README.md` | W2–W4 schemas |
 | W7 | QA: `bun run check`, screenshots both themes at all six bands, slop audit, curl parity | none (read-only) | all |
 
@@ -159,6 +166,8 @@ W2/W3/W4/W5 run in parallel after W1. W4's table lands only after the client app
   minutes); machine parity: all eight lists complete in HTML at every hour.
 - In `/log`, a failure row renders visibly drier than same-age neighbors and its lesson
   renders full celadon; validated constants match the colophon's published values.
+- Wit only on the §5.7 enumerated surfaces; every shipped chrome line client-signed; no
+  surface exists whose only purpose is to carry a line.
 - Print CV one page, black-and-white legible; OG in leaf style; bio byte-identical everywhere.
 - Slop audit passes under `docs/rules.md` as amended by the §13 Q1 resolution.
 
@@ -172,6 +181,7 @@ W2/W3/W4/W5 run in parallel after W1. W4's table lands only after the client app
 | Ink-age as stepped tokens | Continuous interpolation would put computed hex outside `globals.css`; steps keep the token rule and make AA checkable per step. |
 | Hour via ISR 3600 | Static-first honored; no client clock; band logic is a pure tested function. |
 | Index keeps its `<details>` table | Hour-alive needs an openable list on `/`; the v1 structure already provides it — least churn, no new pattern. |
+| Wit law: chrome speaks in register only where it must speak at all | Client pick (option c, 2026-09-05); generalizes "deload week"; caps surface area structurally, not by willpower. |
 | Threshold cut | Client, 2026-09-05. Recorded; not relitigated. |
 
 ## 13. Questions
@@ -182,8 +192,6 @@ W2/W3/W4/W5 run in parallel after W1. W4's table lands only after the client app
 2. **The hour table — RESOLVED (client, 2026-09-05):** mechanism approved. The six
    epigraph pairings (corpus lines, verbatim, referenced by index) and six open-list
    assignments still come to the client for sign-off before W4 lands — that gate stands.
-3. **Wit — OPEN, blocking "go".** v1's law is one delight (the 404). The study's beauty
-   judge found the whole field humorless. Options under discussion: keep the law; a
-   one-aside-per-room budget; or wit confined to surfaces where chrome must already speak
-   (error, emptiness, staleness) — no new surface ever created to carry a line. All chrome
-   lines are drafted for the client's signature under the register rules.
+3. **Wit — RESOLVED (client, 2026-09-05): option (c),** codified as §5.7. Wit is
+   confined to surfaces where chrome must already speak; no surface is ever created to
+   carry a line; every line ships only with the client's signature.
