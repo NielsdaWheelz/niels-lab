@@ -1,0 +1,186 @@
+<title>Page and Wall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Spline+Sans+Mono:wght@300..500&display=swap">
+<style>
+  /* PAGE AND WALL — the same sentences, set twice.
+     Left: the page (Living Hand). Right: the wall (Bearing).
+     Three decisions separate them: where proof lives, whether type is even
+     or graded, and the ground. Everything else can ride on either. */
+  :root { --gutter: #0B0B10; --mono: 'Spline Sans Mono', ui-monospace, monospace; }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--gutter);
+    color: #E8E5EE;
+    font-family: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+    font-optical-sizing: auto; font-size: 1.1rem; line-height: 1.58;
+    margin: 0; font-variant-numeric: oldstyle-nums;
+  }
+  a:focus-visible, summary:focus-visible { outline: 2px solid #C65540; outline-offset: 3px; }
+
+  .intro { max-width: 62ch; margin: 0 auto; padding: 4.5rem 1.5rem 3rem; }
+  .intro h1 { font-style: italic; font-weight: 320; font-variation-settings: 'opsz' 60;
+    font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; margin: 0 0 1rem; }
+  .intro p { margin: 0 0 0.9rem; color: #B5B0BF; }
+  .intro b { color: #E8E5EE; font-weight: 500; }
+
+  .split { display: grid; grid-template-columns: 1fr; gap: 2px; }
+  @media (min-width: 72rem) { .split { grid-template-columns: 1fr 1fr; } }
+  .half { padding: 3rem clamp(1.4rem, 4vw, 4rem) 4rem; min-width: 0; }
+
+  /* ---------------- THE PAGE ---------------- */
+  .page { background: #FAF8F3; color: #1B1B22; }
+  .page ::selection { background: #66327C; color: #FAF8F3; }
+  .page .side { color: #B5432E; }
+  .page .tag { color: #4A7367; }
+  .page h2 { font-style: italic; font-weight: 380; font-variation-settings: 'opsz' 44;
+    font-size: 1.9rem; margin: 2.6rem 0 0.3rem; }
+  .page h2::first-letter { color: #B5432E; }
+  .page .note { color: #8A857B; font-style: italic; margin: 0 0 2rem; }
+  .page .entries { margin: 0; padding: 0; list-style: none; }
+  .page .entry { display: grid; grid-template-columns: minmax(0, 1fr) minmax(9rem, 14rem); gap: 1.6rem; margin: 0 0 1.05rem; }
+  .page .entry > p { margin: 0; padding-left: 1.4rem; text-indent: -1.4rem; }
+  .page .entry > p::before { content: '—\2002'; color: #8A857B; }
+  .page .gloss { font-family: var(--mono); font-size: 0.72rem; line-height: 1.5; color: #4A7367; padding-top: 0.25rem; }
+  .page .gloss a { color: #4A7367; text-decoration-color: #E4E0D5; overflow-wrap: anywhere; }
+  @media (max-width: 40rem) { .page .entry { display: block; } .page .gloss { display: block; padding: 0.2rem 0 0 1.4rem; } }
+  .page .ledger .entry > p { padding-left: 5.8rem; text-indent: -5.8rem; }
+  .page .ledger .entry > p::before { content: none; }
+  .page .when { font-family: var(--mono); font-size: 0.73rem; color: #4A7367; margin-right: 1rem; }
+  .page .struck { position: relative; display: inline; }
+  .page .struck::after { content: ''; position: absolute; left: -0.5%; right: -0.5%; top: 50%; border-top: 1.2px solid #1B1B22; transform: rotate(-0.7deg); }
+  .page .verdictline { border-top: 1px solid #E4E0D5; margin-top: 2.8rem; padding-top: 1.1rem; color: #8A857B; font-style: italic; }
+
+  /* ---------------- THE WALL ---------------- */
+  .wall { background: #16161D; color: #F1EDF5; }
+  .wall ::selection { background: #A87BC4; color: #16161D; }
+  .wall .side { color: #A87BC4; }
+  .wall .tag { color: #7FA99B; }
+  .wall h2 { font-style: italic; font-weight: 420; font-variation-settings: 'opsz' 44;
+    font-size: 1.9rem; margin: 2.6rem 0 0.3rem; color: #A87BC4; }
+  .wall .note { color: #8B8794; font-style: italic; margin: 0 0 2rem; font-weight: 340; }
+  .wall .entries { margin: 0; padding: 0; list-style: none; }
+  .wall .entries > li { border-bottom: 1px solid #2C2B36; }
+  .wall .entries p { margin: 0; padding: 0.8rem 0; }
+  .wall details summary { list-style: none; cursor: pointer; }
+  .wall details summary::-webkit-details-marker { display: none; }
+  .wall .mark { color: #7FA99B; font-family: var(--mono); font-size: 0.72rem; margin-left: 0.5rem; }
+  .wall .pier { background: #201F2A; margin: 0 0 0.9rem; padding: 0.75rem 1rem;
+    font-weight: 730; line-height: 1.4; font-size: 0.98rem; }
+  .wall .pier a { color: #F1EDF5; text-decoration-color: #7FA99B; overflow-wrap: anywhere; }
+  .wall .pier .d { color: #7FA99B; font-family: var(--mono); font-size: 0.7rem; font-weight: 400; display: block; margin-top: 0.35rem; }
+  .wall .when { font-family: var(--mono); font-size: 0.73rem; color: #7FA99B; margin-right: 1rem; }
+  .wall .struck { position: relative; display: inline; }
+  .wall .struck::after { content: ''; position: absolute; left: -0.5%; right: -0.5%; top: 50%; border-top: 1.2px solid #F1EDF5; transform: rotate(-0.7deg); }
+  .wall .lesson { display: block; color: #7FA99B; font-size: 0.92rem; font-weight: 400; font-style: italic; padding: 0 0 0.8rem; }
+  .wall .verdictline { border-top: 1px solid #2C2B36; margin-top: 2.8rem; padding-top: 1.1rem; color: #8B8794; font-style: italic; font-weight: 340; }
+
+  /* shared annotation chrome */
+  .side { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; margin: 0; }
+  .tag { display: block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; margin: 3rem 0 0.8rem; }
+
+  /* ---------------- the five choices ---------------- */
+  .choices { max-width: 66ch; margin: 0 auto; padding: 4.5rem 1.5rem 5rem; }
+  .choices h2 { font-style: italic; font-weight: 360; font-variation-settings: 'opsz' 44; font-size: 1.9rem; margin: 0 0 0.5rem; }
+  .choices > p { color: #B5B0BF; margin: 0 0 2rem; }
+  .choice { border-top: 1px solid #2C2B36; padding: 1rem 0; display: grid; grid-template-columns: 7.5rem 1fr; gap: 1.3rem; }
+  @media (max-width: 40rem) { .choice { grid-template-columns: 1fr; gap: 0.2rem; } }
+  .choice dt { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.13em; text-transform: uppercase; color: #C65540; padding-top: 0.25rem; }
+  .choice dd { margin: 0; color: #B5B0BF; }
+  .choice dd b { color: #E8E5EE; font-weight: 500; }
+  .choice dd .pick { color: #7FA99B; font-family: var(--mono); font-size: 0.74rem; }
+  .plateline { max-width: 66ch; margin: 0 auto; padding: 0 1.5rem 4rem; color: #6E6A78; font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; }
+</style>
+
+<header class="intro">
+  <h1>Page and Wall</h1>
+  <p>The same sentences, set twice. <b>Three decisions</b> separate the halves: where proof lives, whether the type is even or graded, and the ground. Read one entry on the left, then the same entry on the right. Everything else — the clock, the ledger&rsquo;s laws, the stone — can ride on either answer.</p>
+</header>
+
+<div class="split">
+
+  <!-- ================= THE PAGE ================= -->
+  <section class="half page">
+    <p class="side">THE PAGE — proof in the margin · type even · ground of paper</p>
+
+    <h2>Elegant things</h2>
+    <p class="note">order comes from inks and rules; the surface is serene</p>
+
+    <span class="tag">① proof — printed beside the claim, never clicked</span>
+    <ol class="entries">
+      <li class="entry"><p>Squat bar path: one vertical line, drawn twice.</p></li>
+      <li class="entry"><p>Dickinson&rsquo;s slant rhyme: the bell you expected, struck slightly off, on purpose.</p></li>
+      <li class="entry">
+        <p>RMSNorm: LayerNorm minus the mean, and nothing misses it.</p>
+        <span class="gloss"><a href="https://github.com/NielsdaWheelz/niels-gpt-2">niels-gpt model code</a><br>2026-08-09</span>
+      </li>
+      <li class="entry">
+        <p>Weight tying: the matrix that reads is the matrix that speaks.</p>
+        <span class="gloss"><a href="https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/niels_gpt/model/gpt.py">gpt.py, weight tying</a><br>2026-08-09</span>
+      </li>
+    </ol>
+
+    <span class="tag">② order — every entry the same weight, forever</span>
+    <ol class="entries ledger">
+      <li class="entry"><p><span class="when">08-02</span>SQ 3&times;3 @385 &middot; third set moved like the first</p></li>
+      <li class="entry">
+        <p><span class="when">07-20</span><span class="struck">/og 500 in production &middot; fonts missing from the function bundle</span></p>
+        <span class="gloss">A build that passes locally proves the laptop, not the deploy.</span>
+      </li>
+      <li class="entry"><p><span class="when">06-05</span>SQ 5&times;5 @335 &middot; pickup 90 min</p></li>
+    </ol>
+
+    <p class="verdictline">What it buys: the life as something <b style="font-weight:500">written</b> — calm, luminous, finished-feeling. What it costs: nothing on this page carries physical weight; the strongman is a subject here, never a force.</p>
+  </section>
+
+  <!-- ================= THE WALL ================= -->
+  <section class="half wall">
+    <p class="side">THE WALL — proof opens heavy · type settles · ground of night</p>
+
+    <h2>Elegant things</h2>
+    <p class="note">order comes from mass; the past is denser than the present</p>
+
+    <span class="tag">① proof — behind the claim; opened, it is set heavier than the claim</span>
+    <ol class="entries">
+      <li style="font-weight:380;line-height:1.64"><p>Squat bar path: one vertical line, drawn twice.</p></li>
+      <li style="font-weight:450;line-height:1.58"><p>Dickinson&rsquo;s slant rhyme: the bell you expected, struck slightly off, on purpose.</p></li>
+      <li style="font-weight:520;line-height:1.52">
+        <details>
+          <summary><span>RMSNorm: LayerNorm minus the mean, and nothing misses it.</span><span class="mark">◆ 1 proof</span></summary>
+          <div class="pier">niels-gpt model code — <a href="https://github.com/NielsdaWheelz/niels-gpt-2">github.com/NielsdaWheelz/niels-gpt-2</a><span class="d">added 2026-08-09 · load-bearing</span></div>
+        </details>
+      </li>
+      <li style="font-weight:600;line-height:1.46">
+        <details>
+          <summary><span>Weight tying: the matrix that reads is the matrix that speaks.</span><span class="mark">◆ 1 proof</span></summary>
+          <div class="pier">gpt.py, weight tying — <a href="https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/niels_gpt/model/gpt.py">source</a><span class="d">added 2026-08-09 · load-bearing</span></div>
+        </details>
+      </li>
+    </ol>
+
+    <span class="tag">② order — weight grows with depth and age; leading tightens</span>
+    <ol class="entries ledger">
+      <li style="font-weight:390"><p><span class="when">08-02</span>SQ 3&times;3 @385 &middot; third set moved like the first</p></li>
+      <li style="font-weight:520">
+        <p><span class="when">07-20</span><span class="struck">/og 500 in production &middot; fonts missing from the function bundle</span></p>
+        <span class="lesson">A build that passes locally proves the laptop, not the deploy.</span>
+      </li>
+      <li style="font-weight:680;line-height:1.42"><p><span class="when">06-05</span>SQ 5&times;5 @335 &middot; pickup 90 min</p></li>
+    </ol>
+
+    <p class="verdictline">What it buys: the life as something <b style="font-weight:500">borne</b> — gravity, accumulation, effort made visible. What it costs: the serenity; the margin&rsquo;s always-visible proof; some fine control of texture, spent on mass.</p>
+  </section>
+</div>
+
+<section class="choices">
+  <h2>The five choices, unbundled</h2>
+  <p>The plates were bundles. These are the actual decisions, each independent. My pick marked on each — together they are what I would now spec: <b>the wall, wearing the page&rsquo;s margins.</b></p>
+  <dl>
+    <div class="choice"><dt>ground</dt><dd><b>Paper</b> or <b>night</b>. <span class="pick">pick: night</span> — your canon is night writing; the leaf survives as the print CV&rsquo;s world, the one daylight room.</dd></div>
+    <div class="choice"><dt>proof</dt><dd><b>In the margin, always visible</b> — or <b>opened, set heavy</b>. <span class="pick">pick: the margin</span> — the site&rsquo;s ethic made spatial; on narrow screens it folds inline, nearer, never gone.</dd></div>
+    <div class="choice"><dt>order</dt><dd><b>Even type</b> or <b>settling type</b>. <span class="pick">pick: settling</span> — the one mechanism that puts your spine into the typography; tuned subliminal in production, legible here so you can judge it.</dd></div>
+    <div class="choice"><dt>clock</dt><dd><b>Static</b> or <b>hour-alive</b> (epigraph and open leaf follow the real San Francisco hour, server-side). <span class="pick">pick: alive</span> — cheap, honest, Sh&omacr;nagon&rsquo;s own index.</dd></div>
+    <div class="choice"><dt>ledger</dt><dd><b>Uniform rows</b> or <b>the material law</b>: weight settles, ink dries, and the struck failure fades faster than its lesson. <span class="pick">pick: the law</span> — confined to /log, where recency is meaning.</dd></div>
+  </dl>
+</section>
+
+<p class="plateline">Page and Wall &middot; The Second Study &middot; the same corpus, set twice &middot; the threshold is cut and does not appear on this page or any other</p>

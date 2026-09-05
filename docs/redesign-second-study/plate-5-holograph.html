@@ -1,0 +1,231 @@
+<title>The Holograph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Spline+Sans+Mono:wght@300..500&display=swap">
+<style>
+  /* PLATE V — THE HOLOGRAPH. The recommendation, composed:
+     the manuscript's architecture carrying Bearing's physics and Shōnagon's clock.
+     The scroll threshold was struck by the client, 2026-09-05; the book arrives
+     directly. No motion anywhere. */
+  :root {
+    --night: #14141B;
+    --nightink: #EDE9F0;
+    --leaf: #FAF8F3;
+    --ink: #1B1B22;
+    --shu: #B5432E;
+    --shu-night: #C65540;
+    --celadon: #4A7367;
+    --celadon-night: #7FA99B;
+    --murasaki: #66327C;
+    --rule: #E4E0D5;
+    --faded: #8A857B;
+    --nightfaded: #77738A;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--leaf); /* the book is the destination */
+    color: var(--ink);
+    font-family: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+    font-optical-sizing: auto; font-size: 1.14rem; line-height: 1.58;
+    margin: 0; font-variant-numeric: oldstyle-nums;
+  }
+  ::selection { background: var(--murasaki); color: var(--leaf); }
+  a { color: var(--murasaki); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--shu); outline-offset: 3px; }
+  .q { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums lining-nums; }
+
+  /* ---------- the threshold: night, mass, distance ---------- */
+  .threshold { background: var(--night); color: var(--nightink); }
+  .panel { min-height: 92vh; display: grid; align-content: center; padding: 0 clamp(1.4rem, 7vw, 7rem); }
+  .panel .line {
+    font-style: italic; font-weight: 280;
+    font-variation-settings: 'opsz' 72;
+    font-size: clamp(2.6rem, 8.5vw, 7rem);
+    line-height: 1.08; letter-spacing: -0.01em;
+    max-width: 18ch; margin: 0; text-wrap: balance;
+  }
+  .panel .waymark {
+    color: var(--celadon-night); font-family: 'Spline Sans Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase;
+    margin: 2.6rem 0 0;
+  }
+  .panel.two .line { margin-left: auto; text-align: right; font-weight: 420; }
+  .panel.two .waymark { text-align: right; }
+  .panel.three .line { font-weight: 560; }
+  .panel.title { min-height: 96vh; }
+  .panel.title .line { font-weight: 300; max-width: 14ch; }
+  .panel.title .sub { color: var(--nightfaded); font-style: italic; margin: 1rem 0 0; font-size: 1.15rem; }
+  .panel .pil { color: var(--shu-night); font-size: 1.5rem; margin-bottom: 1.2rem; }
+
+  /* the cut */
+  .kire { background: var(--night); padding: 0 0 4.5rem; text-align: center; }
+  .kire .mark { display: inline-block; color: var(--shu-night); font-family: 'Spline Sans Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; border-top: 1px solid var(--shu-night); padding-top: 0.8rem; }
+
+  /* ---------- the book: the canon leaf ---------- */
+  .canon {
+    display: grid;
+    grid-template-columns: minmax(1.4rem, 6vw) minmax(0, 60ch) minmax(1.4rem, 20rem) minmax(0, 1fr);
+  }
+  .canon > * { grid-column: 2; min-width: 0; }
+  .canon > .gloss { grid-column: 3; }
+  .canon > .entries { grid-column: 2 / 4; display: grid; grid-template-columns: subgrid; margin: 0; padding: 0; list-style: none; }
+  .entry { display: grid; grid-template-columns: subgrid; grid-column: 1 / 3; margin: 0 0 1.1rem; }
+  .entry > p { grid-column: 1; margin: 0; padding-left: 1.4rem; text-indent: -1.4rem; }
+  .entry > p::before { content: '—\2002'; color: var(--faded); }
+  .entry > .gloss { grid-column: 2; align-self: start; padding-left: 2.2rem; padding-top: 0.28rem; }
+  .gloss { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.73rem; line-height: 1.5; color: var(--celadon); }
+  .gloss a { color: var(--celadon); text-decoration-color: var(--rule); overflow-wrap: anywhere; }
+  @media (max-width: 62rem) {
+    .canon { grid-template-columns: minmax(1.3rem, 5vw) minmax(0, 1fr) minmax(1.3rem, 5vw) 0; }
+    .canon > .entries { display: block; grid-column: 2; }
+    .entry { display: block; }
+    .entry > .gloss { display: block; padding: 0.25rem 0 0 1.4rem; }
+    .canon > .gloss { grid-column: 2; margin: 0.4rem 0 1.2rem; }
+  }
+
+  .runninghead {
+    display: flex; justify-content: space-between; gap: 2rem;
+    padding: 1.1rem 0 0.8rem; border-bottom: 1px solid var(--rule);
+    font-family: 'Spline Sans Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--faded);
+  }
+  .runninghead .here { color: var(--shu); }
+
+  .hour { margin: 5rem 0 0; }
+  .hour .when { font-family: 'Spline Sans Mono', monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--celadon); margin: 0 0 1.1rem; }
+  .hour .line { font-style: italic; font-weight: 330; font-variation-settings: 'opsz' 54; font-size: clamp(1.4rem, 3.2vw, 2.1rem); line-height: 1.3; margin: 0; }
+  .hour .line + .line { margin-top: 0.35rem; padding-left: 3.5rem; }
+
+  /* contents: the physics is already at work — each course a touch heavier */
+  .contents { margin: 4.5rem 0 0; padding: 0; list-style: none; }
+  .contents li { display: flex; gap: 1.1rem; align-items: baseline; padding: 0.5rem 0; border-top: 1px solid var(--rule); }
+  .contents li:first-child { border-top: 0; }
+  .contents .no { color: var(--shu); min-width: 1.6rem; }
+  .contents a { text-decoration: none; color: var(--ink); }
+  .contents a:hover { color: var(--murasaki); }
+  .contents .count { margin-left: auto; color: var(--celadon); font-family: 'Spline Sans Mono', monospace; font-size: 0.74rem; }
+
+  .leafbreak { margin: 6rem 0 0; border: 0; border-top: 1px solid var(--rule); }
+  h2 { font-style: italic; font-weight: 380; font-variation-settings: 'opsz' 44; font-size: 2rem; line-height: 1.15; margin: 3rem 0 0.4rem; }
+  h2::first-letter { color: var(--shu); }
+  .note { color: var(--faded); font-style: italic; margin: 0 0 2.2rem; }
+
+  /* the ledger: ink-age, asymmetric — the failure fades faster than its lesson */
+  .ledger .entry > p { padding-left: 6.4rem; text-indent: -6.4rem; }
+  .ledger .entry > p::before { content: none; }
+  .when { font-family: 'Spline Sans Mono', monospace; font-size: 0.74rem; color: var(--celadon); margin-right: 1.1rem; }
+  /* the ledger's material law: weight settles (Bearing), ink dries (age) */
+  .age0 { color: var(--ink); font-weight: 390; }
+  .age1 { color: #46444F; font-weight: 470; }
+  .age2 { color: #64616D; font-weight: 550; }
+  .age3 { color: #807D8A; font-weight: 640; }
+  .agefail { color: #8E8B96; font-weight: 470; } /* the failure, faded past its cohort */
+  .struck { position: relative; display: inline; }
+  .struck svg { position: absolute; inset: 46% -1% auto -1%; width: 102%; height: 0.5em; overflow: visible; pointer-events: none; }
+  .struck line { stroke: currentColor; stroke-width: 1.2; }
+  .lesson { color: var(--celadon); }
+
+  /* the stone */
+  .stone { margin: 5.5rem 0 0; background: #FFFFFF; border: 1px solid var(--rule); padding: 1.5rem 1.6rem; }
+  .stone .tag { color: var(--faded); font-family: 'Spline Sans Mono', monospace; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; display: block; margin-bottom: 0.7rem; }
+  .stone p { margin: 0.2rem 0; }
+
+  footer.canon { margin-top: 6.5rem; }
+  footer .rulefoot { border-top: 1px solid var(--rule); padding: 1.6rem 0 4.5rem; }
+  footer p { margin: 0.3rem 0; }
+  .colophon { color: var(--faded); font-size: 0.74rem; line-height: 2; }
+  .colophon b { color: var(--celadon); font-weight: 500; }
+  .wit { color: var(--faded); font-style: italic; margin-top: 1.8rem; }
+  .sign { color: var(--shu); font-style: italic; }
+  .plateline { color: var(--faded); font-family: 'Spline Sans Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2.2rem; }
+</style>
+
+<!-- ============ THE BOOK ============ -->
+<div class="canon" id="book">
+  <nav class="runninghead" aria-label="running head">
+    <span>The Pillow Book &middot; Niels-Erik Nandal</span>
+    <span><span class="here">the index</span> &nbsp;&middot;&nbsp; the ledger &nbsp;&middot;&nbsp; the stone</span>
+  </nav>
+
+  <header style="padding:6.5rem 0 0">
+    <p style="color:var(--shu);font-size:1.5rem;margin:0 0 1rem" aria-hidden="true">¶</p>
+    <h1 style="font-style:italic;font-weight:300;font-variation-settings:'opsz' 72;font-size:clamp(2.4rem,6vw,4.4rem);line-height:1.05;margin:0 0 0.7rem;text-wrap:balance">The Pillow Book of Niels-Erik&nbsp;Nandal,</h1>
+    <p style="color:var(--faded);font-style:italic;margin:0">written in San Francisco.</p>
+  </header>
+
+  <div class="hour">
+    <p class="when">in autumn, the evening</p>
+    <p class="line">The last two inches of a deadlift</p>
+    <p class="line">that has stopped moving.</p>
+  </div>
+  <aside class="gloss" style="padding-top:6rem">the epigraph keeps<br>Sh&#333;nagon&rsquo;s clock,<br>server-side; without<br>a clock, the small hours</aside>
+
+  <ol class="contents">
+    <li style="font-weight:400"><span class="no">1</span><a href="#">Things that quicken the heart</a><span class="count">7</span></li>
+    <li style="font-weight:430"><span class="no">2</span><a href="#">Things I have built</a><span class="count">9</span></li>
+    <li style="font-weight:460"><span class="no">3</span><a href="#">Hateful things (found in codebases)</a><span class="count">8</span></li>
+    <li style="font-weight:495"><span class="no">4</span><a href="#elegant">Elegant things</a><span class="count">8</span></li>
+    <li style="font-weight:530"><span class="no">5</span><a href="#">Things that should be small</a><span class="count">8</span></li>
+    <li style="font-weight:560"><span class="no">6</span><a href="#">Rare things</a><span class="count">7</span></li>
+    <li style="font-weight:595"><span class="no">7</span><a href="#">Things that are distant though near</a><span class="count">7 · open tonight</span></li>
+    <li style="font-weight:630"><span class="no">8</span><a href="#">Things now in decline</a><span class="count">7</span></li>
+  </ol>
+  <aside class="gloss" style="padding-top:1rem">the physics at work:<br>each course heavier,<br>computed, never drawn —<br>and the hour picks<br>which leaf stands open;<br>tonight, the seventh</aside>
+
+  <hr class="leafbreak">
+
+  <h2 id="elegant">Elegant things</h2>
+  <p class="note">leaf the fourth &middot; last written 2026-08-09</p>
+
+  <ol class="entries">
+    <li class="entry" style="font-weight:380"><p>Squat bar path: one vertical line, drawn twice.</p></li>
+    <li class="entry" style="font-weight:415"><p>A saucer pass, airborne over one stick and flat on arrival.</p></li>
+    <li class="entry" style="font-weight:450"><p>The first sentence of Pride and Prejudice: a thesis, a joke, and the entire plot.</p></li>
+    <li class="entry" style="font-weight:485"><p>Dickinson&rsquo;s slant rhyme: the bell you expected, struck slightly off, on purpose.</p></li>
+    <li class="entry" style="font-weight:520"><p>Braudel: the sea gets the biography, and kings are demoted to weather.</p></li>
+    <li class="entry" style="font-weight:555">
+      <p>RMSNorm: LayerNorm minus the mean, and nothing misses it.</p>
+      <span class="gloss"><a href="https://github.com/NielsdaWheelz/niels-gpt-2">niels-gpt model code</a><br><span style="color:var(--faded)">2026-08-09 · load-bearing</span></span>
+    </li>
+    <li class="entry" style="font-weight:590">
+      <p>Weight tying: the matrix that reads is the matrix that speaks.</p>
+      <span class="gloss"><a href="https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/niels_gpt/model/gpt.py">gpt.py, weight tying</a><br><span style="color:var(--faded)">2026-08-09 · load-bearing</span></span>
+    </li>
+    <li class="entry" style="font-weight:625"><p>A citation that still resolves after the document was edited underneath it.</p></li>
+  </ol>
+
+  <hr class="leafbreak">
+
+  <h2>The ledger</h2>
+  <p class="note">the material law, here and only here: weight settles, ink dries. And it is asymmetric — the failure fades faster than its lesson.</p>
+
+  <ol class="entries ledger">
+    <li class="entry age0"><p><span class="when">08-09</span>spec and rules codified &middot; docs/pillow-book-spec.md, docs/rules.md</p></li>
+    <li class="entry age0"><p><span class="when">08-02</span>SQ 3&times;3 @385 &middot; third set moved like the first</p></li>
+    <li class="entry agefail">
+      <p><span class="when">07-20</span><span class="struck">/og 500 in production &middot; fonts missing from the function bundle<svg aria-hidden="true" viewBox="0 0 100 4" preserveAspectRatio="none"><line x1="0" y1="3.4" x2="100" y2="0.6"/></svg></span></p>
+      <span class="gloss lesson">A build that passes locally proves the laptop, not the deploy.</span>
+    </li>
+    <li class="entry age1"><p><span class="when">07-10</span>BP 3&times;3 @250 &middot; paused, no bounce</p></li>
+    <li class="entry age2"><p><span class="when">07-03</span>Moby-Dick 40pp before work &middot; cetology, skimmed nothing</p></li>
+    <li class="entry age3"><p><span class="when">06-19</span>DL 3&times;3 @315 &middot; hook grip holding</p></li>
+    <li class="entry age3"><p><span class="when">06-05</span>SQ 5&times;5 @335 &middot; pickup 90 min</p></li>
+  </ol>
+
+  <div class="stone">
+    <span class="tag">the stone — /cv</span>
+    <p>One page outside the night and outside time: daylight canonical, dense, print-perfect, margins from the same canon at paper scale. <b>What is carved does not age.</b></p>
+  </div>
+
+</div>
+
+<footer class="canon">
+  <div class="rulefoot">
+    <p class="colophon q"><b>colophon, abridged</b> — weight(el) = f(depth, bytes, evidence, age), computed at build, model card published · the hour tables are server-side; no clock means the small hours · ink-age is confined to the ledger, floor at AA, full-ink valve beside the theme control · the honesty rules compile: a disclosure without evidence, a weight without an input, a mark in the source that is not true — each fails the build</p>
+    <p class="wit">Things that are not where you left them: the theme toggle.</p>
+    <p class="sign">Nandal faciebat, San Francisco.</p>
+    <p class="plateline">Plate V &middot; The Second Study &middot; the recommendation, composed &middot; one metaphor, one physics, one clock &middot; the threshold is cut</p>
+  </div>
+</footer>
+<!-- fair copy above. foul papers, honestly kept: this page once opened with a
+     four-panel scroll threshold; struck entire, client's hand, 2026-09-05.
+     what remains is the book, which was always the argument. -->

@@ -76,7 +76,7 @@ export default async function WritingPost({
           mainEntityOfPage: postUrl,
         }}
       />
-      <article>
+      <article className="canon leaf">
         <PageTitle>{post.metadata.title}</PageTitle>
         <p className={styles.gloss}>{post.metadata.summary}</p>
         <p className={styles.dateline}>

@@ -1,4 +1,4 @@
-/* the book's index: title line, sublines, table of lists */
+/* the book's index: title line, sublines, hour epigraph, table of lists */
 
 .subline {
   margin: 0;
@@ -7,6 +7,21 @@
 
 .subline + .subline {
   margin-top: 0.35rem;
+}
+
+/* the hour epigraph (spec §4): one corpus line, verbatim, resolved from
+   the real SF hour band — the one large line on the page. */
+.epigraph {
+  margin: 3rem 0 0;
+  color: var(--lamplight);
+  font-style: italic;
+  font-size: clamp(1.5rem, 3vw, 2.125rem);
+  line-height: 1.35;
+}
+
+/* anchor for .rowMeta's wide-viewport margin placement, below */
+.list {
+  position: relative;
 }
 
 .list + .list {
@@ -38,11 +53,28 @@
 }
 
 .rowMeta {
-  color: var(--faded);
   white-space: nowrap;
 }
 
 /* each open list ends with the address of its own page */
 .permalink {
   margin: 0.9rem 0 0;
+}
+
+/*
+ * Wide viewports: counts and last-written dates move to the reserved
+ * outer margin (spec §4). Each .list is exactly the canon text column's
+ * width by ordinary block inheritance from the page's .canon wrapper
+ * (globals.css), so .rowMeta anchors to its own row directly — no
+ * subgrid needed. Width and gap come from the canon's own tokens
+ * (--gloss-w/--gloss-gap in globals.css; same pair used in
+ * ListBody.module.css for the evidence aside).
+ */
+@media (min-width: 76.0625rem) {
+  .rowMeta {
+    position: absolute;
+    top: 0;
+    left: calc(100% + var(--gloss-gap));
+    width: var(--gloss-w);
+  }
 }

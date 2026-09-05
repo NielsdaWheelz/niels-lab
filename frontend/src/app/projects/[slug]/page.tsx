@@ -77,7 +77,7 @@ export default async function Project({
   return (
     <>
       <JsonLd data={projectSchema} />
-      <article>
+      <article className="canon leaf">
         <PageTitle>{project.metadata.title}</PageTitle>
         <p className={styles.gloss}>{project.metadata.summary}</p>
         <p className={styles.dateline}>

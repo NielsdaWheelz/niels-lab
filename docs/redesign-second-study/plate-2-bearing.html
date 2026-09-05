@@ -1,0 +1,195 @@
+<title>Bearing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Spline+Sans+Mono:wght@300..500&display=swap">
+<style>
+  /* PLATE II — BEARING. One world, committed: night, and weight.
+     Every setting below is the output of one function over real quantities:
+     weight(el) = f(depth, bytes, evidence, age). Nothing moves. The page weighs. */
+  :root {
+    --ink: #16161D;
+    --lamplight: #F1EDF5;
+    --murasaki: #A87BC4;
+    --celadon: #7FA99B;
+    --rule: #2C2B36;
+    --faded: #8B8794;
+    --pier: #201F2A;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--ink);
+    color: var(--lamplight);
+    font-family: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+    font-optical-sizing: auto;
+    font-size: 1.14rem;
+    margin: 0;
+    font-variant-numeric: oldstyle-nums;
+  }
+  ::selection { background: var(--murasaki); color: var(--ink); }
+  a { color: var(--murasaki); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:focus-visible, summary:focus-visible { outline: 2px solid var(--celadon); outline-offset: 3px; }
+  .q { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums lining-nums; }
+
+  .col { max-width: 64ch; margin: 0 auto; padding: 0 1.4rem; }
+
+  /* ---- courses of the wall: weight assigned per element, graded by depth+age ---- */
+  .w340 { font-weight: 340; line-height: 1.66; letter-spacing: 0.004em; }
+  .w400 { font-weight: 400; line-height: 1.62; }
+  .w460 { font-weight: 460; line-height: 1.58; }
+  .w520 { font-weight: 520; line-height: 1.54; }
+  .w580 { font-weight: 580; line-height: 1.50; }
+  .w640 { font-weight: 640; line-height: 1.46; letter-spacing: -0.002em; }
+  .w700 { font-weight: 700; line-height: 1.42; letter-spacing: -0.004em; }
+  .w760 { font-weight: 760; line-height: 1.38; letter-spacing: -0.006em; }
+
+  header { padding: 22vh 0 10vh; }
+  h1 {
+    font-weight: 300; font-style: italic;
+    font-variation-settings: 'opsz' 72;
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    line-height: 1.06; margin: 0 0 0.9rem; text-wrap: balance;
+  }
+  .subline { color: var(--faded); font-style: italic; margin: 0; font-weight: 320; }
+  .load-note { margin-top: 4rem; color: var(--celadon); font-size: 0.74rem; line-height: 1.9; }
+
+  h2 {
+    font-style: italic;
+    font-variation-settings: 'opsz' 40;
+    font-size: 1.75rem; line-height: 1.15;
+    margin: 6rem 0 0.3rem; text-wrap: balance;
+    color: var(--murasaki);
+  }
+  .note { color: var(--faded); font-style: italic; margin: 0 0 2.2rem; font-weight: 340; }
+
+  /* entries: courses of masonry — full-measure line, hairline mortar joint beneath */
+  .wall { margin: 0; padding: 0; list-style: none; }
+  .wall > li { border-bottom: 1px solid var(--rule); }
+  .wall p { margin: 0; padding: 0.85rem 0; }
+  .wall .joint { color: var(--faded); }
+
+  /* evidence: shoring. closed, the claim rests light; opened, the pier is the
+     heaviest setting on the page — evidence is what holds the claim up. */
+  details { padding: 0; }
+  details summary {
+    cursor: pointer; list-style: none; display: block; padding: 0.85rem 0;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary .mark { color: var(--celadon); font-family: 'Spline Sans Mono', monospace; font-size: 0.8em; margin-left: 0.5rem; }
+  details[open] summary .mark { color: var(--faded); }
+  details .pier {
+    background: var(--pier);
+    margin: 0 0 0.9rem; padding: 0.8rem 1.1rem;
+    font-weight: 740; line-height: 1.4; font-size: 1.02rem;
+  }
+  details .pier a { color: var(--lamplight); text-decoration-color: var(--celadon); overflow-wrap: anywhere; }
+  details .pier .d { color: var(--celadon); font-family: 'Spline Sans Mono', monospace; font-size: 0.72rem; font-weight: 400; display: block; margin-top: 0.4rem; }
+
+  /* the poet's exemption: verse alone hangs, unloaded, from above */
+  .hanging { margin: 7rem 0; padding-top: 2.6rem; position: relative; }
+  .hanging::before { content: ''; position: absolute; top: 0; left: 50%; width: 1px; height: 2rem; background: var(--rule); }
+  .hanging p {
+    margin: 0; text-align: center; font-style: italic; font-weight: 260;
+    font-variation-settings: 'opsz' 40;
+    font-size: 1.35rem; line-height: 1.7; color: var(--lamplight);
+  }
+  .hanging .who { text-align: center; color: var(--faded); font-size: 0.85rem; font-style: italic; margin-top: 1rem; font-weight: 320; }
+
+  /* the ledger: the gradient runs across time — the past is load-bearing */
+  .ledger { margin: 0; padding: 0; list-style: none; }
+  .ledger li { border-bottom: 1px solid var(--rule); padding: 0.7rem 0; }
+  .ledger .when { color: var(--celadon); font-family: 'Spline Sans Mono', monospace; font-size: 0.73rem; margin-right: 1rem; }
+  .ledger p { display: inline; margin: 0; }
+  .struck { position: relative; }
+  .struck::after { content: ''; position: absolute; left: -0.5%; right: -0.5%; top: 52%; border-top: 1.3px solid var(--lamplight); transform: rotate(-0.8deg); }
+  .lesson { display: block; color: var(--celadon); font-size: 0.95rem; font-weight: 400; margin-top: 0.3rem; font-style: italic; }
+
+  /* /now — ice: the one unloaded page */
+  .ice {
+    margin: 7rem 0 0; padding: 5rem 0;
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  }
+  .ice h2 { margin-top: 0; color: var(--celadon); }
+  .ice p { font-weight: 250; line-height: 2.1; letter-spacing: 0.01em; font-size: 1.2rem; margin: 0; }
+
+  /* the foundation */
+  footer { padding: 5rem 0 2rem; }
+  .foundation {
+    font-weight: 780; line-height: 1.35; letter-spacing: -0.006em;
+    font-size: 1.15rem; border-top: 3px solid var(--lamplight);
+    padding-top: 1.4rem; margin: 0;
+  }
+  .modelcard { margin-top: 3.5rem; color: var(--faded); font-size: 0.74rem; line-height: 2; }
+  .modelcard b { color: var(--celadon); font-weight: 500; }
+  .plateline { margin-top: 3rem; padding-bottom: 3rem; color: var(--faded); font-family: 'Spline Sans Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; }
+</style>
+
+<div class="col">
+  <header>
+    <h1 class="w340">The Pillow Book of Niels-Erik&nbsp;Nandal,</h1>
+    <p class="subline">written in San Francisco.</p>
+    <p class="load-note q">weight(el) = f(depth, bytes, evidence, age) · computed at build · published in the colophon<br>you are at the top of the wall. it is lightest here.</p>
+  </header>
+
+  <h2 class="w400">Things I have built</h2>
+  <p class="note w340">The résumé. Every line links to the thing itself. Assertion is light; open the shoring — evidence is dense, because evidence is what holds the claim up.</p>
+
+  <ol class="wall">
+    <li>
+      <details>
+        <summary class="w400"><span>A small language model, by hand, in two days — tokenizer, cache, pretraining, chat. It hedges where I hedge.</span><span class="mark">◆ 1 proof</span></summary>
+        <div class="pier">niels-gpt, working notes — <a href="#">/projects/niels-gpt-1</a><span class="d q">added 2026-08-09 · load-bearing</span></div>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary class="w430" style="font-weight:430;line-height:1.6"><span>A reading system where a highlight is a codepoint range into canonical text. When client and server disagree, it refuses to highlight.</span><span class="mark">◆ 1 proof</span></summary>
+        <div class="pier">Nexus, source — <a href="https://github.com/NielsdaWheelz/nexus-web">github.com/NielsdaWheelz/nexus-web</a><span class="d q">added 2026-08-09 · load-bearing</span></div>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary class="w460"><span>LLM agents wrapped around a deterministic scheduler. They may explain the plan; they may not touch it.</span><span class="mark">◆ 1 proof</span></summary>
+        <div class="pier">Factory Simulator, working notes — <a href="#">/projects/factory-simulator</a><span class="d q">added 2026-08-09 · load-bearing</span></div>
+      </details>
+    </li>
+    <li><p class="w520">A reader that ingests messy PDFs and answers from the text it was given, not the text it wished for.</p></li>
+    <li><p class="w560" style="font-weight:560;line-height:1.52">A real-time multiplayer Go board, built for a friend, who thanked me by winning on it.</p></li>
+    <li><p class="w600" style="font-weight:600;line-height:1.48">Two plain-English walkthroughs of backpropagation, written for the person I was in October.</p></li>
+    <li><p class="w640">A budget app: tax brackets and payroll as typed Effect code, the cash flow drawn as a Sankey diagram. It has no tests.</p></li>
+    <li><p class="w700">This site: typed data for a CMS, evidence links checked at build, two client components. The colophon confesses.</p></li>
+  </ol>
+
+  <div class="hanging">
+    <p>When I have fears that I may cease to be<br>Before my pen has glean&rsquo;d my teeming brain&nbsp;&mldr;</p>
+    <p class="who">Keats — the one thing on this site that does not stack. Verse hangs.</p>
+  </div>
+
+  <h2 class="w520">The ledger</h2>
+  <p class="note w340">The gradient runs across time. This week breathes; the past has settled under everything stacked upon it since. The old entries are load-bearing.</p>
+
+  <ol class="ledger">
+    <li class="w340"><span class="when">08-09</span><p>spec and rules codified &middot; docs/pillow-book-spec.md, docs/rules.md</p></li>
+    <li class="w400"><span class="when">08-08</span><p>pillow book corpus &middot; ~140 candidates cut to 60</p></li>
+    <li class="w460"><span class="when">08-02</span><p>SQ 3&times;3 @385 &middot; third set moved like the first</p></li>
+    <li class="w520"><span class="when">07-20</span><p><span class="struck">/og 500 in production &middot; fonts missing from the function bundle</span></p><span class="lesson w400">A build that passes locally proves the laptop, not the deploy.</span></li>
+    <li class="w580"><span class="when">07-10</span><p>BP 3&times;3 @250 &middot; paused, no bounce</p></li>
+    <li class="w640"><span class="when">07-03</span><p>Moby-Dick 40pp before work &middot; cetology, skimmed nothing</p></li>
+    <li class="w700"><span class="when">06-19</span><p>DL 3&times;3 @315 &middot; hook grip holding</p></li>
+    <li class="w760"><span class="when">06-05</span><p>SQ 5&times;5 @335 &middot; pickup 90 min</p></li>
+  </ol>
+
+  <section class="ice">
+    <h2 class="w340">/now — ice</h2>
+    <p>The one unloaded page. Present tense, widest leading, gliding. Nothing here has settled yet, because nothing here has been stood on.</p>
+  </section>
+
+  <footer>
+    <p class="foundation q">THIS PAGE WEIGHS 21,408 BYTES AND BEARS THREE MONTHS OF LEDGER.</p>
+    <p class="modelcard q"><b>model card — the typography</b><br>
+      weight(el) = clamp(340, 340 + 60·depth(el) + 140·evidence(el) + 90·age(el), 780)<br>
+      depth ∈ [0,1] scroll position at build · evidence ∈ {0,1} · age ∈ [0,1] years since added, normalized<br>
+      leading closes as weight rises: lh = 1.66 − 0.28·(wght−340)/440 · no element may display a weight it was not computed to carry</p>
+    <p class="plateline">Plate II &middot; The Second Study &middot; a demonstration wearing the real corpus &middot; nothing moves; the page weighs</p>
+  </footer>
+</div>
+<!-- each course above is annotated with its computed load in the class name.
+     strip the stylesheet and the wall is still a clean semantic list: curl sees Shonagon. -->

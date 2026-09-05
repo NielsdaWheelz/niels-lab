@@ -1,0 +1,313 @@
+<title>The Book of Hours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Spline+Sans+Mono:wght@300..500&display=swap">
+<style>
+  /* PLATE III — THE BOOK OF HOURS. One world, committed: every page is the same
+     page at a different hour. The sky is painted (seeded, deterministic), the
+     words live in a clearing whose contrast never yields. Turner does the moving
+     so the type can keep still. In production the hour is chosen server-side by
+     the real San Francisco clock; here you are handed the dial. */
+  :root {
+    --sky-base: #4A4456; --text: #F0EBF4; --faded: #B9B2C4;
+    --accent: #9DBBAF; --pocket: rgba(38,34,48,0.62); --hairline: rgba(240,235,244,0.16);
+  }
+  :root[data-sky="night"]     { --sky-base:#0B0C14; --text:#E9E4EF; --faded:#8F87A0; --accent:#8FB3A5; --pocket:rgba(8,9,18,0.60); --hairline:rgba(233,228,239,0.14); }
+  :root[data-sky="dawn"]      { --sky-base:#232B34; --text:#EAF0F2; --faded:#9FAFB8; --accent:#9FC4B8; --pocket:rgba(22,29,37,0.58); --hairline:rgba(234,240,242,0.15); }
+  :root[data-sky="noon"]      { --sky-base:#E7E4DB; --text:#23232B; --faded:#6F6D66; --accent:#3F685C; --pocket:rgba(244,242,234,0.62); --hairline:rgba(35,35,43,0.16); }
+  :root[data-sky="afternoon"] { --sky-base:#CDB68C; --text:#2A2118; --faded:#6E5C41; --accent:#54462A; --pocket:rgba(230,216,180,0.58); --hairline:rgba(42,33,24,0.18); }
+  :root[data-sky="dusk"]      { --sky-base:#4A4456; --text:#F0EBF4; --faded:#B9B2C4; --accent:#9DBBAF; --pocket:rgba(38,34,48,0.62); --hairline:rgba(240,235,244,0.16); }
+  :root[data-sky="evening"]   { --sky-base:#241A14; --text:#F3E9DC; --faded:#B39F87; --accent:#D2A868; --pocket:rgba(28,19,13,0.60); --hairline:rgba(243,233,220,0.15); }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--sky-base);
+    color: var(--text);
+    font-family: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+    font-optical-sizing: auto; font-size: 1.13rem; line-height: 1.6;
+    margin: 0; font-variant-numeric: oldstyle-nums;
+  }
+  ::selection { background: var(--accent); color: var(--sky-base); }
+  a { color: var(--text); text-decoration-color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:focus-visible, summary:focus-visible, .dial label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .q { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums lining-nums; }
+
+  #sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; }
+
+  /* the dial — the reader may set the site to any hour; it subsumes the theme toggle */
+  .dial { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 0;
+    background: var(--pocket); backdrop-filter: blur(2px); border-bottom: 1px solid var(--hairline); }
+  .dial label { flex: 1 1 auto; text-align: center; cursor: pointer; padding: 0.6rem 0.4rem;
+    font-family: 'Spline Sans Mono', monospace; font-size: 0.66rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--faded); }
+  .dial input { position: absolute; opacity: 0; pointer-events: none; }
+  .dial label:has(input:checked) { color: var(--text); box-shadow: inset 0 -2px 0 0 var(--accent); }
+
+  /* the clearing — a windless pocket; contrast clamped whatever the sky does */
+  .clearing { max-width: 62ch; margin: 0 auto; padding: 0 1.5rem;
+    background: var(--pocket); box-shadow: 0 0 90px 70px var(--pocket); }
+
+  header { padding: 20vh 0 8vh; }
+  h1 { font-style: italic; font-weight: 300; font-variation-settings: 'opsz' 72;
+    font-size: clamp(2.4rem, 6vw, 4.3rem); line-height: 1.06; margin: 0 0 0.8rem; text-wrap: balance; }
+  .subline { color: var(--faded); font-style: italic; margin: 0; }
+  .skyline { margin-top: 3.4rem; color: var(--accent); font-size: 0.72rem; line-height: 1.9; }
+
+  .opens { color: var(--faded); font-style: italic; font-size: 0.95rem; margin: 4.5rem 0 1rem; }
+  .opens b { color: var(--text); font-weight: 500; }
+
+  details.list { border-top: 1px solid var(--hairline); }
+  details.list:last-of-type { border-bottom: 1px solid var(--hairline); }
+  details.list summary { list-style: none; cursor: pointer; display: flex; gap: 1rem; align-items: baseline; padding: 0.7rem 0; }
+  details.list summary::-webkit-details-marker { display: none; }
+  details.list summary h2 { font-style: italic; font-weight: 380; font-variation-settings: 'opsz' 30;
+    font-size: 1.25rem; margin: 0; }
+  details.list summary .count { margin-left: auto; color: var(--accent); font-family: 'Spline Sans Mono', monospace; font-size: 0.72rem; white-space: nowrap; }
+  details.list[open] summary h2 { font-weight: 480; }
+  .entries { margin: 0.2rem 0 1.6rem; padding: 0; list-style: none; }
+  .entries li { margin: 0 0 0.85rem; padding-left: 1.4rem; text-indent: -1.4rem; }
+  .entries li::before { content: '—\2002'; color: var(--faded); }
+  /* evidence: the pool of lamplight you check a citation by */
+  .proof { display: inline-block; text-indent: 0; margin-left: 0.55rem; padding: 0.05rem 0.5rem;
+    font-family: 'Spline Sans Mono', monospace; font-size: 0.7rem;
+    background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border-radius: 2px; }
+  .proof a { color: inherit; text-decoration-color: currentColor; }
+
+  .weather, .records { margin: 5.5rem 0 0; border-top: 1px solid var(--hairline); padding-top: 2.2rem; }
+  h3 { font-style: italic; font-weight: 420; font-size: 1.2rem; margin: 0 0 0.7rem; }
+  .weather p, .records p { margin: 0 0 0.9rem; color: var(--faded); }
+  .weather p b, .records p b { color: var(--text); font-weight: 500; }
+
+  footer { padding: 4rem 0 3rem; }
+  .modelcard { color: var(--faded); font-size: 0.72rem; line-height: 2; margin: 0; }
+  .modelcard b { color: var(--accent); font-weight: 500; }
+  .plateline { margin-top: 2.6rem; color: var(--faded); font-family: 'Spline Sans Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; }
+</style>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<nav class="dial" aria-label="the hour dial">
+  <label><input type="radio" name="sky" value="night">04:47 · deep night</label>
+  <label><input type="radio" name="sky" value="dawn">06:10 · cold dawn</label>
+  <label><input type="radio" name="sky" value="noon">12:00 · white noon</label>
+  <label><input type="radio" name="sky" value="afternoon">15:30 · amber</label>
+  <label><input type="radio" name="sky" value="dusk" checked>19:40 · dusk</label>
+  <label><input type="radio" name="sky" value="evening">22:30 · lamplit</label>
+</nav>
+
+<div class="clearing">
+  <header>
+    <h1>The Pillow Book of Niels-Erik&nbsp;Nandal,</h1>
+    <p class="subline">written in San Francisco.</p>
+    <p class="skyline q" id="skyline">sky: dusk · autumn · seed 8121 · same inputs, same sky</p>
+  </header>
+
+  <p class="opens" id="opens">It is <b>dusk</b>, so <b>Things now in decline</b> stands open. The hour chooses the door; nothing is locked, only surfaced first.</p>
+
+  <details class="list" data-hour="dawn">
+    <summary><h2>Things that quicken the heart</h2><span class="count">7 · 08-09</span></summary>
+    <ul class="entries">
+      <li>The bar&rsquo;s first millimeter off the floor, which tells you everything the next three seconds will confirm.</li>
+      <li>Watching a meet total pass 1,000 on a third attempt you almost didn&rsquo;t take.</li>
+      <li>A keeper off his line while the ball is still rolling toward your foot.</li>
+      <li>Levin mowing, at the moment the scythe begins to swing itself.</li>
+      <li>The tokenizer round-tripping a page of Joyce with zero unknowns. Byte fallback, keeping its promise.<span class="proof"><a href="https://github.com/NielsdaWheelz/niels-gpt-2">proof</a></span></li>
+      <li>Two generation paths, one fast, one naive, printing identical tokens. The speedup is now legal.<span class="proof"><a href="#">proof</a></span></li>
+      <li>A stranger&rsquo;s heart rate slowing on schedule, inside a game you built to slow it.</li>
+    </ul>
+  </details>
+
+  <details class="list" data-hour="noon">
+    <summary><h2>Things that should be small</h2><span class="count">8 · 08-09</span></summary>
+    <ul class="entries">
+      <li>The blast radius of a deploy. If you cannot draw it, it is not small.</li>
+      <li>A pull request. Past the second scroll, the review becomes a skim and the approval becomes a signature.</li>
+      <li>The distance between a claim and its proof. Ideally one link, to a trace.<span class="proof"><a href="https://github.com/NielsdaWheelz/factory-simulator">proof</a></span></li>
+      <li>The gap between two touches of the ball. Possession is overhead.</li>
+      <li>The walkout before a heavy squat. Two steps. Every extra step is paid for at the bottom.</li>
+      <li>An agent&rsquo;s opportunity to improvise. Pydantic contract in, Pydantic contract out, every invention measured.<span class="proof"><a href="#">proof</a></span></li>
+      <li>A migration. One concern per revision, so the rollback is a sentence instead of a meeting.</li>
+      <li>A Dickinson stanza. Four lines, and you are not the person who started reading them.</li>
+    </ul>
+  </details>
+
+  <details class="list" data-hour="afternoon">
+    <summary><h2>Elegant things</h2><span class="count">8 · 08-09</span></summary>
+    <ul class="entries">
+      <li>Squat bar path: one vertical line, drawn twice.</li>
+      <li>A saucer pass, airborne over one stick and flat on arrival.</li>
+      <li>The first sentence of Pride and Prejudice: a thesis, a joke, and the entire plot.</li>
+      <li>Dickinson&rsquo;s slant rhyme: the bell you expected, struck slightly off, on purpose.</li>
+      <li>Braudel: the sea gets the biography, and kings are demoted to weather.</li>
+      <li>RMSNorm: LayerNorm minus the mean, and nothing misses it.<span class="proof"><a href="https://github.com/NielsdaWheelz/niels-gpt-2">proof</a></span></li>
+      <li>Weight tying: the matrix that reads is the matrix that speaks.<span class="proof"><a href="#">proof</a></span></li>
+      <li>A citation that still resolves after the document was edited underneath it.</li>
+    </ul>
+  </details>
+
+  <details class="list" data-hour="dusk" open>
+    <summary><h2>Things now in decline</h2><span class="count">7 · 08-09</span></summary>
+    <ul class="entries">
+      <li>The two-hour practice nobody films. A proper bag skate produces no content.</li>
+      <li>Defending, in pickup soccer. Eleven wingers a side now.</li>
+      <li>Commit messages that explain why.</li>
+      <li>The personal website. This one included; it knows what it is.<span class="proof"><a href="#">the colophon</a></span></li>
+      <li>The incentivized choice experiment. Cheaper now to ask a model what humans would want.</li>
+      <li>Carrying poems in memory. I keep two Keats odes there against the general trend.</li>
+      <li>Hotel gyms with an actual barbell.</li>
+    </ul>
+  </details>
+
+  <details class="list" data-hour="evening">
+    <summary><h2>Things that are distant though near</h2><span class="count">7 · 08-09</span></summary>
+    <ul class="entries">
+      <li>The last two inches of a deadlift that has stopped moving.</li>
+      <li>The thousand-pound club, from nine ninety-five.</li>
+      <li>War and Peace, third shelf, eye level. I have meant to reread it for ten years and can touch it from this chair.</li>
+      <li>The net, in a shootout. Four feet by six, receding as you skate in.</li>
+      <li>The end of Ulysses, from anywhere in Ulysses.</li>
+      <li>Statistical significance, at p = 0.051.</li>
+      <li>Sleep, with the diff still open.</li>
+    </ul>
+  </details>
+
+  <details class="list" data-hour="night">
+    <summary><h2>Rare things</h2><span class="count">7 · 08-09</span></summary>
+    <ul class="entries">
+      <li>A powerlifting meet that runs on schedule.</li>
+      <li>A benched player who agrees with the decision.</li>
+      <li>Someone who finishes Durant: eleven volumes, in order, no skimming the Reformation.</li>
+      <li>An analysis that matches its preregistration.</li>
+      <li>A rewrite that is smaller than the thing it replaced.</li>
+      <li>A model card that admits what the model cannot do.</li>
+      <li>A secondhand bookshop that has shelved Spengler under Self-Help.</li>
+    </ul>
+  </details>
+
+  <details class="list">
+    <summary><h2>Things I have built</h2><span class="count">9 · 08-09</span></summary>
+    <ul class="entries">
+      <li>A small language model, by hand, in two days — tokenizer, cache, pretraining, chat. It hedges where I hedge.<span class="proof"><a href="#">proof</a></span></li>
+      <li>A reading system where a highlight is a codepoint range into canonical text. When client and server disagree, it refuses to highlight.<span class="proof"><a href="https://github.com/NielsdaWheelz/nexus-web">proof</a></span></li>
+      <li>LLM agents wrapped around a deterministic scheduler. They may explain the plan; they may not touch it.<span class="proof"><a href="#">proof</a></span></li>
+    </ul>
+  </details>
+
+  <details class="list">
+    <summary><h2>Hateful things (found in codebases)</h2><span class="count">8 · 08-09</span></summary>
+    <ul class="entries">
+      <li>A mock of the unit under test. The suite is green because it agrees with itself.</li>
+      <li>A catch block holding a comment where the plan should be. &lsquo;This shouldn&rsquo;t happen.&rsquo; It is happening now.</li>
+      <li>A spotter&rsquo;s hands on a bar that was still moving. Nobody will ever know what the rep was worth.</li>
+    </ul>
+  </details>
+
+  <section class="weather">
+    <h3>The ledger&rsquo;s weather</h3>
+    <p>The most recent row sits in the warmest light on the page; older rows recede into cooler washes. <b>Two silent weeks and the whole ledger clouds over</b> — deload weather, visible from the doorway. The site cannot lie about whether the work is being done, because the light is wired to the log.</p>
+  </section>
+
+  <section class="records">
+    <h3>The records office</h3>
+    <p>One step into <b>/cv</b> and the sky evaporates entirely: ink on white, dense, print-canonical, no atmosphere at all. Walking from a nocturne into a records office — proof the weather elsewhere was chosen, not defaulted.</p>
+  </section>
+
+  <footer>
+    <p class="modelcard q"><b>sky model card</b> — 26 washes per state, stacked at 4–9% alpha, edges jittered; one constructive hatch at a consistent angle, ≤4% · grain varnish 2% over everything · seeded by (date, hour-band, season): same inputs, same sky · no runtime randomness · production chooses the hour server-side; without JavaScript the site is canonically dusk, a complete painting, not a degraded one</p>
+    <p class="plateline">Plate III &middot; The Second Study &middot; a demonstration wearing the real corpus &middot; the sky changes; the words never move</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('sky');
+  const ctx = canvas.getContext('2d');
+
+  // deterministic PRNG — Molnar's rule: the clock proposes, the seed decides
+  const mulberry32 = s => () => { s |= 0; s = s + 0x6D2B79F5 | 0;
+    let t = Math.imul(s ^ s >>> 15, 1 | s);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+
+  // each state: ground + wash palette [color, weight] — glazes, not fills
+  const SKIES = {
+    night:     { seed: 8101, ground: '#0B0C14', washes: [['#1A1530',9],['#2E1D3F',6],['#10121F',8],['#241B3A',4],['#070810',6]], hatch: '#3A2F55' },
+    dawn:      { seed: 8106, ground: '#232B34', washes: [['#33404E',8],['#43635B',5],['#93A6B0',3],['#27333E',8],['#1C242C',6]], hatch: '#5C7280' },
+    noon:      { seed: 8112, ground: '#E7E4DB', washes: [['#F4F2EA',9],['#D9D6C9',7],['#E4D9B8',4],['#EFEDE4',7],['#CFCCBD',4]], hatch: '#B9B5A4' },
+    afternoon: { seed: 8115, ground: '#CDB68C', washes: [['#E0D2AE',8],['#B99C66',6],['#8A6F45',3],['#D8C79E',7],['#C2A876',6]], hatch: '#94794E' },
+    dusk:      { seed: 8119, ground: '#4A4456', washes: [['#5B5268',8],['#3B3648',7],['#6B4E7C',4],['#524A61',7],['#332F40',5]], hatch: '#6E6480' },
+    evening:   { seed: 8122, ground: '#241A14', washes: [['#3A2A1C',8],['#52381F',5],['#6E4A24',3],['#2E2116',6],['#1B120C',7]], hatch: '#5C3F22' },
+  };
+
+  function paint(state) {
+    const S = SKIES[state], rnd = mulberry32(S.seed);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const W = canvas.width = innerWidth * dpr, H = canvas.height = innerHeight * dpr;
+    ctx.fillStyle = S.ground; ctx.fillRect(0, 0, W, H);
+
+    // washes: large irregular translucent bodies, drifting along one diagonal
+    const pool = S.washes.flatMap(([c, w]) => Array(w).fill(c));
+    for (let i = 0; i < 26; i++) {
+      const c = pool[Math.floor(rnd() * pool.length)];
+      const cx = rnd() * W, cy = rnd() * H * 1.1 - H * 0.05;
+      const rx = (0.25 + rnd() * 0.55) * W, ry = (0.10 + rnd() * 0.30) * H;
+      ctx.globalAlpha = 0.04 + rnd() * 0.05;
+      ctx.fillStyle = c;
+      ctx.beginPath();
+      const K = 14, pts = [];
+      for (let k = 0; k < K; k++) {
+        const a = (k / K) * Math.PI * 2;
+        const j = 0.72 + rnd() * 0.56; // jittered edge — watercolor, not preset
+        pts.push([cx + Math.cos(a) * rx * j, cy + Math.sin(a) * ry * j]);
+      }
+      ctx.moveTo((pts[0][0] + pts[K-1][0]) / 2, (pts[0][1] + pts[K-1][1]) / 2);
+      for (let k = 0; k < K; k++) {
+        const p = pts[k], n = pts[(k + 1) % K];
+        ctx.quadraticCurveTo(p[0], p[1], (p[0] + n[0]) / 2, (p[1] + n[1]) / 2);
+      }
+      ctx.fill();
+    }
+
+    // the constructive stroke: one consistent angle, barely there
+    ctx.globalAlpha = 0.035; ctx.strokeStyle = S.hatch; ctx.lineWidth = 1 * dpr;
+    const ang = -0.42, dx = Math.cos(ang), dy = Math.sin(ang), len = 26 * dpr;
+    for (let i = 0; i < 900; i++) {
+      const x = rnd() * W, y = rnd() * H;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + dx * len, y + dy * len); ctx.stroke();
+    }
+
+    // grain varnish, uniform over everything
+    ctx.globalAlpha = 0.05;
+    for (let i = 0; i < W * H / (900 * dpr); i++) {
+      ctx.fillStyle = rnd() > 0.5 ? '#FFFFFF' : '#000000';
+      ctx.fillRect(rnd() * W, rnd() * H, dpr, dpr);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  const NAMES = { night: 'deep night', dawn: 'cold dawn', noon: 'white noon',
+    afternoon: 'amber afternoon', dusk: 'dusk', evening: 'lamplit evening' };
+  const OPENS = { night: 'Rare things', dawn: 'Things that quicken the heart',
+    noon: 'Things that should be small', afternoon: 'Elegant things',
+    dusk: 'Things now in decline', evening: 'Things that are distant though near' };
+
+  function setSky(state) {
+    document.documentElement.dataset.sky = state;
+    paint(state);
+    const S = SKIES[state];
+    document.getElementById('skyline').textContent =
+      `sky: ${NAMES[state]} · autumn · seed ${S.seed} · same inputs, same sky`;
+    document.getElementById('opens').innerHTML =
+      `It is <b>${NAMES[state]}</b>, so <b>${OPENS[state]}</b> stands open. The hour chooses the door; nothing is locked, only surfaced first.`;
+    document.querySelectorAll('details.list').forEach(d => {
+      if (d.dataset.hour) d.open = (d.dataset.hour === state);
+    });
+  }
+
+  document.querySelectorAll('.dial input').forEach(r =>
+    r.addEventListener('change', () => setSky(r.value)));
+  addEventListener('resize', () =>
+    paint(document.documentElement.dataset.sky || 'dusk'));
+
+  setSky('dusk');
+})();
+</script>

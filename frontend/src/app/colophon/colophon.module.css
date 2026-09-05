@@ -68,3 +68,84 @@
 .faded {
   background: var(--faded);
 }
+
+.age0 {
+  background: var(--age-0);
+}
+
+.age1 {
+  background: var(--age-1);
+}
+
+.age2 {
+  background: var(--age-2);
+}
+
+.age3 {
+  background: var(--age-3);
+}
+
+.age4 {
+  background: var(--age-4);
+}
+
+/* The hour table: band, SF hour range, epigraph, opens. A plain data table,
+   scrollable on its own axis so a narrow viewport never widens the page. */
+.hoursWrap {
+  overflow-x: auto;
+  margin-block: 1.5rem;
+}
+
+.hours {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+}
+
+.hours th,
+.hours td {
+  padding: 0.5rem 1.25rem 0.5rem 0;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: baseline;
+}
+
+.hours thead th {
+  font-family: var(--font-chrome);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--faded);
+}
+
+.hours tbody th {
+  font-family: var(--font-chrome);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--celadon);
+  white-space: nowrap;
+}
+
+.hours tbody td:nth-child(2) {
+  font-family: var(--font-chrome);
+  font-size: 0.8125rem;
+  color: var(--faded);
+  white-space: nowrap;
+}
+
+.epigraph {
+  font-style: italic;
+}
+
+.epigraphSource {
+  display: block;
+  margin-top: 0.3rem;
+  font-style: normal;
+}
+
+/* The classical painter's sign-off: a fixed line, not a heading, set apart
+   like a signature under the last brushstroke. */
+.signoff {
+  margin-top: 1.5rem;
+  font-style: italic;
+  color: var(--faded);
+}

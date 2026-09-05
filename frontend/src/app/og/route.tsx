@@ -5,13 +5,14 @@ import { getSiteUrl, siteDescription, siteName } from '@/app/site'
 
 export const runtime = 'nodejs'
 
-// satori has no CSS custom properties: these mirror the dark-theme tokens in
-// globals.css and must be changed with them. The card is always night writing.
-const ink = '#16161d'
-const murasaki = '#a87bc4'
-const celadon = '#7fa99b'
-const faded = '#8f8a99'
-const rule = '#2a2833'
+// satori has no CSS custom properties: these mirror the leaf (light-theme)
+// tokens in globals.css and must be changed with them. The card is always
+// the leaf, per spec §4 (/og rethemed to the leaf).
+const ink = '#f5f3f7'
+const murasaki = '#66327c'
+const celadon = '#4a7367'
+const faded = '#6e6878'
+const rule = '#ddd6e4'
 
 // read at module scope so the bytes are cached between invocations; the files
 // reach the serverless bundle via outputFileTracingIncludes in next.config.ts.

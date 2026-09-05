@@ -80,4 +80,23 @@
   h3 {
     break-after: avoid;
   }
+
+  /* Chrome line, spec §5.7 — client-signed before this ships (see W5
+     return notes). Generated content, not markup: this workstream's brief
+     scopes cv/ to print.css and cv.module.css only, layout unchanged, so
+     the sheet's one sworn line of chrome is added here, in the print
+     stylesheet, on the last element already on the page. */
+  /* Fixed to the sheet's bottom margin so it consumes no flow height —
+     the file's own scale comment documents zero headroom on the page. */
+  article::after {
+    content: 'Printed from nielseriknandal.com; the evidence is one URL away.';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-top: 0.4rem;
+    border-top: 1px solid gray;
+    font-size: 0.75rem;
+    color: black;
+  }
 }

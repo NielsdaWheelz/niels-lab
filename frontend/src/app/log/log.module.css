@@ -22,9 +22,33 @@
   align-items: baseline;
 }
 
-.kind,
+/* Ledger ink-age (spec §5.4): the row carries its age step as the color
+   for all its text, including its date and any linked entry — the site's
+   usual date/link inks are overridden here, scoped to this page only. */
+.row :global(.date),
+.row :global(a) {
+  color: inherit;
+}
+
+.age0 {
+  color: var(--age-0);
+}
+.age1 {
+  color: var(--age-1);
+}
+.age2 {
+  color: var(--age-2);
+}
+.age3 {
+  color: var(--age-3);
+}
+.age4 {
+  color: var(--age-4);
+}
+
+/* The lesson is exempt from ink-age: full celadon at any age (spec §5.4). */
 .lesson {
-  color: var(--faded);
+  color: var(--celadon);
 }
 
 .deload {

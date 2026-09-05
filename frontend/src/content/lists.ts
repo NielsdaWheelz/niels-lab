@@ -81,7 +81,7 @@ const corpus: PillowList[] = [
         text: 'A reading system where a highlight is a codepoint range into canonical text. When client and server disagree, it refuses to highlight.',
         evidence: {
           label: 'Nexus, source',
-          href: 'https://github.com/NielsdaWheelz/nexus-web',
+          href: 'https://github.com/NielsdaWheelz/nexus',
         },
         added: '2026-08-09',
       },
