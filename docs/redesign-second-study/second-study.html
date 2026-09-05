@@ -1,0 +1,351 @@
+<title>The Second Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Spline+Sans+Mono:wght@300..500&display=swap">
+<style>
+  /* Dark-canonical (the site's own rule: night writing). Bare :root = night. */
+  :root {
+    --ground: #16161D;
+    --ink: #EDE9F0;
+    --faded: #8B8794;
+    --rule: #2E2D38;
+    --shu: #C65540;
+    --celadon: #7FA99B;
+    --murasaki: #A87BC4;
+    --pocket: #1C1C25;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --ground: #FAF8F3;
+      --ink: #1B1B22;
+      --faded: #77737E;
+      --rule: #E2DED4;
+      --shu: #B5432E;
+      --celadon: #4A7367;
+      --murasaki: #66327C;
+      --pocket: #F2EFE7;
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #FAF8F3;
+    --ink: #1B1B22;
+    --faded: #77737E;
+    --rule: #E2DED4;
+    --shu: #B5432E;
+    --celadon: #4A7367;
+    --murasaki: #66327C;
+    --pocket: #F2EFE7;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+    font-optical-sizing: auto;
+    font-size: 1.125rem;
+    line-height: 1.62;
+    margin: 0;
+  }
+  ::selection { background: var(--murasaki); color: var(--ground); }
+  a { color: var(--murasaki); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:focus-visible, summary:focus-visible { outline: 2px solid var(--shu); outline-offset: 3px; }
+
+  .mono {
+    font-family: 'Spline Sans Mono', 'iA Writer Quattro', ui-monospace, 'SF Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ------------- the leaf: reading column + reserved margin ------------- */
+  .leaf {
+    display: grid;
+    grid-template-columns: 1fr min(66ch, calc(100% - 3rem)) 1fr;
+    row-gap: 0;
+  }
+  .leaf > * { grid-column: 2; min-width: 0; }
+  p { margin: 0 0 1.1em; }
+  p + p { margin-top: -0.4em; }
+
+  /* rubric marks hang in the margin on wide viewports */
+  .rubric {
+    color: var(--shu);
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 4.5rem 0 1.4rem;
+  }
+  h2 {
+    font-size: 1.9rem;
+    font-weight: 460;
+    font-variation-settings: 'opsz' 34;
+    line-height: 1.2;
+    margin: 0 0 1.2rem;
+    text-wrap: balance;
+  }
+  h3 { font-size: 1.2rem; font-weight: 560; margin: 2rem 0 0.6rem; }
+
+  /* marginal verdicts (celadon apparatus) */
+  .verdict {
+    color: var(--celadon);
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.78rem;
+    line-height: 1.55;
+    letter-spacing: 0.01em;
+  }
+  @media (min-width: 78rem) {
+    .leaf { grid-template-columns: 1fr 13rem min(66ch, 100%) minmax(2rem, 1fr); column-gap: 2.6rem; }
+    .leaf > * { grid-column: 3; }
+    .leaf > .margin { grid-column: 2; text-align: right; align-self: start; padding-top: 0.5rem; }
+    .rubric { grid-column: 2; text-align: right; margin: 4.5rem 0 0; }
+    .rubric + * { margin-top: 4.5rem; }
+  }
+
+  /* ------------- incipit ------------- */
+  header.leaf { min-height: 88vh; align-content: center; padding: 6rem 0 4rem; }
+  .pilcrow { color: var(--shu); font-size: 1.6rem; margin-bottom: 0.4rem; }
+  h1 {
+    font-style: italic;
+    font-weight: 300;
+    font-variation-settings: 'opsz' 72;
+    font-size: clamp(3.2rem, 9vw, 7.2rem);
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    margin: 0 0 2.2rem;
+    text-wrap: balance;
+  }
+  .standfirst { font-size: 1.15rem; color: var(--faded); max-width: 46ch; }
+  .standfirst strong { color: var(--ink); font-weight: 500; }
+  .brieffacts {
+    margin-top: 3.2rem;
+    color: var(--celadon);
+    font-size: 0.78rem;
+    line-height: 2;
+  }
+
+  /* thesis: the one monumental room in this brief */
+  .thesis { padding: 16vh 0 14vh; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .thesis blockquote {
+    margin: 0;
+    font-style: italic;
+    font-weight: 350;
+    font-variation-settings: 'opsz' 60;
+    font-size: clamp(1.7rem, 4.2vw, 3rem);
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+  .thesis figcaption { margin-top: 1.6rem; }
+
+  /* ------------- diagnosis / laws ------------- */
+  ol.plain { padding-left: 1.4rem; margin: 0 0 1.1em; }
+  ol.plain li { margin-bottom: 0.85em; padding-left: 0.35rem; }
+  ol.plain li::marker { color: var(--shu); font-family: 'Spline Sans Mono', monospace; font-size: 0.85em; }
+  .law b { font-weight: 560; }
+  .law span { color: var(--faded); }
+
+  /* ------------- plates ------------- */
+  .plate { border-top: 1px solid var(--rule); margin-top: 5rem; padding-top: 0.5rem; }
+  .plate-no {
+    color: var(--shu);
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    margin: 3.2rem 0 0.6rem;
+  }
+  .plate h2 { font-size: 2.3rem; font-style: italic; font-weight: 380; }
+  .epigraph { color: var(--faded); font-style: italic; margin: -0.6rem 0 1.6rem; }
+  .moment { border-left: 2px solid var(--celadon); padding: 0.1rem 0 0.1rem 1.1rem; margin: 1.6rem 0; }
+  .moment em { color: var(--celadon); font-style: normal; font-family: 'Spline Sans Mono', monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; display: block; margin-bottom: 0.35rem; }
+  .walk { margin: 1.4rem 0 0; }
+  .walk a {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--shu); text-decoration-color: var(--rule);
+  }
+  .risk { color: var(--faded); font-size: 1.02rem; }
+  .risk b { color: var(--ink); font-weight: 560; }
+  .verdict-inline {
+    margin: 1.8rem 0 0;
+    padding: 0.9rem 1.1rem;
+    background: var(--pocket);
+    border-radius: 2px;
+  }
+  @media (min-width: 78rem) { .verdict-inline { background: none; padding: 0; } }
+
+  /* bearing specimen: type settling under load */
+  .specimen { margin: 2rem 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 1.4rem 0 1.2rem; }
+  .specimen p { margin: 0; line-height: 1.5; }
+  .specimen .w1 { font-weight: 340; letter-spacing: 0.005em; }
+  .specimen .w2 { font-weight: 430; }
+  .specimen .w3 { font-weight: 530; }
+  .specimen .w4 { font-weight: 640; line-height: 1.42; }
+  .specimen .w5 { font-weight: 740; line-height: 1.36; }
+  .specimen figcaption { margin-top: 1rem; }
+
+  /* ------------- recommendation manifest ------------- */
+  dl.manifest { margin: 1.8rem 0; }
+  dl.manifest > div { display: grid; grid-template-columns: 8.5rem 1fr; gap: 1.2rem; padding: 0.7rem 0; border-top: 1px solid var(--rule); }
+  dl.manifest dt { color: var(--shu); font-family: 'Spline Sans Mono', monospace; font-size: 0.74rem; letter-spacing: 0.13em; text-transform: uppercase; padding-top: 0.3rem; }
+  dl.manifest dd { margin: 0; }
+  @media (max-width: 34rem) { dl.manifest > div { grid-template-columns: 1fr; gap: 0.15rem; } }
+
+  ul.bank { list-style: none; padding: 0; margin: 0 0 1.1em; }
+  ul.bank li { padding: 0.55rem 0; border-top: 1px solid var(--rule); }
+  ul.bank li:first-child { border-top: 0; }
+  ul.bank .src { color: var(--celadon); font-family: 'Spline Sans Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; margin-left: 0.5rem; white-space: nowrap; }
+
+  footer.leaf { margin: 6rem 0 0; padding: 2.5rem 0 5rem; border-top: 1px solid var(--rule); }
+  footer .mono { font-size: 0.78rem; color: var(--faded); line-height: 2; }
+  footer .sign { color: var(--shu); }
+</style>
+
+<header class="leaf">
+  <div class="pilcrow">¶</div>
+  <h1>The Second Study</h1>
+  <p class="standfirst">The art of <strong>nielseriknandal.com</strong>, rethought from zero. The lists stay; everything the eye receives is on the table. What follows is the diagnosis, the laws the research converged on, four plates, and one recommendation. <strong>Every plate is built: walk it, don&rsquo;t read it.</strong> No code has been touched.</p>
+  <p class="brieffacts mono">31 agents &middot; 7 research lenses &middot; 3 full visions &middot; 15 seeded concepts<br>1 adversarial critic &middot; 3-judge panel &middot; 2026-09-04</p>
+</header>
+
+<figure class="thesis leaf">
+  <blockquote>All three visions are beautiful at sixteen pixels. The man was a strongman. Nobody built anything heavy.</blockquote>
+  <figcaption class="verdict">— the critic, closing the demolition report. This sentence governs the brief.</figcaption>
+</figure>
+
+<main class="leaf">
+
+  <p class="rubric" id="diagnosis">i &middot; Diagnosis</p>
+  <h2>Correct is not the same as beautiful</h2>
+  <p>The Pillow Book v1 succeeded at everything it policed and failed at the one thing it couldn&rsquo;t lint. Total coherence — six tokens, two faces, one animation — and almost nothing sensuous. The survey put its finger on five wounds:</p>
+  <ol class="plain">
+    <li><b>The corpus is a poem the design sets like a memo.</b> &ldquo;Sleep, with the diff still open&rdquo; gets the same 1.125rem treatment as footer furniture. Nothing is ever granted display scale, silence, or a page of its own.</li>
+    <li><b>The moral signature is visually the most timid thing on the site.</b> Claim-wired-to-evidence is the whole ethic, and it renders as a 13px <span class="mono">›</span>.</li>
+    <li><b>The palette never gets a moment.</b> Murasaki and celadon exist only as small-size trim; &ldquo;night writing&rdquo; is a stated concept with no material presence.</li>
+    <li><b>Every room wears the same shell.</b> Homepage, log, CV, lab — one centered column, no rhythm shift, no architecture.</li>
+    <li><b>The log&rsquo;s pathos is invisible.</b> Struck failures with attached lessons are a diary device with real weight, rendered as indistinguishable rows in a plain list.</li>
+  </ol>
+  <p>The failure is not austerity. It is that the austerity was never once interrupted by magnificence.</p>
+
+  <p class="rubric" id="laws">ii &middot; The Laws</p>
+  <h2>What every lens converged on</h2>
+  <p>Seven research digests, three judges, and one critic agree on more than they disagree. These are the laws any direction must obey — the constitution under whichever plate wins.</p>
+  <ol class="plain">
+    <li class="law"><b>One metaphor, fully committed, or none.</b> <span>The tell of kitsch is always incompletion — a garden that is just a blog, a car that drives nowhere. Bruno Simon and gwern sit at opposite poles of the same law.</span></li>
+    <li class="law"><b>Words win the first half-second.</b> <span>If atmosphere takes the eye before the sentence does, contrast is miscalibrated. The room serves the sitter.</span></li>
+    <li class="law"><b>Every unit of light, weight, or ornament traces to a real datum — or it is cut.</b> <span>A glow that means nothing is a gradient with an alibi.</span></li>
+    <li class="law"><b>Two tempos: instant and geological.</b> <span>Nothing between. Anything cycling faster than minutes reads as screensaver; Eno&rsquo;s test — noticed by staring, never by interruption.</span></li>
+    <li class="law"><b>Choreograph the scroll; build one heavy room.</b> <span>The reader&rsquo;s scroll is the one animation no designer can remove, and no vision used it. One surface at architectural scale, traveled through, the reader&rsquo;s hand as the only easing curve — this is where the hockey player and the strongman live as felt experience instead of caption.</span></li>
+    <li class="law"><b>The site must be able to smile.</b> <span>Sh&omacr;nagon is arch, quick, catty; Austen is funny. Sixteen concepts built sixteen mausoleums for a man who is not dead. The deepest register of a life is reached faster through delight than through sediment.</span></li>
+    <li class="law"><b>The lists are the anti-silo. Never a facet-nav.</b> <span>&ldquo;Things that are exact: a wrist shot, a deadlift, a line of iambic pentameter&rdquo; — the zuihitsu already dissolves taxonomy. Any design that re-siloes the six selves, then labors to reconnect them, has misread the genre. The lists, not the lives, are the load-bearing walls.</span></li>
+    <li class="law"><b>Plain HTML is the ground truth; the source is the second text.</b> <span>curl, reader mode, and agents get the complete book. View-source finds the page <em>more</em> composed underneath, never less. Machine legibility gains facts, never loses them.</span></li>
+    <li class="law"><b>Nothing is locked, only surfaced first.</b> <span>Whatever selective disclosure the design uses, the full text is always one honest move away. Earned revelation layers on top of legibility, never replaces it.</span></li>
+    <li class="law"><b>The honesty rules compile.</b> <span>Every plate ends in a governing rule, and every governing rule is prose intention until it becomes a build-time lint: no disclosure without evidence, no computed weight without a traceable input, no mark in the source that isn&rsquo;t true. The mound&rsquo;s own trowel, sharpened into a test suite. This is the one law that keeps all the others alive under deadline.</span></li>
+    <li class="law"><b>No costume.</b> <span>The traditions are sources for structure and rhythm, never surface: no parchment texture, no cork board, no pixel that depicts stone. Period lives in diction and apparatus or not at all.</span></li>
+  </ol>
+
+  <!-- ============================ PLATES ============================ -->
+
+  <p class="rubric" id="plates">iii &middot; The Plates</p>
+  <h2>Four directions, each fully committed</h2>
+  <p>Distilled from three full visions and fifteen concepts, adversarially demolished, judged through three lenses. Each plate is buildable alone. The verdicts are quoted without mercy.</p>
+
+  <section class="plate">
+    <p class="plate-no">PLATE I</p>
+    <h2>The Living Hand</h2>
+    <p class="epigraph">&ldquo;This living hand, now warm and capable — see, here it is — I hold it towards you.&rdquo; — Keats</p>
+    <p>The site as holograph: the single manuscript copy, in the author&rsquo;s own hand, still being written. Canon-derived asymmetric margins (2:3:4:6, computed, published in the colophon) with the wide outer margin as the site&rsquo;s reserved zone — and that margin is where the ethic becomes architecture: <b>evidence stands beside its claim, at the height of the claim</b>, celadon apparatus running parallel to ink text the way Rashi flanks the Talmud. No click, no <span class="mono">›</span>. Four inks and a leaf: ink, vermilion rubric (structural jobs only, enumerable on one hand), celadon apparatus, murasaki thread (links only). The leaf becomes canonical; dark becomes a scene — the lamplit page on the night desk. Zero motion on wide viewports. The manuscript&rsquo;s condition is stillness; the only thing that moves is the reader.</p>
+    <div class="moment"><em>Signature moment</em>In the log, a failure is struck with a single sloped stroke — one rule, one slope, sitewide — and its lesson stands in the margin: &ldquo;A build that passes locally proves the laptop, not the deploy.&rdquo; Keats&rsquo;s crossed-out drafts survive because the crossing-out was part of the poem.</div>
+    <p class="walk"><a href="https://claude.ai/code/artifact/6f609655-3c0a-4cc6-a177-c0ebd7c1bbf9">walk through it — the leaf, the margin, the ruling &rarr;</a></p>
+    <p class="risk"><b>Risk:</b> medieval cosplay by accumulation — pilcrow + drop cap + incipit + folio is six antiquarian signifiers stacking into a Renaissance faire of restraint. And the deeper charge sticks: this cures &ldquo;correct but not beautiful&rdquo; with <b>more rigorous correctness</b>. It ships only if it takes the monument and the smile from the laws above.</p>
+    <div class="margin verdict verdict-inline">critic: ranked 1 of 3<br>&ldquo;wins on points, not knockout&rdquo;<br>margin apparatus = the site&rsquo;s ethic promoted to architecture<br>charge: re-commits the diagnosed sin</div>
+  </section>
+
+  <section class="plate">
+    <p class="plate-no">PLATE II</p>
+    <h2>Bearing</h2>
+    <p class="epigraph">Everything below bears everything above.</p>
+    <p>The site as load-bearing wall. Every element has mass — <b>measured, not asserted</b>: at build time a published pure function assigns each line its setting from real quantities, <span class="mono">weight(el) = f(depth,&nbsp;bytes,&nbsp;evidence,&nbsp;age)</span>, rendered on the variable weight axis of the faces the site already owns. A page opens light and settles, course by course, toward a stout foundation. The semantic inversion is the whole ethic: <b>assertion is light, evidence is dense</b> — because evidence is what actually holds the claim up. Poems are exempt: verse alone hangs from above, unloaded — the one typographic law that is itself a poem. /now is ice: the lightest page on the site, present tense gliding, nothing settled yet. The footer counts plates onto the bar: <i>this page weighs 38,214 bytes and bears seven years.</i></p>
+    <figure class="specimen" aria-label="Type settling under accumulated load, light at the top to heavy at the foundation">
+      <p class="w1">This week&rsquo;s entries breathe near the surface,</p>
+      <p class="w2">last year&rsquo;s have begun to take the weight,</p>
+      <p class="w3">the old work tightens under what was stacked upon it,</p>
+      <p class="w4">and the record of 2019 has settled into masonry,</p>
+      <p class="w5">load-bearing, compressed, holding everything above.</p>
+      <figcaption class="verdict">the mechanism, felt before seen: wght 340 &rarr; 740, leading closing as the courses settle</figcaption>
+    </figure>
+    <div class="moment"><em>Signature moment</em>The /log: seven years in one column, and the gradient runs across years. What a visitor tells a friend: &ldquo;His past is literally denser. The old entries are load-bearing.&rdquo;</div>
+    <p class="walk"><a href="https://claude.ai/code/artifact/49f1848a-bf20-4bd8-ac9a-a450d94a7734">walk through it — feel the wall settle &rarr;</a></p>
+    <p class="risk"><b>Risk:</b> physics toy — scroll-triggered boldening, illegible slabs, strain performed instead of borne. The police: no element may display a weight it was not computed to carry, and the whole gradient lives inside legibility. If you notice the mechanism before you feel it, the setting is wrong.</p>
+    <div class="margin verdict verdict-inline">beauty 9 &middot; meaning 8 &middot; matter 9<br>the only concept in all three top-fives<br>&ldquo;works like meter in verse&rdquo;<br>&ldquo;the form is derived from him, not draped on him&rdquo;<br>strip the styling and the austere semantic lists remain intact</div>
+  </section>
+
+  <section class="plate">
+    <p class="plate-no">PLATE III</p>
+    <h2>The Book of Hours</h2>
+    <p class="epigraph">In spring, the dawn. The sky does the moving so the words can keep still.</p>
+    <p>Turner on the web: every page is the same page at a different hour. One painted ground — thirty stacked near-transparent washes, seeded deterministically by date, hour, season — beneath austere typography held in a <b>clearing</b>: a stabilized pocket whose contrast is clamped to AA whatever the sky is doing. Light is wired to fact: the reader&rsquo;s real hour, the season, the recency of the log. Cold dawn is rink light at 6 a.m., kept honest and unnamed. Two silent weeks and the ledger clouds over — the site&rsquo;s conscience, visible from the doorway. The hour dial subsumes the theme toggle. One step into the CV and the sky evaporates entirely: ink on white, a records office — proof the weather elsewhere was chosen.</p>
+    <div class="moment"><em>Signature moment</em>At 4:47 a.m. the site stands at its deepest ink and <i>Things that quicken the heart</i> is the list standing open — Sh&omacr;nagon&rsquo;s clock choosing the door. The design&rsquo;s whole thesis in one dawn visit.</div>
+    <p class="walk"><a href="https://claude.ai/code/artifact/beb63619-cb45-46cc-b7db-fbb30dae878a">walk through it — turn the hour dial, watch the door change &rarr;</a></p>
+    <p class="risk"><b>Risk:</b> disqualifying at partial budget. Thirty tuned washes &times; six states &times; seasonal tilt is weeks of taste-work, and the critic&rsquo;s finding is exact: amputated to presets, a murasaki-bruised dark gradient <b>is literally the banned purple gradient</b>. This plate ships at 100% or not at all. Second finding: the conscience mechanism has no mercy rule — a recruiter arriving mid-vacation sees a site performing depression.</p>
+    <div class="margin verdict verdict-inline">critic: highest ceiling, ranked 2<br>&ldquo;the only vision that swings at magnificence&rdquo;<br>cold-dawn-as-rink-light: best facet translation in the field<br>all-or-nothing; realistic 60% state = the forbidden object</div>
+  </section>
+
+  <section class="plate">
+    <p class="plate-no">PLATE IV</p>
+    <h2>Tell</h2>
+    <p class="epigraph">Every stratum was once the surface.</p>
+    <p>The site as excavation report of an inhabited mound. <b>&ldquo;A man who has been five things is not five men; he is one mound&rdquo;</b> — the truest sentence anyone wrote in either fleet. A typed section drawing is the navigation: the occupation layer alive at the top (/now, /log), numbered strata descending — research, engineering, the novels, the poems, the iron — and the profile bottoms out at ice, not soil. The lists are registers of small finds, each entry catalogued, cross-referenced (<span class="mono">cf. NN-071</span>); following the threads is the entire game, and the only save file is the visitor&rsquo;s mind. The site accessions its own log: entries older than a season are formally compacted into the stratum below. The living site buries itself.</p>
+    <div class="moment"><em>Signature moment</em>The ice stratum is bedrock: everything above cross-references down into it; it references nothing below, because there is nothing below. Hockey given the load-bearing position every literary design denies it.</div>
+    <p class="walk"><a href="https://claude.ai/code/artifact/40019708-2f23-4de1-b197-8050b70e9076">walk through it — read the wall, open the finds &rarr;</a></p>
+    <p class="risk"><b>Risk:</b> apparatus that catalogues feeling instead of producing it — the beauty judge scored the mound a 6 and preferred the grief of its own discarded candidate. And theme-park archaeology waits one texture away. The police: nothing enters that could not appear in a real excavation monograph.</p>
+    <div class="margin verdict verdict-inline">meaning 9 &middot; matter 7 &middot; beauty 6<br>&ldquo;the truest sentence in the dossier&rdquo;<br>registers survive a 60% build intact<br>coldest room of the four</div>
+  </section>
+
+  <!-- ============================ RECOMMENDATION ============================ -->
+
+  <p class="rubric" id="recommendation">iv &middot; Recommendation</p>
+  <h2>Plate V — The Holograph</h2>
+  <p class="epigraph">A holograph: a work wholly in the author&rsquo;s own hand. The manuscript, given mass.</p>
+  <p class="walk" style="margin:0 0 0.8rem"><a href="https://claude.ai/code/artifact/efd5729f-80f6-45ea-9347-e2c46e68b868">walk through it — the book, arriving directly &rarr;</a></p>
+  <p class="walk" style="margin:0 0 1.6rem"><a href="https://claude.ai/code/artifact/e1c24c29-6d69-4e14-881e-e19f49aa30ca">page and wall, side by side — the same corpus set twice, and the five choices unbundled &rarr;</a></p>
+  <p>The plates above are pure commitments; this is the composition I would build. It is not a merge of everything — the carnival is the one guaranteed failure — but one governing metaphor carrying one physics, one clock, one monument, under a strict graft budget. The metaphor is Plate I&rsquo;s: the living manuscript. The physics is Plate II&rsquo;s: weight, computed from truth. They are not two ideas. A manuscript is a physical object; ink laid on over years <i>has</i> mass; the page settles. Bearing is what The Living Hand feels like when it stops being weightless.</p>
+
+  <dl class="manifest">
+    <div><dt>Architecture</dt><dd>The Living Hand entire: computed canon margins, the reserved outer margin as the site&rsquo;s home for apparatus — evidence beside claim, at claim height. Four inks and a leaf. Leaf canonical; night as the desk scene.</dd></div>
+    <div><dt>Physics</dt><dd>Bearing&rsquo;s weight function as the site&rsquo;s <b>only</b> typographic mechanism, subliminal, published in the colophon as a model card. Assertion light, evidence dense. Poems hang.</dd></div>
+    <div><dt>Clock</dt><dd>Sh&omacr;nagon&rsquo;s hour, server-side: the index epigraph and which list stands open follow the real San Francisco hour and season. No JavaScript; without a clock the site is canonically the small hours.</dd></div>
+    <div><dt>Monument</dt><dd><b>Cut, 2026-09-05, client&rsquo;s hand.</b> The scroll threshold is struck. The critic&rsquo;s charge — nobody built anything heavy — must now be answered by the body itself: the settling type carries the mass, or nothing does.</dd></div>
+    <div><dt>Ledger</dt><dd>Ink-age confined to /log, where recency <i>is</i> meaning — and asymmetric: a struck failure fades faster than the lesson beside it. After a year, what remains dark is what was learned.</dd></div>
+    <div><dt>Stone</dt><dd>The CV is the one page outside the night and outside time: daylight canonical, dense, print-perfect, margins derived from the same canon at paper scale. What is carved does not age.</dd></div>
+    <div><dt>Source</dt><dd>Foul papers: the rendered page is the fair copy, the HTML source the working draft — comments holding true struck lines, reverted SHAs, missed lifts. Every mark real or absent. The colophon comment signs each leaf: <i>written in San Francisco; ruled by hand.</i></dd></div>
+    <div><dt>Smile</dt><dd>A wit budget, spent deadpan: the 404&rsquo;s lineage extended to one dry aside per room — the running head, the empty states, the colophon — Sh&omacr;nagon&rsquo;s temper, never a wink. Delight is a requirement, not a garnish.</dd></div>
+    <div><dt>Lint</dt><dd>Law 10 as CI: evidence validation extended to the weight function&rsquo;s inputs, the hour tables, the source apparatus. A mark that cannot prove itself fails the build.</dd></div>
+  </dl>
+
+  <p><b>Refused, by name:</b> the painted skies (Plate III stands or falls whole — it does not donate parts); strata numbering and find-tags outside the log; ink-age anywhere but the ledger; drop caps <i>and</i> rubricated folios together (pick the rubric, drop the costume); any second display-scale room; X-ray, theater, and loom imagery entire; the contradicting field note — the single best anti-slop device in the fleet, but it is new prose, which is your pen, not mine. It goes to the content phase as a question, not a graft.</p>
+
+  <p class="rubric" id="bank">v &middot; The Device Bank</p>
+  <h2>Worth keeping whichever plate wins</h2>
+  <ul class="bank">
+    <li>The sign-in sheet: six roles in a theater&rsquo;s safety ledger, four signed out with dates, two rows still open. Bureaucratic elegy; the best sixty-second emotional payload in either fleet. <span class="src">ghost light</span></li>
+    <li>The contradicting specimen label: every evidence disclosure opens onto the raw field note, always a shade less flattering than the sentence it proves. Anti-slop as formal law. <span class="src">the parish</span></li>
+    <li>Error-bar dating: evidenced claims inked firm; unproven memory drawn with confidence intervals. The record admits which parts of the life it can prove. <span class="src">long section</span></li>
+    <li>The mutating first sentence: the unpublished novel&rsquo;s opening line descending the margin draft by draft to the one clause unchanged in nineteen years. Requires the real drafts; dies otherwise. <span class="src">core</span></li>
+    <li>Machine-first completeness: publish the entire structured corpus in markup regardless of what the visual layer shows — what a machine can read decoupled, permanently, from what a human sees. <span class="src">third line</span></li>
+    <li>Git-derived freshness: any &ldquo;tended&rdquo; signal computed from the actual log, free and impossible to fake. <span class="src">undercut</span></li>
+    <li>The hand-picked next: one authored &ldquo;read next&rdquo; per leaf — a webring of one, never a recommendation engine. <span class="src">weird web</span></li>
+    <li>The committee of voices: occasionally, a second self glosses an entry in the margin — the engineer&rsquo;s dry note on the novelist&rsquo;s claim. Disco Elysium&rsquo;s quorum, typographically, and only where the content earns it. <span class="src">games lens</span></li>
+  </ul>
+
+  <p class="rubric" id="questions">vi &middot; Questions</p>
+  <h2>Answers that change the spec</h2>
+  <ol class="plain">
+    <li><b>Which plate?</b> I–IV pure, or V as composed. Everything downstream — spec, schemas, workstreams — waits on this one choice.</li>
+    <li><b>May the leaf take the throne?</b> Plates I and V make light canonical and demote &ldquo;night writing&rdquo; to the desk scene. Plate III keeps night sovereign. This is a real philosophical reversal of v1, not a token swap.</li>
+    <li><b>Does the raw material exist?</b> Foul papers and the mutating sentence run on real struck drafts, real missed lifts, real reverted SHAs, nineteen real years of one first line. If the archive doesn&rsquo;t exist, those devices are cut — nothing is ever fabricated into an evidence-sacred site.</li>
+    <li><b>The field notes:</b> the contradicting specimen label needs new prose in your hand, one label per entry, each a shade less flattering than its claim. Content phase, question-skeletons only — do you want the skeletons drafted?</li>
+  </ol>
+  <p>On your <b>go</b> with a plate chosen: the lean spec — schemas, non-goals, acceptance criteria, non-overlapping workstreams — then implementation on a second go, hard cutover, no legacy paths, branch only.</p>
+
+</main>
+
+<footer class="leaf">
+  <p class="mono">The full dossier — 3 visions, demolition report, 15 concepts, 3 judgments, 7 research digests —<br>is at <span class="sign">docs/redesign-second-study/</span> in the repo, untracked, uncommitted.<br><br>Fleet: 2 workflows &middot; 31 agents &middot; fable held for visions, critic, and two judges; sonnet for the line work.<br><span class="sign">Nandal&rsquo;s fleet faciebat &middot; San Francisco &middot; 2026-09-04</span></p>
+</footer>

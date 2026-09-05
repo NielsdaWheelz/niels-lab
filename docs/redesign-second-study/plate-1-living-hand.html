@@ -1,0 +1,227 @@
+<title>The Living Hand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Spline+Sans+Mono:wght@300..500&display=swap">
+<style>
+  /* PLATE I — THE LIVING HAND. One world, committed: the leaf is canonical.
+     Four inks and a leaf; no texture, no gradient, no motion. */
+  :root {
+    --leaf: #FAF8F3;
+    --ink: #1B1B22;
+    --shu: #B5432E;
+    --celadon: #4A7367;
+    --murasaki: #66327C;
+    --rule: #E4E0D5;
+    --faded: #8A857B;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--leaf);
+    color: var(--ink);
+    font-family: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+    font-optical-sizing: auto;
+    font-size: 1.14rem;
+    line-height: 1.58;
+    margin: 0;
+    font-variant-numeric: oldstyle-nums;
+  }
+  ::selection { background: var(--murasaki); color: var(--leaf); }
+  a { color: var(--murasaki); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:focus-visible, label:focus-visible, input:focus-visible + label { outline: 2px solid var(--shu); outline-offset: 3px; }
+  .q { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums lining-nums; }
+
+  /* The canon: margins derived, not padded. Inner narrow, outer wide and reserved. */
+  .canon {
+    display: grid;
+    grid-template-columns:
+      minmax(1.4rem, 6vw)            /* inner margin (2) */
+      minmax(0, 60ch)                /* the text block  */
+      minmax(1.4rem, 20rem)          /* outer margin (4) — the reserved zone */
+      minmax(0, 1fr);
+    row-gap: 0;
+  }
+  .canon > * { grid-column: 2; min-width: 0; }
+  .canon > .gloss { grid-column: 3; }
+
+  /* running head — the navigation, on every leaf, forever */
+  .runninghead {
+    display: flex; justify-content: space-between; gap: 2rem;
+    padding: 1.1rem 0 0.8rem;
+    border-bottom: 1px solid var(--rule);
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--faded);
+  }
+  .runninghead .here { color: var(--shu); }
+
+  /* incipit */
+  .incipit { padding: 7rem 0 4rem; }
+  .pilcrow { color: var(--shu); font-size: 1.5rem; line-height: 1; margin-bottom: 1rem; }
+  h1 {
+    font-style: italic; font-weight: 300;
+    font-variation-settings: 'opsz' 72;
+    font-size: clamp(2.6rem, 6.5vw, 4.8rem);
+    line-height: 1.05; letter-spacing: -0.005em;
+    margin: 0 0 0.8rem; text-wrap: balance;
+  }
+  .subline { color: var(--faded); font-style: italic; margin: 0; }
+
+  /* the hour epigraph — chirashigaki: two lines, offset by a fixed, repeatable measure */
+  .hour { margin: 5.5rem 0 0; }
+  .hour .when { font-family: 'Spline Sans Mono', monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--celadon); margin: 0 0 1.2rem; }
+  .hour .line {
+    font-style: italic; font-weight: 330;
+    font-variation-settings: 'opsz' 54;
+    font-size: clamp(1.5rem, 3.4vw, 2.3rem);
+    line-height: 1.3; margin: 0;
+  }
+  .hour .line + .line { margin-top: 0.4rem; padding-left: 3.5rem; }
+
+  /* contents leaf */
+  .contents { margin: 5.5rem 0 0; padding: 0; list-style: none; }
+  .contents li { display: flex; gap: 1.1rem; align-items: baseline; padding: 0.55rem 0; border-top: 1px solid var(--rule); }
+  .contents li:first-child { border-top: 0; }
+  .contents .no { color: var(--shu); font-size: 1rem; min-width: 1.6rem; }
+  .contents a { text-decoration: none; color: var(--ink); }
+  .contents a:hover { color: var(--murasaki); }
+  .contents .count { margin-left: auto; color: var(--celadon); font-family: 'Spline Sans Mono', monospace; font-size: 0.74rem; }
+
+  /* section rubric */
+  .leafbreak { margin: 6.5rem 0 0; border: 0; border-top: 1px solid var(--rule); }
+  h2 {
+    font-style: italic; font-weight: 360;
+    font-variation-settings: 'opsz' 44;
+    font-size: 2rem; line-height: 1.15; margin: 3rem 0 0.4rem; text-wrap: balance;
+  }
+  h2::first-letter { color: var(--shu); }
+  .note { color: var(--faded); font-style: italic; margin: 0 0 2.4rem; }
+
+  /* entries: hanging em-dash, baseline-held; evidence stands in the margin at claim height */
+  .canon > .entries { margin: 0; padding: 0; list-style: none; grid-column: 2 / 4; display: grid; grid-template-columns: subgrid; }
+  .entry { display: grid; grid-template-columns: subgrid; grid-column: 1 / 3; margin: 0 0 1.15rem; }
+  .entry > p { grid-column: 1; margin: 0; padding-left: 1.4rem; text-indent: -1.4rem; }
+  .entry > p::before { content: '—\2002'; color: var(--faded); }
+  .entry > .gloss { grid-column: 2; align-self: start; padding-left: 2.2rem; padding-top: 0.28rem; }
+  .gloss {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.73rem; line-height: 1.5; color: var(--celadon);
+  }
+  .gloss a { color: var(--celadon); text-decoration-color: var(--rule); overflow-wrap: anywhere; }
+  .gloss .d { color: var(--faded); }
+
+  /* narrow viewports: the gloss folds inline beneath its claim — nearer, never gone */
+  @media (max-width: 62rem) {
+    .canon { grid-template-columns: minmax(1.3rem, 5vw) minmax(0, 1fr) minmax(1.3rem, 5vw) 0; }
+    .canon > .entries { display: block; grid-column: 2; }
+    .entry { display: block; }
+    .entry > .gloss { display: block; padding: 0.25rem 0 0 1.4rem; }
+    .canon > .gloss { grid-column: 2; margin: 0.4rem 0 1.2rem; }
+  }
+
+  /* the ledger leaf */
+  .ledger { margin: 0; padding: 0; list-style: none; }
+  .ledger .entry > p { padding-left: 6.4rem; text-indent: -6.4rem; }
+  .ledger .entry > p::before { content: none; }
+  .ledger .when { font-family: 'Spline Sans Mono', monospace; font-size: 0.74rem; color: var(--celadon); margin-right: 1.1rem; }
+  /* the struck failure: one sloped stroke, drawn once, legible beneath */
+  .struck { position: relative; display: inline; }
+  .struck svg { position: absolute; inset: 46% -1% auto -1%; width: 102%; height: 0.5em; overflow: visible; pointer-events: none; }
+  .struck line { stroke: var(--ink); stroke-width: 1.3; }
+  .lesson { color: var(--celadon); }
+
+  /* the ruling — pricking and construction, shown on request (pure CSS) */
+  #ruling { position: absolute; opacity: 0; }
+  .ruling-toggle {
+    display: inline-block; cursor: pointer; user-select: none;
+    font-family: 'Spline Sans Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--faded);
+    border-bottom: 1px solid var(--rule); padding-bottom: 2px;
+  }
+  #ruling:checked ~ .page {
+    background-image: repeating-linear-gradient(
+      to bottom, transparent 0, transparent calc(1.58 * 1.14rem - 1px),
+      #B5432E14 calc(1.58 * 1.14rem - 1px), #B5432E14 calc(1.58 * 1.14rem));
+  }
+  #ruling:checked ~ .page .canon > * { box-shadow: -1px 0 0 0 #4A736722, 1px 0 0 0 #4A736722; }
+
+  footer { margin-top: 7rem; border-top: 1px solid var(--rule); padding: 1.6rem 0 4.5rem; }
+  footer p { margin: 0.2rem 0; }
+  .plateline { color: var(--faded); font-family: 'Spline Sans Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; }
+</style>
+
+<input type="checkbox" id="ruling">
+<div class="page">
+<div class="canon">
+  <nav class="runninghead" aria-label="running head">
+    <span>The Pillow Book &middot; Niels-Erik Nandal</span>
+    <span><span class="here">the index</span> &nbsp;&middot;&nbsp; the ledger &nbsp;&middot;&nbsp; the fair copy</span>
+  </nav>
+
+  <header class="incipit">
+    <div class="pilcrow" aria-hidden="true">¶</div>
+    <h1>The Pillow Book of Niels-Erik&nbsp;Nandal,</h1>
+    <p class="subline">written in San Francisco.</p>
+  </header>
+
+  <div class="hour">
+    <p class="when">in the small hours</p>
+    <p class="line">Sleep, with the diff</p>
+    <p class="line">still open.</p>
+  </div>
+  <aside class="gloss" style="padding-top:6.2rem">the epigraph keeps<br>Sh&#333;nagon&rsquo;s clock —<br>swapped server-side,<br>dawn in spring,<br>night in winter</aside>
+
+  <ol class="contents">
+    <li><span class="no">1</span><a href="#quicken">Things that quicken the heart</a><span class="count">7 · 2026-08-09</span></li>
+    <li><span class="no">2</span><a href="#">Things I have built</a><span class="count">9 · 2026-08-09</span></li>
+    <li><span class="no">3</span><a href="#">Hateful things (found in codebases)</a><span class="count">8 · 2026-08-09</span></li>
+    <li><span class="no">4</span><a href="#">Elegant things</a><span class="count">8 · 2026-08-09</span></li>
+    <li><span class="no">5</span><a href="#">Things that should be small</a><span class="count">8 · 2026-08-09</span></li>
+    <li><span class="no">6</span><a href="#">Rare things</a><span class="count">7 · 2026-08-09</span></li>
+    <li><span class="no">7</span><a href="#">Things that are distant though near</a><span class="count">7 · 2026-08-09</span></li>
+    <li><span class="no">8</span><a href="#">Things now in decline</a><span class="count">7 · 2026-08-09</span></li>
+  </ol>
+
+  <hr class="leafbreak">
+
+  <h2 id="quicken">Things that quicken the heart</h2>
+  <p class="note">leaf the first &middot; last written 2026-08-09</p>
+
+  <ol class="entries">
+    <li class="entry"><p>The bar&rsquo;s first millimeter off the floor, which tells you everything the next three seconds will confirm.</p></li>
+    <li class="entry"><p>Watching a meet total pass 1,000 on a third attempt you almost didn&rsquo;t take.</p></li>
+    <li class="entry"><p>A keeper off his line while the ball is still rolling toward your foot.</p></li>
+    <li class="entry"><p>Levin mowing, at the moment the scythe begins to swing itself.</p></li>
+    <li class="entry">
+      <p>The tokenizer round-tripping a page of Joyce with zero unknowns. Byte fallback, keeping its promise.</p>
+      <span class="gloss"><a href="https://github.com/NielsdaWheelz/niels-gpt-2">niels-gpt tokenizer, byte fallback</a><br><span class="d">2026-08-09</span></span>
+    </li>
+    <li class="entry">
+      <p>Two generation paths, one fast, one naive, printing identical tokens. The speedup is now legal.</p>
+      <span class="gloss"><a href="#">niels-gpt: kv-cache prefill/decode against naive generation</a><br><span class="d">2026-08-09</span></span>
+    </li>
+    <li class="entry"><p>A stranger&rsquo;s heart rate slowing on schedule, inside a game you built to slow it.</p></li>
+  </ol>
+
+  <hr class="leafbreak">
+
+  <h2>The ledger</h2>
+  <p class="note">training, reading, shipping &middot; failures kept in</p>
+
+  <ol class="entries ledger">
+    <li class="entry"><p><span class="when q">08-09</span>spec and rules codified &middot; docs/pillow-book-spec.md, docs/rules.md</p></li>
+    <li class="entry"><p><span class="when q">08-02</span>SQ 3&times;3 @385 &middot; third set moved like the first</p></li>
+    <li class="entry">
+      <p><span class="when q">07-20</span><span class="struck">/og 500 in production &middot; fonts missing from the function bundle<svg aria-hidden="true" viewBox="0 0 100 4" preserveAspectRatio="none"><line x1="0" y1="3.4" x2="100" y2="0.6"/></svg></span></p>
+      <span class="gloss lesson">A build that passes locally proves the laptop, not the deploy.</span>
+    </li>
+    <li class="entry"><p><span class="when q">07-10</span>BP 3&times;3 @250 &middot; paused, no bounce</p></li>
+    <li class="entry"><p><span class="when q">07-03</span>Moby-Dick 40pp before work &middot; cetology, skimmed nothing</p></li>
+  </ol>
+
+  <footer>
+    <p><label class="ruling-toggle" for="ruling">show the ruling</label></p>
+    <p class="plateline" style="margin-top:1.6rem">Plate I &middot; The Second Study &middot; a demonstration wearing the real corpus &middot; ruled by hand, no texture, no motion</p>
+  </footer>
+</div>
+</div>
+<!-- fair copy above. this leaf was set in one sitting; the ruling you can summon
+     is the page's own construction, not a decoration of it. -->

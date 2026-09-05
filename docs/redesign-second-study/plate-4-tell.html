@@ -1,0 +1,167 @@
+<title>Tell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Spline+Sans+Mono:wght@300..500&display=swap">
+<style>
+  /* PLATE IV — TELL. One world, committed: the excavation report of an inhabited
+     mound. Graphite on dark field, one conventional red. Nothing appears here
+     that could not appear in a real excavation monograph: numbering, registers,
+     section drawing, cross-references, field prose. No ornament. No stone pixels. */
+  :root {
+    --field: #17181A;
+    --graphite: #C9CBC6;
+    --dim: #7E817C;
+    --line: #3A3C3A;
+    --red: #C24D38;      /* the one conventional red: annotation only */
+    --live: #D8DAD4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--field);
+    color: var(--graphite);
+    font-family: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+    font-optical-sizing: auto; font-size: 1.12rem; line-height: 1.6;
+    margin: 0; font-variant-numeric: oldstyle-nums;
+  }
+  ::selection { background: var(--red); color: var(--field); }
+  a { color: var(--graphite); text-decoration-color: var(--red); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:focus-visible, summary:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+  .q { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums lining-nums; }
+
+  .col { max-width: 66ch; margin: 0 auto; padding: 0 1.4rem; }
+
+  header { padding: 8vh 0 3rem; }
+  .repno { color: var(--red); font-family: 'Spline Sans Mono', monospace; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; margin: 0 0 1.4rem; }
+  h1 { font-weight: 420; font-variation-settings: 'opsz' 60; font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.1; margin: 0 0 0.6rem; text-wrap: balance; }
+  .subtitle { color: var(--dim); font-style: italic; margin: 0; }
+  .epigraph { color: var(--dim); font-style: italic; margin: 2.6rem 0 0; }
+
+  /* ---- the section drawing: the profile IS the navigation ---- */
+  .drawing { margin: 4.5rem 0 0; border: 1px solid var(--line); padding: 1.6rem 1.4rem 1.2rem; overflow-x: auto; }
+  .drawing .caption { font-family: 'Spline Sans Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); margin: 0 0 1.3rem; display: flex; justify-content: space-between; gap: 1rem; }
+  .drawing .caption .n { color: var(--red); }
+  .stratum { display: grid; grid-template-columns: 5.2rem 1fr auto; gap: 1.1rem; align-items: baseline;
+    padding: 0.62rem 0.2rem; border-top: 1px dashed var(--line); text-decoration: none; color: var(--graphite); }
+  .stratum:hover { background: #1E2022; }
+  .stratum .ctx { font-family: 'Spline Sans Mono', monospace; font-size: 0.74rem; color: var(--dim); }
+  .stratum .what { font-size: 1.02rem; }
+  .stratum .span { font-family: 'Spline Sans Mono', monospace; font-size: 0.72rem; color: var(--dim); white-space: nowrap; }
+  .stratum.live { border-top: 1px solid var(--graphite); color: var(--live); }
+  .stratum.live .ctx { color: var(--red); }
+  /* hachure: a recording convention, not a texture — depth by line-density only */
+  .h1x { background-image: repeating-linear-gradient(-45deg, transparent 0 11px, #C9CBC60F 11px 12px); }
+  .h2x { background-image: repeating-linear-gradient(-45deg, transparent 0 8px,  #C9CBC614 8px 9px); }
+  .h3x { background-image: repeating-linear-gradient(-45deg, transparent 0 5px,  #C9CBC61A 5px 6px); }
+  .bedrock { border-bottom: 2px solid var(--graphite); }
+  .drawing .datum { font-family: 'Spline Sans Mono', monospace; font-size: 0.68rem; color: var(--dim); margin: 1rem 0 0; text-align: right; }
+
+  h2 { font-weight: 460; font-variation-settings: 'opsz' 34; font-size: 1.55rem; margin: 5.5rem 0 0.3rem; }
+  h2 .no { color: var(--red); font-family: 'Spline Sans Mono', monospace; font-size: 0.8rem; margin-right: 0.8rem; vertical-align: 0.15em; }
+  .method { color: var(--dim); font-style: italic; margin: 0 0 2rem; }
+
+  /* ---- register of small finds ---- */
+  .register { margin: 0; padding: 0; list-style: none; }
+  .find { border-top: 1px dashed var(--line); }
+  .find summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 6.2rem 1fr; gap: 1.1rem; padding: 0.75rem 0.2rem; align-items: baseline; }
+  .find summary::-webkit-details-marker { display: none; }
+  .find .no { font-family: 'Spline Sans Mono', monospace; font-size: 0.74rem; color: var(--dim); }
+  .find[open] .no { color: var(--red); }
+  .find .text { margin: 0; }
+  .find .card { margin: 0 0 1rem 7.3rem; padding: 0.7rem 1rem; border-left: 1px solid var(--line);
+    font-family: 'Spline Sans Mono', monospace; font-size: 0.74rem; line-height: 1.9; color: var(--dim); }
+  .find .card b { color: var(--graphite); font-weight: 500; }
+  .find .card a { overflow-wrap: anywhere; }
+  .cf { color: var(--red); font-family: 'Spline Sans Mono', monospace; font-size: 0.78em; white-space: nowrap; }
+  @media (max-width: 40rem) {
+    .find summary { grid-template-columns: 1fr; gap: 0.15rem; }
+    .find .card { margin-left: 0.2rem; }
+  }
+
+  /* field prose */
+  .fieldnote { margin: 3.2rem 0 0; color: var(--dim); }
+  .fieldnote b { color: var(--graphite); font-weight: 500; }
+
+  /* accession — the living site burying itself */
+  .accession { margin: 5.5rem 0 0; border: 1px dashed var(--line); padding: 1.3rem 1.4rem; }
+  .accession .tag { color: var(--red); font-family: 'Spline Sans Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 0.7rem; }
+  .accession p { margin: 0.3rem 0; }
+  .accession .q { font-size: 0.78rem; color: var(--dim); }
+
+  footer { padding: 5rem 0 3rem; }
+  .plateline { color: var(--dim); font-family: 'Spline Sans Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; margin: 0; }
+</style>
+
+<div class="col">
+  <header>
+    <p class="repno">NN / 2026 · interim report · excavations continuing</p>
+    <h1>Tell Nandal</h1>
+    <p class="subtitle">the excavation report of an inhabited mound — San Francisco, occupation ongoing</p>
+    <p class="epigraph">Every stratum was once the surface. A man who has been five things is not five men; he is one mound.</p>
+  </header>
+
+  <figure class="drawing" aria-label="Section drawing: the profile is the navigation">
+    <figcaption class="caption"><span>FIG. 1 — SECTION, EAST-FACING</span><span class="n">north points toward now →</span></figcaption>
+    <a class="stratum live" href="#"><span class="ctx q">001</span><span class="what">OCCUPATION — the live surface · /now · /log</span><span class="span q">2026 · open</span></a>
+    <a class="stratum h1x" href="#"><span class="ctx q">002</span><span class="what">research — models, tokenizers, caches</span><span class="span q">2025–26</span></a>
+    <a class="stratum h1x" href="#"><span class="ctx q">003</span><span class="what">engineering — systems built for strangers</span><span class="span q">2021–</span></a>
+    <a class="stratum h2x" href="#"><span class="ctx q">004</span><span class="what">the novels — robber trench, backfilled with fiction</span><span class="span q">2017–</span></a>
+    <a class="stratum h2x" href="#"><span class="ctx q">005</span><span class="what">the poems — votive deposits, placed to be found</span><span class="span q">2015–</span></a>
+    <a class="stratum h3x" href="#reg006"><span class="ctx q">006</span><span class="what">iron — register sorts by kilograms</span><span class="span q">2019–</span></a>
+    <a class="stratum h3x bedrock" href="#"><span class="ctx q">007</span><span class="what">ICE — bedrock; destruction layer at top</span><span class="span q">–2015</span></a>
+    <p class="datum q">datum: today · depths measured in years before present · profile bottoms out at ice, not soil</p>
+  </figure>
+
+  <p class="fieldnote">Context <b>007</b> is a destruction layer: the occupation ended abruptly and the surface was resurfaced nightly until it wasn&rsquo;t. Every stratum above cross-references down into 007. <b>007 references nothing below, because there is nothing below.</b></p>
+
+  <h2 id="reg006"><span class="no q">REG. B</span>Register of small finds — elegant things</h2>
+  <p class="method">Finds tray cutting all strata; a disposition recurs at every era. Catalogued by depth; context cards on the existing zero-JS disclosure. Prose untouched — only its address changes.</p>
+
+  <ol class="register">
+    <li><details class="find">
+      <summary><span class="no q">NN-006.02</span><p class="text">Squat bar path: one vertical line, drawn twice.</p></summary>
+      <div class="card"><b>findspot</b> stratum 006, iron · <b>condition</b> complete · <b>assoc.</b> <span class="cf">cf. NN-001.09</span> (SQ 3×3 @385, live surface)</div>
+    </details></li>
+    <li><details class="find">
+      <summary><span class="no q">NN-007.01</span><p class="text">A saucer pass, airborne over one stick and flat on arrival.</p></summary>
+      <div class="card"><b>findspot</b> stratum 007, ice — bedrock · <b>condition</b> worn, edges intact · <b>note</b> deepest find in this tray; everything above learned its flatness here</div>
+    </details></li>
+    <li><details class="find">
+      <summary><span class="no q">NN-004.03</span><p class="text">The first sentence of Pride and Prejudice: a thesis, a joke, and the entire plot.</p></summary>
+      <div class="card"><b>findspot</b> stratum 004, the novels · <b>assoc.</b> <span class="cf">cf. NN-005.02</span> (Dickinson&rsquo;s slant rhyme, adjacent deposit)</div>
+    </details></li>
+    <li><details class="find">
+      <summary><span class="no q">NN-005.02</span><p class="text">Dickinson&rsquo;s slant rhyme: the bell you expected, struck slightly off, on purpose.</p></summary>
+      <div class="card"><b>findspot</b> stratum 005, votive · <b>note</b> smallest find, longest card — inverse proportion as law: one object placed on purpose, meant to be found later, by you, reading a register</div>
+    </details></li>
+    <li><details class="find">
+      <summary><span class="no q">NN-004.05</span><p class="text">Braudel: the sea gets the biography, and kings are demoted to weather.</p></summary>
+      <div class="card"><b>findspot</b> stratum 004 · <b>assoc.</b> <span class="cf">cf. NN-001.02</span> (Braudel 41pp, ledger row, live surface) — conjoining fragments of one vessel found across two layers</div>
+    </details></li>
+    <li><details class="find">
+      <summary><span class="no q">NN-002.04</span><p class="text">RMSNorm: LayerNorm minus the mean, and nothing misses it.</p></summary>
+      <div class="card"><b>findspot</b> stratum 002, research · <b>primary evidence</b> <a href="https://github.com/NielsdaWheelz/niels-gpt-2">niels-gpt model code</a> · calibrated date, inked firm</div>
+    </details></li>
+    <li><details class="find">
+      <summary><span class="no q">NN-002.05</span><p class="text">Weight tying: the matrix that reads is the matrix that speaks.</p></summary>
+      <div class="card"><b>findspot</b> stratum 002 · <b>primary evidence</b> <a href="https://github.com/NielsdaWheelz/niels-gpt-2/blob/5fb02af2ed7a25d18f5fcafdf040abb22c314c96/niels_gpt/model/gpt.py">gpt.py, weight tying</a> · the dig publishes its own dataset; the machine reader is a fellow excavator</div>
+    </details></li>
+    <li><details class="find">
+      <summary><span class="no q">NN-003.08</span><p class="text">A citation that still resolves after the document was edited underneath it.</p></summary>
+      <div class="card"><b>findspot</b> stratum 003, engineering · <b>assoc.</b> <span class="cf">cf. NN-002</span> passim · undated memory — drawn with error bars: 2023 ± 2</div>
+    </details></li>
+  </ol>
+
+  <div class="accession">
+    <span class="tag">accession notice — the mound accretes</span>
+    <p>Ledger rows older than a season are formally accessioned: assigned find numbers, compacted into the stratum below the surface.</p>
+    <p class="q">2026-06-05 · SQ 5×5 @335 · pickup 90 min → accessioned 2026-09-01 as NN-001.14, stratum 001→006</p>
+    <p class="q">2026-06-12 · Braudel 41pp · grain prices, Messina, the slowness of news → accessioned 2026-09-01 as NN-001.15</p>
+    <p>A returning visitor finds last spring&rsquo;s training log has become archaeology. The living site buries itself.</p>
+  </div>
+
+  <p class="fieldnote">The site holds no state, no progress, no unlock. The only save file is the visitor&rsquo;s mind: <b>NN-005.02</b>, read after <b>NN-007.01</b>, is a different object than before. Depth of experience equals depth of reading.</p>
+
+  <footer>
+    <p class="plateline">Plate IV &middot; The Second Study &middot; a demonstration wearing the real corpus &middot; graphite, one conventional red, nothing a site illustrator would not draw</p>
+  </footer>
+</div>
+<!-- methods: trench dug by hand in one sitting; sieve size, 25 words; no sepia, no dust, no whip. -->
