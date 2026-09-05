@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <section>
+    <section className="canon leaf">
       <h1 className="list-title">Things that are not where you left them</h1>
       <hr />
       <ul className="entries" role="list">

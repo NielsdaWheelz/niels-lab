@@ -13,7 +13,7 @@ export const metadata = createPageMetadata({
 
 export default function Page() {
   return (
-    <section>
+    <section className="canon leaf">
       <PageTitle>projects</PageTitle>
       <ul className={styles.index} role="list">
         {getProjects().map((project) => (

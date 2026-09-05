@@ -12,7 +12,7 @@ export const metadata = createPageMetadata({
 
 export default function Page() {
   return (
-    <article>
+    <article className="canon leaf">
       <PageTitle>lab</PageTitle>
 
       <div className="prose">

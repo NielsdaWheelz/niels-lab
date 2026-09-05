@@ -9,7 +9,12 @@
   margin-top: 1rem;
 }
 
-/* evidence body: the labeled link to the primary source */
+/* anchor for the evidence aside's wide-viewport margin placement, below */
+.entry {
+  position: relative;
+}
+
+/* evidence body: the labeled link to the primary source (narrow fold) */
 .source {
   margin: 0.3rem 0 0.6rem;
 }
@@ -17,4 +22,38 @@
 .source img {
   display: block;
   margin-top: 0.35rem;
+}
+
+/*
+ * Wide viewports: the evidence details is superseded by an always-visible
+ * margin aside (spec §5.2, §8 kill list) — the same markup renders both
+ * ways, no dual path beyond this block. Each .entry is exactly the canon
+ * text column's width by ordinary block inheritance from the page's
+ * .canon wrapper (globals.css), so the aside can anchor to it directly
+ * without subgridding into the canon. Width and gap come from the canon's
+ * own tokens (--gloss-w/--gloss-gap in globals.css).
+ */
+@media (min-width: 76.0625rem) {
+  .evidence {
+    position: absolute;
+    top: 0;
+    left: calc(100% + var(--gloss-gap));
+    width: var(--gloss-w);
+  }
+
+  .evidence > summary {
+    display: none;
+  }
+
+  /* Closed <details> hides content via ::details-content
+     { content-visibility: hidden } in current engines; older engines use
+     display: none on the children. Both must be overridden for the aside
+     to render while the details stays closed. */
+  .evidence::details-content {
+    content-visibility: visible;
+  }
+
+  .evidence > .source {
+    display: block;
+  }
 }

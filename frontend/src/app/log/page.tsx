@@ -1,6 +1,7 @@
 import { PageTitle } from '@/app/components/PageTitle'
 import { createPageMetadata } from '@/app/site'
 import { getLedger, isStale } from '@/lib/ledger'
+import { ageStep, FAILURE_FACTOR } from '@/lib/ledger/inkAge'
 import styles from './log.module.css'
 
 export const revalidate = 86400
@@ -19,7 +20,7 @@ export default async function LogPage() {
   const today = new Date().toISOString().slice(0, 10)
 
   return (
-    <section>
+    <section className="canon leaf">
       <PageTitle>log</PageTitle>
       <p className="prose">
         Training, reading, shipping. The failures stay in.
@@ -35,13 +36,24 @@ export default async function LogPage() {
       <ol className={styles.rows} role="list">
         {events.map((event) => {
           const text = event.failed ? <s>{event.text}</s> : event.text
+          // Ledger ink-age (spec §5.4): the row's whole text ages together;
+          // a failure dries at FAILURE_FACTOR while its lesson stays exempt.
+          const step = ageStep(
+            event.date,
+            today,
+            event.failed ? FAILURE_FACTOR : 1,
+          )
+          const age = styles[`age${step}`]
 
           return (
-            <li key={`${event.date} ${event.text}`} className={styles.row}>
+            <li
+              key={`${event.date} ${event.text}`}
+              className={`${styles.row} ${age}`}
+            >
               <time className="date" dateTime={event.date}>
                 {event.date}
               </time>
-              <span className={styles.kind}>{event.kind}</span>
+              <span>{event.kind}</span>
               <span>
                 {event.href ? <a href={event.href}>{text}</a> : text}
                 {event.failed ? (

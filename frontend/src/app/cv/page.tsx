@@ -50,7 +50,7 @@ export default function CVPage() {
           about: { '@id': getPersonSchemaId() },
         }}
       />
-      <article>
+      <article className="canon leaf">
         <PageTitle>cv</PageTitle>
         <p className={styles.bio}>{bio}</p>
         <p className={`chrome ${styles.contact}`}>

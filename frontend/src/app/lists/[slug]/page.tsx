@@ -44,7 +44,7 @@ export default async function ListPage({
   const last = lastWritten(list)
 
   return (
-    <article>
+    <article className="canon leaf">
       <header>
         <h1 className="list-title">{list.title}</h1>
         <p className="chrome">

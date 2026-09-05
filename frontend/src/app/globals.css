@@ -1,25 +1,45 @@
 /*
- * The Pillow Book — design system (docs/pillow-book-spec.md §6).
+ * The Second Study — design system (docs/second-study-spec.md §7).
  * These tokens are the only source of color in the app; hex literals
  * outside this file are forbidden (docs/rules.md).
  *
- * WCAG contrast, computed 2026-08-09 (scratch script, WCAG 2.x math):
- *   dark ground #16161D:  lamplight 15.58:1 · murasaki 5.40:1 ·
- *                         celadon 6.90:1 · faded 5.37:1 — all AA
- *   light ground #F5F3F7: lamplight 16.33:1 · murasaki 8.24:1 ·
+ * Light is canonical (the leaf); dark is a true scene, not an afterthought
+ * (spec §2 "ground: paper"). theme.ts's default flips to match; the toggle
+ * and storage mechanism are unchanged.
+ *
+ * WCAG contrast, computed 2026-09-05 (scratch script, WCAG 2.x math):
+ *   leaf ground #F5F3F7:  lamplight 16.33:1 · murasaki 8.24:1 ·
  *                         celadon 4.83:1 · faded 4.87:1 — all AA
+ *   night ground #16161D: lamplight 15.58:1 · murasaki 5.40:1 ·
+ *                         celadon 6.90:1 · faded 5.37:1 — all AA
  *   --rule is a decorative hairline, never text.
+ *
+ * Ink-age steps (--age-0..4, spec §5.4): stepped interpolation from
+ * --lamplight toward --faded, t = 0, 0.25, 0.5, 0.75, 1. Every step is
+ * AA against its own ground:
+ *   leaf:   age-0 16.33:1 · age-1 12.68:1 · age-2 9.32:1 ·
+ *           age-3 6.67:1 · age-4 4.87:1
+ *   night:  age-0 15.58:1 · age-1 12.36:1 · age-2 9.65:1 ·
+ *           age-3 7.31:1 · age-4 5.37:1
  */
 
-/* Dark is canonical ("night writing"). Light is a true inverse. */
+/* Light is canonical ("the leaf"). Dark is a scene, not an inversion. */
 :root {
-  color-scheme: dark;
-  --ink: #16161d; /* page ground */
-  --lamplight: #f1edf5; /* body text */
-  --murasaki: #a87bc4; /* headings, links */
-  --celadon: #7fa99b; /* evidence marks, dates, counts */
-  --rule: #2a2833; /* hairlines */
-  --faded: #8f8a99; /* secondary text */
+  color-scheme: light;
+  --ink: #f5f3f7; /* page ground */
+  --lamplight: #16161d; /* body text */
+  --murasaki: #66327c; /* headings, links */
+  --celadon: #4a7367; /* evidence marks, dates, counts, lessons */
+  --rule: #ddd6e4; /* hairlines */
+  --faded: #6e6878; /* secondary text; ink-age floor */
+
+  /* Ledger ink-age (src/lib/ledger/inkAge.ts): stepped, not continuous, so
+     every color still traces to a token here. */
+  --age-0: #16161d;
+  --age-1: #2c2b34;
+  --age-2: #423f4b;
+  --age-3: #585461;
+  --age-4: #6e6878;
 
   /* Newsreader: ALL reading text. Quattro: dates, counts, chrome only. */
   --font-reading: var(--font-serif), 'Newsreader', Georgia, serif;
@@ -30,27 +50,53 @@
 /* Theme engine (src/lib/theme.ts): an inline head script sets
    data-theme on <html> before paint, from localStorage or
    prefers-color-scheme. */
-:root[data-theme='light'] {
-  color-scheme: light;
-  --ink: #f5f3f7;
-  --lamplight: #16161d;
-  --murasaki: #66327c;
-  --celadon: #4a7367;
-  --rule: #ddd6e4;
-  --faded: #6e6878;
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ink: #16161d;
+  --lamplight: #f1edf5;
+  --murasaki: #a87bc4;
+  --celadon: #7fa99b;
+  --rule: #2a2833;
+  --faded: #8f8a99;
+  --age-0: #f1edf5;
+  --age-1: #d9d4de;
+  --age-2: #c0bcc7;
+  --age-3: #a8a3b0;
+  --age-4: #8f8a99;
 }
 
 /* No-JS fallback: honor the system preference when the init script
    never ran (data-theme absent). */
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    color-scheme: light;
-    --ink: #f5f3f7;
-    --lamplight: #16161d;
-    --murasaki: #66327c;
-    --celadon: #4a7367;
-    --rule: #ddd6e4;
-    --faded: #6e6878;
+    color-scheme: dark;
+    --ink: #16161d;
+    --lamplight: #f1edf5;
+    --murasaki: #a87bc4;
+    --celadon: #7fa99b;
+    --rule: #2a2833;
+    --faded: #8f8a99;
+    --age-0: #f1edf5;
+    --age-1: #d9d4de;
+    --age-2: #c0bcc7;
+    --age-3: #a8a3b0;
+    --age-4: #8f8a99;
+  }
+}
+
+/* prefers-contrast: more — every ledger row reads at full ink, in either
+   theme. Matched against every root state so specificity can't strand it
+   behind the theme blocks above. */
+@media (prefers-contrast: more) {
+  :root,
+  :root:not([data-theme]),
+  :root[data-theme='dark'],
+  :root[data-theme='light'] {
+    --age-0: var(--lamplight);
+    --age-1: var(--lamplight);
+    --age-2: var(--lamplight);
+    --age-3: var(--lamplight);
+    --age-4: var(--lamplight);
   }
 }
 
@@ -68,7 +114,7 @@ html {
 
 body {
   margin: 0 auto;
-  max-width: 44rem;
+  max-width: 88rem;
   padding: 1.5rem 1.25rem 4rem;
   background: var(--ink);
   color: var(--lamplight);
@@ -126,6 +172,71 @@ hr {
   border: 0;
   border-top: 1px solid var(--rule);
   margin-block: 2rem;
+}
+
+/* ---------- the canon grid ---------- */
+
+/*
+ * The canon: an asymmetric two-margin grid. `.canon` alone is the bare
+ * layout (used by the running head and the footer); `.canon.leaf` also
+ * paints the night scene below. Content pages place their reading matter
+ * at the implicit text column and their evidence glosses in `.gloss`.
+ *
+ * Track formula — published in the colophon verbatim (spec §5.6):
+ *   text column   = --measure                = 68ch (kept from v1)
+ *   outer margin  = round(0.4 x --measure)   = 27ch — one Quattro gloss
+ *                   line's width; the schema guarantees 0..1 gloss per
+ *                   entry, so one line is all the margin must hold
+ *   inner margin  = 2.5rem, fixed             — a flat gutter beyond the
+ *                   body's own 1.25rem edge padding
+ *   spare         = 1fr                       — absorbs whatever is left
+ *                   on very wide viewports, the desk beyond the leaf
+ * Canon breakpoint: 76rem. Below it the grid collapses to a single
+ * block-flow column; the reserved margin folds away. Folding the gloss
+ * into its entry's own <details> disclosure is each page's job (spec
+ * §5.2) — this rule only owns the grid, not that markup.
+ */
+.canon {
+  --gloss-w: 27ch;
+  --gloss-gap: 1.5rem;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 2.5rem)
+    minmax(0, var(--measure))
+    minmax(0, var(--gloss-w))
+    minmax(0, 1fr);
+}
+
+.canon > * {
+  grid-column: 2;
+  min-width: 0;
+}
+
+@media (max-width: 76rem) {
+  .canon {
+    display: block;
+  }
+}
+
+/*
+ * Night is a scene, not an inversion (spec §7): on wide viewports, in the
+ * dark theme, the text column gets a second, flatter tone behind it — the
+ * lamplit leaf on the desk. A grid-item pseudo-element, sized to the text
+ * column and spanning every row, carries it. Two flat tones, no gradient:
+ * the desk is --ink; the leaf is --ink mixed 8% toward --lamplight.
+ */
+@media (min-width: 76.0625rem) {
+  :root[data-theme='dark'] .canon.leaf {
+    position: relative;
+  }
+
+  :root[data-theme='dark'] .canon.leaf::before {
+    content: '';
+    grid-column: 2;
+    grid-row: 1 / -1;
+    background: color-mix(in srgb, var(--ink) 92%, var(--lamplight) 8%);
+    z-index: -1;
+  }
 }
 
 /* ---------- primitives ---------- */
@@ -204,19 +315,29 @@ hr {
   text-indent: 0;
 }
 
-/* .chrome / .date / .count — Quattro small chrome. Quattro is ONLY
-   for dates, counts, evidence chrome, ledger rows — never reading
-   text. Dates and counts read in celadon. */
+/* .chrome / .date / .count / .gloss — Quattro small chrome. Quattro is
+   ONLY for dates, counts, evidence chrome, ledger rows, glosses — never
+   reading text. Dates, counts and glosses read in celadon. */
 .chrome,
 .date,
-.count {
+.count,
+.gloss {
   font-family: var(--font-chrome);
   font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
 }
 
 .date,
-.count {
+.count,
+.gloss {
+  color: var(--celadon);
+}
+
+.gloss {
+  line-height: 1.5;
+}
+
+.gloss a {
   color: var(--celadon);
 }
 
@@ -236,7 +357,8 @@ summary::-webkit-details-marker {
 /* .evidence — a details element carrying primary proof for an entry.
    <details class="evidence"><summary>label</summary>…</details>
    Celadon Quattro summary with a › mark that turns when open
-   (instant swap, not an animation). */
+   (instant swap, not an animation). Superseded on wide viewports by the
+   margin gloss (spec §8); this narrow-viewport fold is still load-bearing. */
 .evidence > summary {
   font-family: var(--font-chrome);
   font-size: 0.8125rem;
@@ -341,7 +463,7 @@ code .sh__token--comment {
   font-style: italic;
 }
 
-/* ---------- shell: skip link, nav, footer ---------- */
+/* ---------- shell: skip link, running head, footer ---------- */
 
 /* .sr-only — text for assistive technology only (e.g. the ledger's
    "failed:" cue, evidence summary names). */
@@ -375,37 +497,47 @@ code .sh__token--comment {
   border: 1px solid var(--rule);
 }
 
+/* .site-nav — the running head (rendered by components/nav.tsx), on every
+   leaf: site title at the text column's left edge, sections at its right,
+   a hairline beneath spanning the full canon width. The class name is also
+   cv/print.css's hook to drop it from the printed CV; keep it even though
+   nothing here styles it directly — `.canon` and `.running-head` do. */
 .site-nav {
+  margin-bottom: 3rem;
+  padding-block: 1rem 0.85rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.running-head {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
   gap: 0.25rem 1.25rem;
-  margin-bottom: 3rem;
+  justify-content: space-between;
 }
 
-.site-nav a {
+.running-head-name {
+  color: var(--lamplight);
   text-decoration: none;
 }
 
-.site-nav a:hover {
+.running-head-links {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.1rem;
+}
+
+.running-head-link {
+  color: var(--faded);
+  text-decoration: none;
+}
+
+.running-head-link:hover {
+  color: var(--lamplight);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
-}
-
-.nav-name {
-  font-style: italic;
-  color: var(--lamplight);
-  margin-right: auto;
-}
-
-.nav-link {
-  font-size: 0.9375rem;
-  color: var(--faded);
-}
-
-.nav-link:hover {
-  color: var(--lamplight);
 }
 
 .theme-toggle {

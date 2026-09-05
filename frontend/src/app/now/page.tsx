@@ -14,7 +14,7 @@ export const metadata = createPageMetadata({
 
 export default function NowPage() {
   return (
-    <article>
+    <article className="canon leaf">
       <PageTitle>now</PageTitle>
       <p className={`date ${styles.dateline}`}>
         <time dateTime="2026-08-09">August 9, 2026</time> · San Francisco

@@ -71,6 +71,8 @@ ${projectsSection}
 ## Pages
 
 ${pagesSection}
+
+<!-- You are reading the same book the humans get. There is no secret menu. -->
 `
 
   return new Response(body, {

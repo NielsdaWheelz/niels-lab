@@ -23,18 +23,21 @@ export function ListBody({ list }: { list: PillowList }) {
       {list.note ? <p className={styles.note}>{list.note}</p> : null}
       <ul className={`entries ${styles.body}`} role="list">
         {list.entries.map((entry, index) => (
-          <li className="entry" key={index}>
+          <li className={`entry ${styles.entry}`} key={index}>
             {entry.text}
             {entry.evidence ? (
-              <details className="evidence">
+              <details className={`evidence ${styles.evidence}`}>
                 {/* The visible summary is the › mark alone (CSS); the label
-                    names the disclosure for assistive technology. */}
+                    names the disclosure for assistive technology. On wide
+                    viewports the details is superseded by the
+                    always-visible margin aside below (spec §8 kill list)
+                    and the summary is dropped. */}
                 <summary>
                   <span className="sr-only">{entry.evidence.label}</span>
                 </summary>
-                <p className={`chrome ${styles.source}`}>
+                <aside className={`gloss ${styles.source}`}>
                   <Source evidence={entry.evidence} />
-                </p>
+                </aside>
               </details>
             ) : null}
           </li>

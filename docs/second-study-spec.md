@@ -64,7 +64,10 @@ entrance; the site's force comes from scale, margins, the hour, and the corpus i
 3. **Hour system** — `src/lib/hour.ts`: pure `band(date, tz) → HourBand` and
    `season(date)`; `src/content/hours.ts`: the typed table (§6) referencing corpus entries
    by `(slug, index)` so epigraphs are byte-identical by construction. `/` renders with
-   `revalidate: 3600`. Build-time fallback band: the small hours.
+   `revalidate: 3600`. The band is computed from the server clock at every render — a
+   server render always has a clock, so no fallback path exists (amended during QA
+   2026-09-05: the earlier "build-time fallback: the small hours" line described a
+   non-situation and would have required machinery the acceptance does not need).
 4. **Ledger ink-age** — `src/lib/ledger/inkAge.ts`: pure `ageStep(rowDate, today) → 0..4`
    mapped to stepped tokens `--age-0..--age-4` (defined in `globals.css`, both themes,
    every step AA — stepped, not continuous, so tokens remain the only color source).

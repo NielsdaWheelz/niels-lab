@@ -14,7 +14,19 @@ const publishedAtRegex = /^\d{4}-\d{2}-\d{2}$/
 
 const listsFile = 'src/content/lists.ts'
 const logFile = 'src/content/log.ts'
+const hoursFile = 'src/content/hours.ts'
+const inkAgeFile = 'src/lib/ledger/inkAge.ts'
 const logKinds = new Set(['train', 'read', 'ship', 'write'])
+// Spec §6: America/Los_Angeles wall-clock bands, 00–05 · 05–08 · 08–12 ·
+// 12–17 · 17–20 · 20–24.
+const hourBands = [
+  'small-hours',
+  'dawn',
+  'morning',
+  'afternoon',
+  'dusk',
+  'evening',
+]
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 // Lifting and meet numbers ship as prose only (spec §9): no evidence, ever.
 // A keyword tripwire, not a complete gate: it catches the obvious nouns,
@@ -421,6 +433,60 @@ function validateLog(events, errors, externalHrefs) {
   }
 }
 
+// Spec §6/§11: every band's epigraph must name a published list and an
+// in-range entry index, so the rendered line is byte-identical to the
+// corpus by construction; `opens` must resolve the same way.
+function validateHours(hourTable, errors, lists) {
+  const listBySlug = new Map(lists.map((list) => [list.slug, list]))
+
+  for (const bandName of hourBands) {
+    const entry = hourTable?.[bandName]
+    const where = `${hoursFile}: band "${bandName}"`
+
+    if (!entry) {
+      errors.push(`${where} is missing`)
+      continue
+    }
+
+    const epigraphList = listBySlug.get(entry.epigraph?.list)
+    if (!epigraphList) {
+      errors.push(
+        `${where}: epigraph list "${entry.epigraph?.list}" is not a published list`,
+      )
+    } else if (
+      !Number.isInteger(entry.epigraph?.index) ||
+      entry.epigraph.index < 0 ||
+      entry.epigraph.index >= epigraphList.entries.length
+    ) {
+      errors.push(
+        `${where}: epigraph index ${entry.epigraph?.index} is out of range for "${entry.epigraph?.list}"`,
+      )
+    }
+
+    if (!listBySlug.has(entry.opens)) {
+      errors.push(`${where}: opens "${entry.opens}" is not a published list`)
+    }
+  }
+}
+
+// Spec §6: AGE_STEPS/FAILURE_FACTOR must stay finite numbers. Reuses
+// loadExport rather than new machinery; ageStep itself isn't data and isn't
+// checked here.
+function validateInkAge(errors) {
+  const ageSteps = loadExport(inkAgeFile, 'AGE_STEPS', errors)
+  const failureFactor = loadExport(inkAgeFile, 'FAILURE_FACTOR', errors)
+  const constants = [
+    ...(Array.isArray(ageSteps) ? ageSteps : []),
+    failureFactor,
+  ]
+
+  for (const value of constants) {
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      errors.push(`${inkAgeFile}: ink-age constants must be finite numbers`)
+    }
+  }
+}
+
 // Dead proof is a build error; an unreachable network is not, so the site
 // still builds on a train.
 async function checkExternalHrefs(hrefs, errors, warnings) {
@@ -494,6 +560,10 @@ async function main() {
   const logEvents = loadExport(logFile, 'log', errors)
   validateLog(logEvents, errors, externalHrefs)
   totals.push(`log:${logEvents.length}`)
+
+  const hourTable = loadExport(hoursFile, 'hourTable', errors)
+  validateHours(hourTable, errors, lists)
+  validateInkAge(errors)
 
   await checkExternalHrefs(externalHrefs, errors, warnings)
 
