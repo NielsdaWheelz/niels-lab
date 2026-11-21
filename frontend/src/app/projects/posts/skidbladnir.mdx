@@ -1,0 +1,75 @@
+---
+title: 'Skíðblaðnir'
+publishedAt: '2026-11-20'
+summary: 'Every tmux session on every machine you own, on your desktop and your Android phone.'
+liveUrl: 'https://skid.nielseriknandal.com'
+repoUrl: 'https://github.com/NielsdaWheelz/skidbladnir'
+---
+
+Skíðblaðnir, skid for short, is a
+[Go gateway, CLI, and terminal UI](https://github.com/NielsdaWheelz/skidbladnir/tree/b0dd12a6d9865dac8938fdbba9d0fae7072d7cc0/cmd/skidbladnir)
+on each computer, plus a
+[Kotlin and Jetpack Compose Android app](https://github.com/NielsdaWheelz/skidbladnir/tree/b0dd12a6d9865dac8938fdbba9d0fae7072d7cc0/android).
+Each computer runs
+[its own gateway](https://github.com/NielsdaWheelz/skidbladnir/blob/b0dd12a6d9865dac8938fdbba9d0fae7072d7cc0/README.md#how-it-works)
+beside its tmux, reached over Tailscale; no computer relays another's
+terminal. I specified, built, and run it for my own three computers and one
+phone.
+
+The first decision was where sessions live. Before a scope reset to a tmux
+remote, my design kept its own state: SQLite as authority, hook and control
+sockets, and a registry of agents. The reset's answer:
+["tmux is the database and the process supervisor."](https://github.com/NielsdaWheelz/skidbladnir/blob/b0dd12a6d9865dac8938fdbba9d0fae7072d7cc0/docs/history.md#2-tmux-as-the-store)
+skid keeps its metadata in tmux user options, so a restart lists tmux again
+and a session started by hand appears in the inventory. The cost is a process
+per read: on 21 October, on one Mac with 18 to 20 agent sessions, the gateway
+used 13.6% of a core, its children 17.5%, and the tmux server 5.0%. Since
+v0.22.0 a budget bounds a steady listing to two tmux processes; I have not
+remeasured.
+
+The second was what a lost reply means. The first draft answered with
+[durable operations](https://github.com/NielsdaWheelz/skidbladnir/blob/b0dd12a6d9865dac8938fdbba9d0fae7072d7cc0/docs/history.md#3-at-most-once-never-replay):
+idempotency keys kept for 90 days and a recoveries endpoint. I kept its
+refusal to guess and dropped the machinery. Every effect on an existing
+session is one tmux command queue: a
+[guard](https://github.com/NielsdaWheelz/skidbladnir/blob/b0dd12a6d9865dac8938fdbba9d0fae7072d7cc0/internal/tmux/guard.go)
+on the server lifetime and session id, the effect, and an applied marker.
+Without the marker the outcome is `unknown`: reported, never retried. A lost
+join reply leaves the invitation spent.
+
+The third was
+[herdr](https://github.com/NielsdaWheelz/skidbladnir/blob/b0dd12a6d9865dac8938fdbba9d0fae7072d7cc0/docs/history.md#6-herdr-adopted-then-abandoned).
+On 22 September I planned to hand terminals, pane processes, and agent
+observations to it as a maintained upstream, and keep skid's Android app,
+gateways, and CLI. v0.7.0 ran over herdr on all three hosts on 24 September.
+On 25 September I split the tmux product back out so both could run side by
+side, and by 30 September I had retired herdr. herdr's interface did not suit
+me: it leans on the mouse and on shortcuts I found arcane, and pairing the
+phone was laborious. Having used skid, minimal and keyboard-first, I would not
+go back. The episode took eight days and two releases. skid's status research
+borrowed herdr's separation of detection from attention, its explicit
+unknown, and its startup readiness.
+
+Numbers, from GitHub's release lists on 2026-11-20: 80 releases between
+2026-08-27 and 2026-11-20, 39 of them in the first repository, now
+[herdr-mobile](https://github.com/NielsdaWheelz/herdr-mobile/releases), and
+41 in
+[its current one](https://github.com/NielsdaWheelz/skidbladnir/releases).
+Over tracked non-binary files, my
+[reduction campaign](https://github.com/NielsdaWheelz/skidbladnir/blob/b0dd12a6d9865dac8938fdbba9d0fae7072d7cc0/docs/history.md#9-the-48-reduction)
+of 21 to 23 October cut the repository from 101,192 lines to 52,309, 48.3%
+fewer: Go fell 29%, Kotlin 39%, and Markdown 75%.
+
+What is wrong with it. It is a
+[single-user prototype](https://github.com/NielsdaWheelz/skidbladnir/blob/b0dd12a6d9865dac8938fdbba9d0fae7072d7cc0/docs/architecture.md),
+calibrated to one owner, three computers, and one phone. There is no iOS app.
+The phone pairs only by scanning a QR code with Google Play services. There is
+no retained behavioral test suite. Each change is proven by
+[temporary tests](https://github.com/NielsdaWheelz/skidbladnir/blob/b0dd12a6d9865dac8938fdbba9d0fae7072d7cc0/docs/history.md#5-temporary-tests-over-a-retained-suite)
+at its boundary, then deleted; CI catches invalid source and broken builds,
+not session targeting, input delivery, pairing, terminal interaction, or
+client behavior. Sessions die with their tmux server, and I have not yet
+observed recovery from a real reboot.
+
+The calibration settles the rest: "Exact targets and at-most-once effects are
+not negotiable; availability and polish are."
